@@ -3,6 +3,7 @@ from openpilot.common.constants import CV
 from openpilot.common.realtime import DT_MDL
 from openpilot.sunnypilot.selfdrive.controls.lib.auto_lane_change import AutoLaneChangeController, AutoLaneChangeMode
 from openpilot.sunnypilot.selfdrive.controls.lib.lane_turn_desire import LaneTurnController
+from openpilot.common.params import Params
 
 LaneChangeState = log.LaneChangeState
 LaneChangeDirection = log.LaneChangeDirection
@@ -28,6 +29,9 @@ class DesireHelper:
     self.alc = AutoLaneChangeController(self)
     self.lane_turn_controller = LaneTurnController(self)
     self.lane_turn_direction = TurnDirection.none
+    self.params = Params()
+    self.auto_overtake = False
+    self.overtake_timer = 0.0
 
   @staticmethod
   def get_lane_change_direction(CS):
@@ -36,6 +40,7 @@ class DesireHelper:
   def update(self, carstate, lateral_active, lane_change_prob, left_edge_detected=False, right_edge_detected=False):
     self.alc.update_params()
     self.lane_turn_controller.update_params()
+    self.auto_overtake = self.params.get_bool("AutoOvertake")
     v_ego = carstate.vEgo
     one_blinker = carstate.leftBlinker != carstate.rightBlinker
     below_lane_change_speed = v_ego < LANE_CHANGE_SPEED_MIN
@@ -45,21 +50,38 @@ class DesireHelper:
                                                left_blinker=carstate.leftBlinker, right_blinker=carstate.rightBlinker, v_ego=v_ego)
     self.lane_turn_direction = self.lane_turn_controller.get_turn_direction()
 
+    # --- Auto Overtake (left only, no blinker) ---
+    auto_overtake_triggered = False
+    if self.auto_overtake and lateral_active and not below_lane_change_speed and not one_blinker:
+      # Simple condition: left lane free (no blindspot) and speed ok
+      if not carstate.leftBlindspot and not left_edge_detected:
+        self.overtake_timer += DT_MDL
+        if self.overtake_timer > 2.0:  # wait 2 seconds before triggering
+          auto_overtake_triggered = True
+      else:
+        self.overtake_timer = 0.0
+    else:
+      self.overtake_timer = 0.0
+
     if not lateral_active or self.lane_change_timer > LANE_CHANGE_TIME_MAX + self.alc.lane_change_time_extra or \
        self.alc.lane_change_set_timer == AutoLaneChangeMode.OFF:
       self.lane_change_state = LaneChangeState.off
       self.lane_change_direction = LaneChangeDirection.none
       self.lane_change_timer = 0.0
     else:
-      if self.lane_change_state == LaneChangeState.off and one_blinker and not self.prev_one_blinker and not below_lane_change_speed:
+      # Normal blinker-based or auto overtake
+      start_condition = (one_blinker and not self.prev_one_blinker) or auto_overtake_triggered
+
+      if self.lane_change_state == LaneChangeState.off and start_condition and not below_lane_change_speed:
         self.lane_change_state = LaneChangeState.preLaneChange
         self.lane_change_timer = 0.0
-        # Initialize lane change direction to prevent UI alert flicker
-        self.lane_change_direction = self.get_lane_change_direction(carstate)
+        self.lane_change_direction = LaneChangeDirection.left if auto_overtake_triggered else self.get_lane_change_direction(carstate)
+        if auto_overtake_triggered:
+          self.overtake_timer = 0.0
 
       elif self.lane_change_state == LaneChangeState.preLaneChange:
-        # Update lane change direction
-        self.lane_change_direction = self.get_lane_change_direction(carstate)
+        if not auto_overtake_triggered:
+          self.lane_change_direction = self.get_lane_change_direction(carstate)
 
         torque_applied = carstate.steeringPressed and \
                          ((carstate.steeringTorque > 0 and self.lane_change_direction == LaneChangeDirection.left) or
@@ -73,11 +95,14 @@ class DesireHelper:
 
         self.alc.update_lane_change(blindspot_detected, edge_detected, carstate.brakePressed, torque_applied)
 
-        if not one_blinker or below_lane_change_speed:
+        # For auto overtake, skip blinker requirement
+        blinker_ok = one_blinker or (auto_overtake_triggered or self.lane_change_direction == LaneChangeDirection.left and self.auto_overtake)
+
+        if (not blinker_ok and not auto_overtake_triggered) or below_lane_change_speed:
           self.lane_change_state = LaneChangeState.off
           self.lane_change_direction = LaneChangeDirection.none
           self.lane_change_timer = 0.0
-        elif (torque_applied or self.alc.auto_lane_change_allowed) and not self.alc.lane_change_blocked:
+        elif (torque_applied or self.alc.auto_lane_change_allowed or auto_overtake_triggered) and not self.alc.lane_change_blocked:
           self.lane_change_state = LaneChangeState.laneChangeStarting
           self.lane_change_timer = 0.0
 
