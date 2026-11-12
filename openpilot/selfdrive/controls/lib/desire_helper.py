@@ -13,6 +13,7 @@ LANE_CHANGE_SPEED_MIN = 20 * CV.MPH_TO_MS  # 20 mph == 8.9408 m/s
 LANE_CHANGE_TIME_MAX = 10.
 LANE_CHANGE_START_TIME = 0.5
 AUTO_OVERTAKE_DELAY = 2.0
+AUTO_OVERTAKE_SPEED_MIN = 60 * CV.KPH_TO_MS  # 60 km/h == 16.67 m/s
 
 # Lead qualification. x is meters ahead, v is absolute speed in m/s.
 AUTO_OVERTAKE_LEAD_PROB = 0.5
@@ -192,6 +193,7 @@ class DesireHelper:
       self.auto_overtake and
       lateral_active and
       not below_lane_change_speed and
+      v_ego >= AUTO_OVERTAKE_SPEED_MIN and
       not carstate.leftBlinker and
       not carstate.rightBlinker and
       not carstate.leftBlindspot and
