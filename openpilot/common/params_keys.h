@@ -140,6 +140,7 @@ inline static std::unordered_map<std::string, ParamKeyAttributes> keys = {
     {"ChestnutRetry", {CLEAR_ON_MANAGER_START | CLEAR_ON_IGNITION_ON, BOOL}},
     {"InitialCruiseSpeedKph", {PERSISTENT, INT, "40"}},
     {"NavDestination", {CLEAR_ON_MANAGER_START | CLEAR_ON_OFFROAD_TRANSITION, JSON}},
+    {"NavDestinationPending", {PERSISTENT, JSON}},  // destination typed on the device; navd geocodes it. Not BACKUP
     {"NavigationEnabled", {PERSISTENT, BOOL, "0"}},
     {"Offroad_ChestnutModelError", {CLEAR_ON_MANAGER_START, JSON}},
     {"Offroad_Pairing", {CLEAR_ON_MANAGER_START, JSON}},

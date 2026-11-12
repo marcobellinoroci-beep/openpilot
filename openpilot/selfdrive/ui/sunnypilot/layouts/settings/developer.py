@@ -61,9 +61,13 @@ class DeveloperLayoutSP(DeveloperLayout):
     self.mapbox_token_btn = button_item(tr("Mapbox Token"), self._mapbox_token_button_text, self._mapbox_token_description,
                                         callback=self._on_mapbox_token_clicked)
 
+    # Navigation: destination typed here. navd geocodes it with Mapbox and sets NavDestination when onroad.
+    self.nav_destination_btn = button_item(tr("Destinazione"), self._nav_destination_button_text, self._nav_destination_description,
+                                           callback=self._on_nav_destination_clicked)
+
     # zoompilot: no Error Log row, nothing writes error.log since sentry was removed
     self.items: list = [self.show_advanced_controls, self.enable_github_runner_toggle, self.enable_copyparty_toggle, self.prebuilt_toggle,
-                        self.mapbox_token_btn,]
+                        self.mapbox_token_btn, self.nav_destination_btn,]
 
   @staticmethod
   def _mapbox_token() -> str:
@@ -78,6 +82,52 @@ class DeveloperLayoutSP(DeveloperLayout):
     status = tr("Set") + f" ({token[:6]}…{token[-4:]})" if len(token) > 12 else (tr("Set") if token else tr("Not set"))
     return tr("Your own Mapbox access token (pk.…) for navigation routes. Leave empty and confirm to remove it.") + \
       f"<br><br>{tr('Status')}: {status}"
+
+  @staticmethod
+  def _nav_pending() -> dict:
+    pending = ui_state.params.get("NavDestinationPending")
+    return pending if isinstance(pending, dict) and str(pending.get("query") or "").strip() else {}
+
+  def _nav_destination_button_text(self) -> str:
+    return tr("MODIFICA") if self._nav_pending() else tr("IMPOSTA")
+
+  def _nav_destination_description(self) -> str:
+    pending = self._nav_pending()
+    intro = tr("Scrivi un indirizzo o un luogo. Viene cercato con Mapbox quando l'auto è accesa e la navigazione parte da sola. " +
+               "Servono Navigazione (Alpha) attiva e il Mapbox Token. Conferma un campo vuoto per cancellarla.")
+    if not pending:
+      return intro + "<br><br>" + tr("Stato") + ": " + tr("nessuna destinazione")
+    query = str(pending.get("query"))
+    status = pending.get("status")
+    message = str(pending.get("message") or "")
+    if status == "ok":
+      state = tr("destinazione") + f": {pending.get('name') or query}"
+    elif status == "error":
+      state = tr("errore") + f" ({query}): {message or tr('nessun risultato')}"
+    else:
+      state = tr("in attesa") + f": \"{query}\""
+      if message:
+        state += f" - {message}"
+      elif not self._mapbox_token():
+        state += " - " + tr("manca il Mapbox Token")
+      else:
+        state += " - " + tr("verrà cercata quando l'auto è accesa")
+    return intro + "<br><br>" + tr("Stato") + ": " + state
+
+  def _on_nav_destination_clicked(self):
+    def on_done(result: DialogResult, text: str):
+      if result != DialogResult.CONFIRM:
+        return
+      query = " ".join(text.split())
+      if query:
+        ui_state.params.put("NavDestinationPending", {"query": query, "status": "pending"})
+      else:
+        ui_state.params.remove("NavDestinationPending")
+        ui_state.params.remove("NavDestination")  # stop the current route too
+
+    current = str(self._nav_pending().get("query") or "")
+    dialog = InputDialogSP(tr("Destinazione"), tr("Indirizzo o luogo, es. Via Roma 1, Milano"), current_text=current, callback=on_done)
+    dialog.show()
 
   def _on_mapbox_token_clicked(self):
     def on_done(result: DialogResult, text: str):
