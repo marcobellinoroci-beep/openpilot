@@ -17,6 +17,8 @@ MANEUVER_TRANSITION_THRESHOLD = 10
 REROUTE_COUNTER_MIN = 3
 ROUTE_RESEND_PERIOD = 10  # updates (seconds); a restarted mapsd gets the route within this
 RECOMPUTE_HOLD = 10  # updates (seconds) between route requests
+MAPBOX_HOST = "https://api.mapbox.com"
+COMMA_NAV_HOST = API_HOST.rstrip('/') + '/v1/nav'
 
 
 def set_banner(instruction, banners, distance_to_maneuver):
@@ -50,9 +52,20 @@ class RouteEngine:
     self.recompute_hold = 0
     self.reroute_counter = 0
 
-    self.mapbox_token = os.environ.get("MAPBOX_TOKEN")
+    self.mapbox_token = self.get_mapbox_token()
     self.api = Api(self.params.get("DongleId")) if self.mapbox_token is None else None
-    self.mapbox_host = "https://api.mapbox.com" if self.mapbox_token is not None else API_HOST.rstrip('/') + '/v1/nav'
+    self.mapbox_host = MAPBOX_HOST if self.mapbox_token is not None else COMMA_NAV_HOST
+
+  def get_mapbox_token(self) -> str | None:
+    """Own Mapbox token: MAPBOX_TOKEN env var first, then the MapboxToken param (set from the device UI)."""
+    token = os.environ.get("MAPBOX_TOKEN")
+    if not token:
+      try:
+        token = self.params.get("MapboxToken")
+      except Exception:
+        token = None
+    token = token.strip() if isinstance(token, str) else None
+    return token or None
 
   def update(self):
     self.sm.update(0)
@@ -101,9 +114,14 @@ class RouteEngine:
     if lang is not None:
       lang = lang.replace('main_', '')
 
-    token = self.mapbox_token
+    # Re-read so a token entered after navd started is used on the next route request.
+    token = self.get_mapbox_token()
+    self.mapbox_token = token
     if token is None:
+      if self.api is None:
+        self.api = Api(self.params.get("DongleId"))
       token = self.api.get_token()
+    self.mapbox_host = MAPBOX_HOST if self.mapbox_token is not None else COMMA_NAV_HOST
 
     params = {
       'access_token': token,

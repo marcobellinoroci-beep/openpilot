@@ -19,6 +19,7 @@ from openpilot.system.ui.widgets.confirm_dialog import ConfirmDialog
 from openpilot.system.ui.widgets.list_view import button_item
 
 from openpilot.system.ui.sunnypilot.widgets.html_render import HtmlModalSP
+from openpilot.system.ui.sunnypilot.widgets.input_dialog import InputDialogSP
 from openpilot.system.ui.sunnypilot.widgets.list_view import toggle_item_sp
 
 PREBUILT_PATH = os.path.join(Paths.comma_home(), "prebuilt") if PC else "/data/openpilot/prebuilt"
@@ -56,8 +57,41 @@ class DeveloperLayoutSP(DeveloperLayout):
 
     self.error_log_btn = button_item(tr("Error Log"), tr("VIEW"), tr("View the error log for zoompilot crashes."), callback=self._on_error_log_clicked)
 
+    # Navigation: own Mapbox token for navd (MAPBOX_TOKEN env var still wins when set).
+    self.mapbox_token_btn = button_item(tr("Mapbox Token"), self._mapbox_token_button_text, self._mapbox_token_description,
+                                        callback=self._on_mapbox_token_clicked)
+
     # zoompilot: no Error Log row, nothing writes error.log since sentry was removed
-    self.items: list = [self.show_advanced_controls, self.enable_github_runner_toggle, self.enable_copyparty_toggle, self.prebuilt_toggle,]
+    self.items: list = [self.show_advanced_controls, self.enable_github_runner_toggle, self.enable_copyparty_toggle, self.prebuilt_toggle,
+                        self.mapbox_token_btn,]
+
+  @staticmethod
+  def _mapbox_token() -> str:
+    token = ui_state.params.get("MapboxToken")
+    return token.strip() if isinstance(token, str) else ""
+
+  def _mapbox_token_button_text(self) -> str:
+    return tr("EDIT") if self._mapbox_token() else tr("SET")
+
+  def _mapbox_token_description(self) -> str:
+    token = self._mapbox_token()
+    status = tr("Set") + f" ({token[:6]}…{token[-4:]})" if len(token) > 12 else (tr("Set") if token else tr("Not set"))
+    return tr("Your own Mapbox access token (pk.…) for navigation routes. Leave empty and confirm to remove it.") + \
+      f"<br><br>{tr('Status')}: {status}"
+
+  def _on_mapbox_token_clicked(self):
+    def on_done(result: DialogResult, text: str):
+      if result != DialogResult.CONFIRM:
+        return
+      token = text.strip()
+      if token:
+        ui_state.params.put("MapboxToken", token)
+      else:
+        ui_state.params.remove("MapboxToken")
+
+    dialog = InputDialogSP(tr("Mapbox Token"), tr("Paste or type your Mapbox access token"), current_text=self._mapbox_token(),
+                           callback=on_done)
+    dialog.show()
 
   @staticmethod
   def _on_prebuilt_toggled(state):
