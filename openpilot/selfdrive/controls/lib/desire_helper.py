@@ -13,12 +13,27 @@ LANE_CHANGE_SPEED_MIN = 20 * CV.MPH_TO_MS  # 20 mph == 8.9408 m/s
 LANE_CHANGE_TIME_MAX = 10.
 LANE_CHANGE_START_TIME = 0.5
 AUTO_OVERTAKE_DELAY = 2.0
+AUTO_OVERTAKE_LEAD_VREL = -1.0  # m/s; lead must be at least this much slower than ego
+AUTO_OVERTAKE_LEAD_PROB = 0.5
 
 TURN_DESIRES = {
   TurnDirection.none: log.Desire.none,
   TurnDirection.turnLeft: log.Desire.turnLeft,
   TurnDirection.turnRight: log.Desire.turnRight,
 }
+
+
+def is_slower_lead(leads, v_ego):
+  """True if the current model lead is ahead, confident, and slower than ego."""
+  if not leads:
+    return False
+  lead = leads[0]
+  try:
+    v_rel = lead.v[0] - v_ego
+    return lead.prob > AUTO_OVERTAKE_LEAD_PROB and lead.x[0] > 0.0 and v_rel < AUTO_OVERTAKE_LEAD_VREL
+  except (IndexError, AttributeError, TypeError):
+    return False
+
 
 class DesireHelper:
   def __init__(self):
@@ -39,7 +54,7 @@ class DesireHelper:
   def get_lane_change_direction(CS):
     return LaneChangeDirection.left if CS.leftBlinker else LaneChangeDirection.right
 
-  def update(self, carstate, lateral_active, lane_change_prob, left_edge_detected=False, right_edge_detected=False, has_slower_lead=False):
+  def update(self, carstate, lateral_active, lane_change_prob, left_edge_detected=False, right_edge_detected=False, slower_lead_detected=False):
     self.alc.update_params()
     self.lane_turn_controller.update_params()
     self.auto_overtake = self.params.get_bool("AutoOvertake")
@@ -65,7 +80,7 @@ class DesireHelper:
       not left_edge_detected and
       self.lane_change_state == LaneChangeState.off and
       self.alc.lane_change_set_timer != AutoLaneChangeMode.OFF and
-      has_slower_lead
+      slower_lead_detected
     )
     if overtake_conditions:
       self.overtake_timer += DT_MDL
