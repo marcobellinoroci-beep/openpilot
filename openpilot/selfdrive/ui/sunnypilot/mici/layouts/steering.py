@@ -130,8 +130,13 @@ class SteeringLayoutMici(NavScroller):
     self._lc_level = BigMultiParamToggleSP(tr("lane change") + "\n" + tr("smoothing"), "LaneChangeSmoothing", LC_LEVEL_LABELS, off_index=0,
                                            description=tr("Makes lane changes slower and smoother.\n" +
                                                           "Off is stock. Every other pace is slower."))
-    self._lc_view = self._lane_change_btn.link_sub_panel([self._lc_timer, self._lc_bsm, self._lc_road_edge,
-                                                          self._lc_level])
+    # Auto Overtake toggle
+self._auto_overtake = BigParamControlSP(tr("auto overtake"), "AutoOvertake",
+                                        description=tr("Automatically changes to the left lane when the left lane is clear.\\n" +
+                                                       "Works even without using the blinker. Use with caution."))
+
+self._lc_view = self._lane_change_btn.link_sub_panel([self._lc_timer, self._lc_bsm, self._lc_road_edge,
+                                                      self._lc_level, self._auto_overtake])
 
     # BlinkerPauseLateralControl is the picker's off; the speed is stored in the display unit
     self._blinker_speed = BigParamOption(tr("blinker pauses steering"), "BlinkerMinLateralControlSpeed",
