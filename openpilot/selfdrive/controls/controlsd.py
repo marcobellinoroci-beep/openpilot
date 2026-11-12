@@ -128,6 +128,26 @@ class Controls(ControlsExt):
       CC.leftBlinker = model_v2.meta.laneChangeDirection == LaneChangeDirection.left
       CC.rightBlinker = model_v2.meta.laneChangeDirection == LaneChangeDirection.right
 
+    # Long-press engagement button (SET/RESUME) for 2s to toggle AutoOvertake
+    # Detect via carState cruise buttons or events. Simple timer based on button held.
+    if not hasattr(self, '_ao_press_timer'):
+      self._ao_press_timer = 0.0
+      self._ao_was_pressed = False
+    # Approximate: if SET or RESUME is held (common on many cars including Tesla stalk)
+    # This is a lightweight check; refine if needed.
+    button_held = (hasattr(CS, 'cruiseState') and 
+                   (getattr(CS.cruiseState, 'set', False) or getattr(CS.cruiseState, 'resume', False)))
+    if button_held:
+      self._ao_press_timer += DT_CTRL
+      if self._ao_press_timer >= 2.0 and not self._ao_was_pressed:
+        current = self.params.get_bool("AutoOvertake")
+        self.params.put_bool("AutoOvertake", not current)
+        self._ao_was_pressed = True
+        cloudlog.info(f"AutoOvertake toggled to {not current}")
+    else:
+      self._ao_press_timer = 0.0
+      self._ao_was_pressed = False
+
     if not CC.latActive:
       self.LaC.reset()
     if not CC.longActive:
