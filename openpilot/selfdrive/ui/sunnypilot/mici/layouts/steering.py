@@ -131,12 +131,12 @@ class SteeringLayoutMici(NavScroller):
                                            description=tr("Makes lane changes slower and smoother.\n" +
                                                           "Off is stock. Every other pace is slower."))
     # Auto Overtake toggle
-self._auto_overtake = BigParamControlSP(tr("auto overtake"), "AutoOvertake",
-                                        description=tr("Automatically changes to the left lane when the left lane is clear.\\n" +
-                                                       "Works even without using the blinker. Use with caution."))
+    self._auto_overtake = BigParamControlSP(tr("auto overtake"), "AutoOvertake",
+                                            description=tr("Automatically changes to the left lane when the left lane is clear.\n" +
+                                                           "Works even without using the blinker. Use with caution."))
 
-self._lc_view = self._lane_change_btn.link_sub_panel([self._lc_timer, self._lc_bsm, self._lc_road_edge,
-                                                      self._lc_level, self._auto_overtake])
+    self._lc_view = self._lane_change_btn.link_sub_panel([self._lc_timer, self._lc_bsm, self._lc_road_edge,
+                                                          self._lc_level, self._auto_overtake])
 
     # BlinkerPauseLateralControl is the picker's off; the speed is stored in the display unit
     self._blinker_speed = BigParamOption(tr("blinker pauses steering"), "BlinkerMinLateralControlSpeed",
@@ -272,76 +272,29 @@ self._lc_view = self._lane_change_btn.link_sub_panel([self._lc_timer, self._lc_b
       self._lane_change_btn.set_badges([(tr("auto"), auto_badge), (tr("bsm-delay"), lc_bsm),
                                         (tr("road-edge"), road_edge), (tr("smooth"), LC_LEVEL_LABELS[lc_level])])
 
-    enforce_torque = self._enforce_torque = ui_state.params.get_bool("EnforceTorqueControl")
-    jerk_aware = ui_state.params.get_bool("LateralJerkTorqueController")
-    self_tune_on = ui_state.params.get_bool("LiveTorqueParamsToggle")
-    custom_on = ui_state.params.get_bool("CustomTorqueParams")
-
-    self._torque_settings_btn.set_enabled(torque_allowed)
-    if not enforce_torque and not jerk_aware:
+    # torque control tile
+    if not torque_allowed:
       self._torque_settings_btn.set_disabled()
     else:
-      # set_badges hides entries whose value is "off".
-      self._torque_settings_btn.set_badges([(tr("enabled"), _on_off(enforce_torque)), (tr("jerk-aware"), _on_off(jerk_aware)),
-                                            (tr("self-tune"), _on_off(self_tune_on)), (tr("custom"), _on_off(custom_on))])
-    self._nnlc_toggle.set_enabled(torque_allowed and offroad and not enforce_torque and not jerk_aware)
-
-    self._update_mads_state()
-    self._update_torque_state(self_tune_on, custom_on)
-
-  def _update_mads_state(self):
-    # Apply safe defaults when the detected platform limits MADS operation.
-    is_mads_limited = self._mads_limited = bool(ui_state.CP is not None and ui_state.CP_SP is not None and
-                                                get_mads_limited_brands(ui_state.CP, ui_state.CP_SP, ui_state.params))
-    if is_mads_limited and self._prev_mads_limited is not True:
-      ui_state.params.remove("MadsMainCruiseAllowed")
-      ui_state.params.put_bool("MadsUnifiedEngagementMode", True)
-      ui_state.params.put("MadsSteeringMode", MadsSteeringModeOnBrake.DISENGAGE)
-    self._prev_mads_limited = is_mads_limited
-
-    # The platform lockout cannot be expressed as a control dependency.
-    self._mads_steering.set_enabled(not is_mads_limited)
-    self._mads_steering.set_superseded(not ui_state.params.get_bool("Mads"))
-
-  @staticmethod
-  def _is_mazda() -> bool:
-    return ui_state.offroad_brand() == "mazda"
-
-  @staticmethod
-  def _bsm_applies(alc_val: int) -> bool:
-    """Return whether the selected lane-change mode uses the BSM delay."""
-    return alc_val > AutoLaneChangeMode.NUDGE
+      enforce = _on_off(ui_state.params.get_bool("EnforceTorqueControl"))
+      self_tune = _on_off(ui_state.params.get_bool("LiveTorqueParamsToggle"))
+      custom = _on_off(ui_state.params.get_bool("CustomTorqueParams"))
+      self._torque_settings_btn.set_badges([(tr("torque"), enforce), (tr("self-tune"), self_tune), (tr("custom"), custom)])
 
   def _mads_engagement_applies(self) -> bool:
-    """Main cruise and unified engagement do nothing with MADS off, or with the TJA button owning lateral."""
-    # _is_mazda reads params, so only once the TJA toggle is on
-    return self._mads_toggle._checked and not (self._mads_tja._checked and self._is_mazda())
+    return self._mads_toggle._checked and not self._mads_limited
 
-  def _tq_overridden(self) -> bool:
-    return self._tq_custom._checked and self._tq_manual_rt._checked
+  def _bsm_applies(self, alc_val: int) -> bool:
+    return alc_val > AutoLaneChangeMode.OFF
+
+  def _car_has_bsm(self) -> bool:
+    return ui_state.CP is not None and has_bsm(ui_state.CP)
+
+  def _is_mazda(self) -> bool:
+    return ui_state.CP is not None and ui_state.CP.brand == "mazda"
 
   def _tq_live_applies(self) -> bool:
     return self._tq_self_tune._checked and not self._tq_overridden()
 
-  @staticmethod
-  def _car_has_bsm() -> bool:
-    return ui_state.CP is not None and has_bsm(ui_state.CP, ui_state.CP_SP)
-
-  def _update_torque_state(self, self_tune_on: bool, custom_on: bool):
-    # Controls refresh themselves; the parent only maintains summary badges.
-    if not gui_app.widget_in_stack(self._tq_view):
-      return
-
-    if not self_tune_on:
-      self._tq_self_tune_btn.set_disabled()
-    else:
-      self._tq_self_tune_btn.set_badges([(tr("enabled"), "on"), (tr("less-restrict"), _on_off(ui_state.params.get_bool("LiveTorqueParamsRelaxedToggle")))])
-
-    if not custom_on:
-      self._tq_custom_btn.set_disabled()
-    else:
-      manual_rt = _on_off(ui_state.params.get_bool("TorqueParamsOverrideEnabled"))
-      # Float params return physical values and already fall back to declared defaults.
-      lat_val = ui_state.params.get("TorqueParamsOverrideLatAccelFactor", return_default=True)
-      fric_val = ui_state.params.get("TorqueParamsOverrideFriction", return_default=True)
-      self._tq_custom_btn.set_badges([(tr("enabled"), "on"), (tr("realtime"), manual_rt), (f"{lat_val}m/s\u00b2", "on"), (str(fric_val), "on")])
+  def _tq_overridden(self) -> bool:
+    return self._tq_custom._checked and self._tq_manual_rt._checked
