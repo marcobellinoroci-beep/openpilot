@@ -13,8 +13,30 @@ LANE_CHANGE_SPEED_MIN = 20 * CV.MPH_TO_MS  # 20 mph == 8.9408 m/s
 LANE_CHANGE_TIME_MAX = 10.
 LANE_CHANGE_START_TIME = 0.5
 AUTO_OVERTAKE_DELAY = 2.0
-AUTO_OVERTAKE_LEAD_VREL = -1.0  # m/s; lead must be at least this much slower than ego
+
+# Lead qualification. x is meters ahead, v is absolute speed in m/s.
 AUTO_OVERTAKE_LEAD_PROB = 0.5
+AUTO_OVERTAKE_LEAD_MAX_X = 70.0  # m; ignore leads farther than this
+# Slightly slower than ego. -1.0 m/s never fired once longitudinal control had
+# matched the lead (v_rel ~ 0) or when the lead was only a little slower.
+AUTO_OVERTAKE_LEAD_VREL = -0.3  # m/s; v_lead - v_ego must be below this
+# Used only when the caller omits v_cruise_kph, so that path stays unchanged.
+AUTO_OVERTAKE_LEAD_VREL_LEGACY = -1.0  # m/s
+# carState.vCruise is kph. 255 is the unset sentinel; <= 0 is also unset.
+AUTO_OVERTAKE_VCRUISE_UNSET_KPH = 255.0
+AUTO_OVERTAKE_LEAD_BELOW_SET_SPEED = 1.0  # m/s; v_lead must be at least this far under the set speed
+# One model frame is 0.05 s. A dropout shorter than this must not zero overtake_timer.
+AUTO_OVERTAKE_LEAD_DROPOUT_HOLD = 0.5  # s
+
+# Left adjacent lane. laneLineProbs[0] is the far-left line, [1] is the ego-left line.
+# Both have to be confident or the lane is not treated as present.
+LEFT_LANE_LINE_PROB_MIN = 0.5
+# modelV2 has no adjacent-object list. leadsV3 is the only cheap occupancy signal:
+# a confident lead whose current y lies between those two lines occupies the lane.
+# Model y is positive to the right, so the left lane is the more-negative band.
+# The inset keeps a vehicle riding the shared line from counting as in-lane.
+LEFT_LANE_OCCUPANCY_MARGIN_M = 0.4  # m
+LEFT_LANE_LEAD_PROB_MIN = 0.5
 
 TURN_DESIRES = {
   TurnDirection.none: log.Desire.none,
@@ -23,16 +45,109 @@ TURN_DESIRES = {
 }
 
 
-def is_slower_lead(leads, v_ego):
-  """True if the current model lead is ahead, confident, and slower than ego."""
+def _cruise_set_speed_ms(v_cruise_kph):
+  """Cruise set speed in m/s, or None when it is unset.
+
+  carState.vCruise is kph. <= 0 or >= 255 (the unset sentinel) means no setpoint.
+  """
+  try:
+    v_kph = float(v_cruise_kph)
+  except (TypeError, ValueError):
+    return None
+  if v_kph <= 0.0 or v_kph >= AUTO_OVERTAKE_VCRUISE_UNSET_KPH:
+    return None
+  return v_kph * CV.KPH_TO_MS
+
+
+def is_slower_lead(leads, v_ego, v_cruise_kph=None):
+  """True if the current model lead is one auto-overtake should consider.
+
+  Confident (prob > 0.5) and ahead. When v_cruise_kph is omitted the legacy
+  predicate is kept (v_lead - v_ego < -1 m/s, no distance cap, no set-speed
+  check) so existing callers do not change.
+
+  When v_cruise_kph is passed (carState.vCruise, kph) the lead must also be
+  within AUTO_OVERTAKE_LEAD_MAX_X and either slightly slower than ego
+  (v_lead - v_ego < -0.3 m/s) or more than ~1 m/s below the cruise set speed.
+  A matched lead (v_rel ~ 0) still counts in that second case. 255 or <= 0
+  means the setpoint is unset and only the relative-speed check applies.
+  """
   if not leads:
     return False
   lead = leads[0]
   try:
-    v_rel = lead.v[0] - v_ego
-    return lead.prob > AUTO_OVERTAKE_LEAD_PROB and lead.x[0] > 0.0 and v_rel < AUTO_OVERTAKE_LEAD_VREL
-  except (IndexError, AttributeError, TypeError):
+    v_lead = float(lead.v[0])
+    x = float(lead.x[0])
+    prob = float(lead.prob)
+    v_ego = float(v_ego)
+  except (IndexError, AttributeError, TypeError, ValueError):
     return False
+
+  if not (prob > AUTO_OVERTAKE_LEAD_PROB and x > 0.0):
+    return False
+
+  v_rel = v_lead - v_ego
+  if v_cruise_kph is None:
+    return v_rel < AUTO_OVERTAKE_LEAD_VREL_LEGACY
+
+  if x >= AUTO_OVERTAKE_LEAD_MAX_X:
+    return False
+  if v_rel < AUTO_OVERTAKE_LEAD_VREL:
+    return True
+
+  v_set = _cruise_set_speed_ms(v_cruise_kph)
+  if v_set is None:
+    return False
+  return v_lead < (v_set - AUTO_OVERTAKE_LEAD_BELOW_SET_SPEED)
+
+
+def is_left_lane_clear(model_v2):
+  """True when the left adjacent lane exists and no model lead is sitting in it.
+
+  Existence: far-left laneLineProbs[0] and ego-left laneLineProbs[1] both above
+  LEFT_LANE_LINE_PROB_MIN, with the far line actually to the left of the near one.
+  Occupancy: leadsV3 are time-offset lead hypotheses, not a dedicated object list,
+  but a confident lead whose current (x, y) falls strictly inside that band is
+  treated as occupying the lane. Missing lane data returns False.
+  """
+  try:
+    probs = model_v2.laneLineProbs
+    lines = model_v2.laneLines
+    if len(probs) < 2 or len(lines) < 2:
+      return False
+    if not (probs[0] > LEFT_LANE_LINE_PROB_MIN and probs[1] > LEFT_LANE_LINE_PROB_MIN):
+      return False
+    y_far = float(lines[0].y[0])
+    y_near = float(lines[1].y[0])
+  except (IndexError, AttributeError, TypeError, ValueError):
+    return False
+
+  # Far-left line must sit to the left of the ego-left line.
+  if not y_far < y_near:
+    return False
+  y_lo = y_far + LEFT_LANE_OCCUPANCY_MARGIN_M
+  y_hi = y_near - LEFT_LANE_OCCUPANCY_MARGIN_M
+  if y_lo >= y_hi:
+    return False
+
+  try:
+    leads = model_v2.leadsV3
+  except (AttributeError, TypeError):
+    return True
+
+  for lead in leads:
+    try:
+      if not (float(lead.prob) > LEFT_LANE_LEAD_PROB_MIN):
+        continue
+      x = float(lead.x[0])
+      y = float(lead.y[0])
+    except (IndexError, AttributeError, TypeError, ValueError):
+      continue
+    if x <= 0.0 or x >= AUTO_OVERTAKE_LEAD_MAX_X:
+      continue
+    if y_lo < y < y_hi:
+      return False
+  return True
 
 
 class DesireHelper:
@@ -49,12 +164,13 @@ class DesireHelper:
     self.auto_overtake = False
     self.auto_overtake_active = False
     self.overtake_timer = 0.0
+    self.lead_dropout_timer = 0.0
 
   @staticmethod
   def get_lane_change_direction(CS):
     return LaneChangeDirection.left if CS.leftBlinker else LaneChangeDirection.right
 
-  def update(self, carstate, lateral_active, lane_change_prob, left_edge_detected=False, right_edge_detected=False, slower_lead_detected=False):
+  def update(self, carstate, lateral_active, lane_change_prob, left_edge_detected=False, right_edge_detected=False, slower_lead_detected=False, left_lane_clear=True):
     self.alc.update_params()
     self.lane_turn_controller.update_params()
     self.auto_overtake = self.params.get_bool("AutoOvertake")
@@ -70,7 +186,9 @@ class DesireHelper:
     # --- Auto Overtake (left only, no blinker required) ---
     # Count only while the state machine is off. On a 2s hold, enter preLaneChange
     # left and let AutoLaneChangeController / the existing machine finish the change.
-    overtake_conditions = (
+    # left_lane_clear defaults True so callers that do not compute it are unchanged.
+    # A lead dropout shorter than AUTO_OVERTAKE_LEAD_DROPOUT_HOLD does not zero the timer.
+    overtake_ready = (
       self.auto_overtake and
       lateral_active and
       not below_lane_change_speed and
@@ -78,14 +196,19 @@ class DesireHelper:
       not carstate.rightBlinker and
       not carstate.leftBlindspot and
       not left_edge_detected and
+      left_lane_clear and
       self.lane_change_state == LaneChangeState.off and
-      self.alc.lane_change_set_timer != AutoLaneChangeMode.OFF and
-      slower_lead_detected
+      self.alc.lane_change_set_timer != AutoLaneChangeMode.OFF
     )
-    if overtake_conditions:
+    if overtake_ready and slower_lead_detected:
+      self.overtake_timer += DT_MDL
+      self.lead_dropout_timer = 0.0
+    elif overtake_ready and self.overtake_timer > 0.0 and self.lead_dropout_timer < AUTO_OVERTAKE_LEAD_DROPOUT_HOLD:
+      self.lead_dropout_timer += DT_MDL
       self.overtake_timer += DT_MDL
     else:
       self.overtake_timer = 0.0
+      self.lead_dropout_timer = 0.0
 
     if not lateral_active or self.lane_change_timer > LANE_CHANGE_TIME_MAX + self.alc.lane_change_time_extra or \
        self.alc.lane_change_set_timer == AutoLaneChangeMode.OFF:
