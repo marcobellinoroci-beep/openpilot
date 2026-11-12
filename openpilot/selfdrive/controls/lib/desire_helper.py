@@ -39,7 +39,7 @@ class DesireHelper:
   def get_lane_change_direction(CS):
     return LaneChangeDirection.left if CS.leftBlinker else LaneChangeDirection.right
 
-  def update(self, carstate, lateral_active, lane_change_prob, left_edge_detected=False, right_edge_detected=False):
+  def update(self, carstate, lateral_active, lane_change_prob, left_edge_detected=False, right_edge_detected=False, has_slower_lead=False):
     self.alc.update_params()
     self.lane_turn_controller.update_params()
     self.auto_overtake = self.params.get_bool("AutoOvertake")
@@ -64,7 +64,8 @@ class DesireHelper:
       not carstate.leftBlindspot and
       not left_edge_detected and
       self.lane_change_state == LaneChangeState.off and
-      self.alc.lane_change_set_timer != AutoLaneChangeMode.OFF
+      self.alc.lane_change_set_timer != AutoLaneChangeMode.OFF and
+      has_slower_lead
     )
     if overtake_conditions:
       self.overtake_timer += DT_MDL
