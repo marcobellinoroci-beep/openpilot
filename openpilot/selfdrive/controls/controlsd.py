@@ -128,25 +128,38 @@ class Controls(ControlsExt):
       CC.leftBlinker = model_v2.meta.laneChangeDirection == LaneChangeDirection.left
       CC.rightBlinker = model_v2.meta.laneChangeDirection == LaneChangeDirection.right
 
-    # Long-press engagement button (SET/RESUME) for 2s to toggle AutoOvertake
-    # Detect via carState cruise buttons or events. Simple timer based on button held.
+    # Long-press any engagement-related button for 2s to toggle AutoOvertake
+    # More robust detection for Tesla and other cars
     if not hasattr(self, '_ao_press_timer'):
       self._ao_press_timer = 0.0
-      self._ao_was_pressed = False
-    # Approximate: if SET or RESUME is held (common on many cars including Tesla stalk)
-    # This is a lightweight check; refine if needed.
-    button_held = (hasattr(CS, 'cruiseState') and 
-                   (getattr(CS.cruiseState, 'set', False) or getattr(CS.cruiseState, 'resume', False)))
-    if button_held:
+      self._ao_last_toggle = 0.0
+
+    # Detect button activity via cruise state changes or common button fields
+    button_active = False
+    if hasattr(CS, 'cruiseState'):
+      cs = CS.cruiseState
+      button_active = (getattr(cs, 'set', False) or 
+                       getattr(cs, 'resume', False) or 
+                       getattr(cs, 'cancel', False) or
+                       getattr(cs, 'available', False) and not getattr(cs, 'enabled', True))
+
+    # Also check onroadEvents for button presses if available
+    if self.sm.updated.get('onroadEvents', False):
+      for e in self.sm['onroadEvents']:
+        if e.name in ('buttonEnable', 'buttonCancel', 'buttonSet', 'buttonResume'):
+          button_active = True
+
+    now = self.sm.logMonoTime['carState'] / 1e9 if 'carState' in self.sm.logMonoTime else 0
+    if button_active:
       self._ao_press_timer += DT_CTRL
-      if self._ao_press_timer >= 2.0 and not self._ao_was_pressed:
+      if self._ao_press_timer >= 2.0 and (now - self._ao_last_toggle) > 3.0:
         current = self.params.get_bool("AutoOvertake")
         self.params.put_bool("AutoOvertake", not current)
-        self._ao_was_pressed = True
-        cloudlog.info(f"AutoOvertake toggled to {not current}")
+        self._ao_last_toggle = now
+        self._ao_press_timer = 0.0
+        cloudlog.info(f"AutoOvertake toggled via long-press to {not current}")
     else:
-      self._ao_press_timer = 0.0
-      self._ao_was_pressed = False
+      self._ao_press_timer = max(0.0, self._ao_press_timer - DT_CTRL * 2)
 
     if not CC.latActive:
       self.LaC.reset()
