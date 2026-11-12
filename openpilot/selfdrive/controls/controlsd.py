@@ -30,6 +30,14 @@ LaneChangeDirection = log.LaneChangeDirection
 
 ACTUATOR_FIELDS = tuple(car.CarControl.Actuators.schema.fields.keys())
 
+# Button types for engagement (adjust if needed for your car)
+ENGAGE_BUTTONS = {
+  car.CarState.ButtonEvent.Type.accelCruise,
+  car.CarState.ButtonEvent.Type.decelCruise,
+  car.CarState.ButtonEvent.Type.setCruise,
+  car.CarState.ButtonEvent.Type.resumeCruise,
+  car.CarState.ButtonEvent.Type.mainCruise,
+}
 
 class Controls(ControlsExt):
   def __init__(self) -> None:
@@ -70,6 +78,11 @@ class Controls(ControlsExt):
 
     self.LaC = ControlsExt.initialize_lateral_control(self, self.LaC, self.CI, DT_CTRL)
 
+    # Long press for AutoOvertake toggle
+    self.engage_button_timer = 0.0
+    self.engage_button_was_pressed = False
+    self.auto_overtake_toggled = False
+
   def update(self):
     self.sm.update(15)
     if self.sm.updated["extrinsicsCalibration"]:
@@ -78,8 +91,33 @@ class Controls(ControlsExt):
       device_motion = Pose.from_device_motion(self.sm['deviceMotion'])
       self.calibrated_pose = self.pose_calibrator.build_calibrated_pose(device_motion)
 
+  def check_auto_overtake_toggle(self, CS):
+    """Toggle AutoOvertake when engagement button is held for 2 seconds."""
+    button_pressed = False
+    for be in CS.buttonEvents:
+      if be.type in ENGAGE_BUTTONS and be.pressed:
+        button_pressed = True
+        break
+
+    if button_pressed:
+      self.engage_button_timer += DT_CTRL
+      if self.engage_button_timer >= 2.0 and not self.auto_overtake_toggled:
+        current = self.params.get_bool("AutoOvertake")
+        self.params.put_bool("AutoOvertake", not current)
+        self.auto_overtake_toggled = True
+        cloudlog.info(f"AutoOvertake toggled to {not current}")
+    else:
+      if self.engage_button_timer > 0 and self.engage_button_timer < 2.0:
+        # short press, reset
+        pass
+      self.engage_button_timer = 0.0
+      self.auto_overtake_toggled = False
+
   def state_control(self):
     CS = self.sm['carState']
+
+    # Check long press for AutoOvertake
+    self.check_auto_overtake_toggle(CS)
 
     # Update VehicleModel
     lp = self.sm['vehicleParameters']
