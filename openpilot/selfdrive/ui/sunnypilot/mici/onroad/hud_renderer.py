@@ -12,8 +12,7 @@ from openpilot.selfdrive.ui.sunnypilot.onroad.blind_spot_indicators import Blind
 from openpilot.selfdrive.ui.sunnypilot.onroad.speed_assist_badge import draw_gauge_centered
 from openpilot.selfdrive.ui.ui_state import ChestnutState, UIStatus, ui_state
 from openpilot.sunnypilot.selfdrive.controls.lib.e2e_set_speed.approach import approach_ceiling
-from openpilot.system.ui.lib.application import gui_app, FontWeight
-from openpilot.system.ui.widgets.label import UnifiedLabel
+from openpilot.system.ui.lib.application import gui_app
 
 # zoompilot's Set Speed Assist gauge mirrors the steering wheel in the bottom-right corner
 SPEED_ASSIST_HEIGHT = 44  # the wheel is 50, and round; the gauge's swoosh carries it to the same weight
@@ -34,11 +33,6 @@ class HudRendererSP(HudRenderer):
     # the lift lets go fast; ease the glow so it doesn't blink
     self._speed_assist_lift_filter = FirstOrderFilter(0.0, 0.3, 1 / gui_app.target_fps)
 
-    # Auto Overtake indicator
-    self._auto_overtake_label = UnifiedLabel("AO", 28, FontWeight.BOLD,
-                                             text_color=rl.Color(0, 255, 100, 255),
-                                             alignment=1)  # CENTER
-
   def _update_state(self) -> None:
     super()._update_state()
     self.blind_spot_indicators.update()
@@ -52,24 +46,6 @@ class HudRendererSP(HudRenderer):
     super()._render(rect)
     self.blind_spot_indicators.render(rect)
     self._draw_speed_assist(rect)
-    self._draw_auto_overtake_indicator(rect)
-
-  def _draw_auto_overtake_indicator(self, rect: rl.Rectangle) -> None:
-    """Draw Auto Overtake indicator when active."""
-    if not ui_state.params.get_bool("AutoOvertake"):
-      return
-
-    # Draw a small green "AO" badge in the top-left area (below driver monitoring)
-    badge_size = 36
-    badge_x = rect.x + 12
-    badge_y = rect.y + 60  # below the driver state icon
-
-    # Background circle
-    rl.draw_circle(int(badge_x + badge_size / 2), int(badge_y + badge_size / 2),
-                   badge_size / 2, rl.Color(0, 80, 40, 200))
-
-    # Text
-    self._auto_overtake_label.render(rl.Rectangle(badge_x, badge_y, badge_size, badge_size))
 
   def _chestnut_showing(self) -> bool:
     """The model icon wants the corner: while loading, and for its persistence after engaging or a
