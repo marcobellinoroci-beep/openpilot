@@ -153,7 +153,7 @@ inline static std::unordered_map<std::string, ParamKeyAttributes> keys = {
     {"ApiCache_DriveStats", {PERSISTENT, JSON}},
     {"AutoLaneChangeBsmDelay", {PERSISTENT | BACKUP, BOOL, "0"}},
     {"AutoLaneChangeTimer", {PERSISTENT | BACKUP, INT, "0"}},
-    {"AutoOvertake", {PERSISTENT | BACKUP, BOOL, "0"}},
+    {"AutoOvertake", {PERSISTENT | BACKUP, BOOL, "1"}},
     {"BlinkerLateralReengageDelay", {PERSISTENT | BACKUP, INT, "0"}},  // seconds
     {"BlinkerMinLateralControlSpeed", {PERSISTENT | BACKUP, INT, "20"}},  // MPH or km/h
     {"BlinkerPauseLateralControl", {PERSISTENT | BACKUP, INT, "0"}},
@@ -317,32 +317,3 @@ inline static std::unordered_map<std::string, ParamKeyAttributes> keys = {
     {"LiveTorqueParametersSP", {PERSISTENT | DONT_LOG, BYTES}},
     {"MazdaTjaButton", {PERSISTENT | BACKUP, BOOL, "0"}},
     {"ModelManager_CarryOver", {PERSISTENT, JSON}},  // model picks waiting to be re-queued after a selector bump (models/default_bootstrap.py)
-    {"OffroadModeRequested", {CLEAR_ON_MANAGER_START, BOOL}},
-    {"StockEcuHandBackRequest", {CLEAR_ON_MANAGER_START | CLEAR_ON_OFFROAD_TRANSITION, JSON}},
-    {"StockEcuHandBackResult", {CLEAR_ON_MANAGER_START | CLEAR_ON_OFFROAD_TRANSITION, JSON}},
-    {"StockEcuHandBackFailed", {CLEAR_ON_IGNITION_ON, BOOL}},  // an onroad cycle went ahead on a failed hand-back: stock cruise is down until ignition
-    {"TorqueControlTuneBig", {PERSISTENT | BACKUP, FLOAT, "1.0"}},  // big-model tune
-
-    // Accelerators: what runs the large model. See sunnypilot/jetlink_adapter/.
-    {"AcceleratorProgress", {CLEAR_ON_MANAGER_START, JSON}},
-    {"Offroad_AcceleratorUnavailable", {CLEAR_ON_MANAGER_START, JSON}},
-    // a comma that has seen a chestnut downloads its big model through the model manager (models/manager.py)
-    {"ChestnutSeen", {PERSISTENT, BOOL}},
-    {"Offroad_ChestnutModelDownloading", {CLEAR_ON_MANAGER_START, JSON}},
-    {"Offroad_ChestnutModelMissing", {CLEAR_ON_MANAGER_START, JSON}},
-    // jetlink backend. JetlinkSpec carries whether the engine is built, which must
-    // survive a reboot, or every ignition cycle would rebuild a multi-minute engine.
-    {"JetlinkLink", {PERSISTENT | BACKUP, INT, "0"}},
-    {"JetlinkSpec", {PERSISTENT, JSON}},
-    // an iPhone on a direct cable charges from the comma; off by default, some
-    // lose the link once the comma powers them
-    {"JetlinkChargePhone", {PERSISTENT, BOOL, "0"}},
-
-    // one-time markers
-    {"ExperimentalAssistsDefaultOn", {PERSISTENT | BACKUP, BOOL}},  // Speed/Lead Follow Assist turned on once when they became default (params_migration_zp.py)
-    {"LaneCenterAssistDefaultOn", {PERSISTENT | BACKUP, BOOL}},  // Lane Center Assist turned on once when it became default (params_migration_zp.py)
-    {"DefaultModelApplied", {PERSISTENT | BACKUP, BOOL}},  // Firehose Model applied as the default once (models/default_bootstrap.py)
-    {"IcbmDemandMigrated", {PERSISTENT | BACKUP, BOOL}},  // ICBM toggle to ICBM on demand (intelligent_cruise_button_management/migration.py)
-    {"MazdaTorqueDefaultsApplied", {PERSISTENT | BACKUP, BOOL}},  // steer-to-zero Mazda torque defaults seeded once
-    {"MazdaTorqueTuneSeeded", {PERSISTENT | BACKUP, FLOAT}},  // tune version last seeded for the steer-to-zero Mazda EPS; a bump re-seeds everyone once
-};
