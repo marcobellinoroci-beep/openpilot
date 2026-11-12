@@ -84,5 +84,12 @@ class HudRendererSP(HudRenderer):
   def left_blind_spot_detected(self) -> bool:
     return self.blind_spot_indicators.left_detected
 
+  def _draw_auto_overtake_badge(self, rect: rl.Rectangle) -> None:
+    """Show small 'AO' badge when AutoOvertake is active."""
+    if not ui_state.params.get_bool("AutoOvertake"):
+      return
+    # Draw a simple text badge in the top-left area
+    rl.draw_text("AO", int(rect.x + 12), int(rect.y + 12), 18, rl.Color(255, 200, 0, 220))
+
   def _has_blind_spot_detected(self) -> bool:
     return self.blind_spot_indicators.detected
