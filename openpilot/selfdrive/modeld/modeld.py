@@ -483,7 +483,14 @@ def main(demo=False):
       lane_change_prob = l_lane_change_prob + r_lane_change_prob
       mdv2sp_send.modelDataV2SP.zoompilot.acceleratorState = jetlink_adapter.state(model)
       left_edge, right_edge = RELC.update_and_fill(modelv2_send.modelV2, mdv2sp_send.modelDataV2SP, v_ego)
-      DH.update(sm['carState'], sm['carControl'].latActive, lane_change_prob, left_edge, right_edge)
+      # Check for a slower lead vehicle (positive distance, negative relative speed)
+      has_slower_lead = False
+      leads = modelv2_send.modelV2.leadsV3
+      if leads:
+        lead = leads[0]
+        if lead.prob > 0.5 and lead.x[0] > 0 and lead.v[0] < -1.0:  # at least 1 m/s slower
+          has_slower_lead = True
+      DH.update(sm['carState'], sm['carControl'].latActive, lane_change_prob, left_edge, right_edge, has_slower_lead)
       modelv2_send.modelV2.meta.laneChangeState = DH.lane_change_state
       modelv2_send.modelV2.meta.laneChangeDirection = DH.lane_change_direction
       mdv2sp_send.valid = modelv2_send.valid
