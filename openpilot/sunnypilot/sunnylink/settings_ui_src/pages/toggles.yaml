@@ -1,11 +1,11 @@
 # Page: toggles
 # Edit this file. Run compile_settings_ui.py to emit settings_ui.json.
 id: toggles
-label: Toggles
+label: Opzioni
 icon: toggles
 order: 5
 remote_configurable: true
-description: Core openpilot feature toggles
+description: Opzioni principali di openpilot
 sections:
 - id: core_toggles
   title: ''
@@ -14,36 +14,33 @@ sections:
   - key: OpenpilotEnabledToggle
     widget: toggle
     needs_onroad_cycle: true
-    title: Enable sunnypilot
-    description: Use the sunnypilot system for adaptive cruise control and lane keep driver assistance. Your attention is
-      required at all times to use this feature.
+    title: Attiva sunnypilot
+    description: Usa il sistema sunnypilot per il cruise control adattivo e l'assistenza al mantenimento della corsia. Questa funzione richiede sempre la tua attenzione.
     enablement:
     - $ref: '#/macros/offroad'
   - key: IsLdwEnabled
     widget: toggle
-    title: Enable Lane Departure Warnings
-    description: Receive alerts to steer back into the lane when your vehicle drifts over a detected lane line without a turn
-      signal activated while driving over 31 mph (50 km/h).
+    title: Attiva avvisi di uscita dalla corsia
+    description: Ricevi un avviso per rientrare in corsia quando il veicolo supera una linea di corsia senza freccia inserita, sopra i 50 km/h (31 mph).
   - key: AlwaysOnDM
     widget: toggle
-    title: Always-On Driver Monitoring
-    description: Enable driver monitoring even when sunnypilot is not engaged.
+    title: Monitoraggio conducente sempre attivo
+    description: Attiva il monitoraggio del conducente anche quando sunnypilot non è inserito.
   - key: IsMetric
     widget: toggle
-    title: Use Metric System
-    description: Display speed in km/h instead of mph.
+    title: Usa il sistema metrico
+    description: Mostra la velocità in km/h invece che in mph.
 - id: recording
-  title: Recording
-  description: Camera and audio recording during drives
+  title: Registrazione
+  description: Registrazione video e audio durante la guida
   items:
   - key: RecordFront
     widget: toggle
     needs_onroad_cycle: true
-    title: Record and Upload Driver Camera
-    description: Upload data from the driver facing camera and help improve the driver monitoring algorithm.
+    title: Registra e carica la telecamera del conducente
+    description: Carica i dati della telecamera rivolta al conducente e aiuta a migliorare l'algoritmo di monitoraggio del conducente.
   - key: RecordAudio
     widget: toggle
     needs_onroad_cycle: true
-    title: Record and Upload Microphone Audio
-    description: Record and store microphone audio while driving. The audio will be included in the dashcam video in comma
-      connect.
+    title: Registra e carica l'audio del microfono
+    description: Registra e salva l'audio del microfono durante la guida. L'audio sarà incluso nel video dashcam su comma connect.

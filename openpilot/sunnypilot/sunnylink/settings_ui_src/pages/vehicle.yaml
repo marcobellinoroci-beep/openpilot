@@ -1,25 +1,25 @@
 # Page: vehicle (per-brand settings)
 # Compiles to settings_ui.json#vehicle_settings (brand = section id).
 id: vehicle
-label: Vehicle
+label: Veicolo
 icon: vehicle
 order: 99
 kind: vehicle
 sections:
 - id: hyundai
-  title: Hyundai / Kia / Genesis Settings
+  title: Impostazioni Hyundai / Kia / Genesis
   description: ''
   items:
   - key: HyundaiLongitudinalTuning
     widget: multiple_button
-    title: Custom Longitudinal Tuning
+    title: Taratura longitudinale personalizzata
     options:
     - value: 0
       label: 'Off'
     - value: 1
-      label: Dynamic
+      label: Dinamica
     - value: 2
-      label: Predictive
+      label: Predittiva
     visibility:
     - type: capability
       field: hyundai_alpha_long_available
@@ -28,7 +28,7 @@ sections:
     - $ref: '#/macros/offroad'
     - $ref: '#/macros/longitudinal'
 - id: subaru
-  title: Subaru Settings
+  title: Impostazioni Subaru
   description: ''
   items:
   - key: SubaruStopAndGo
@@ -41,37 +41,34 @@ sections:
       equals: true
   - key: SubaruStopAndGoManualParkingBrake
     widget: toggle
-    title: Stop and Go for Manual Parking Brake (Beta)
+    title: Stop and Go con freno di stazionamento manuale (Beta)
     enablement:
     - $ref: '#/macros/offroad'
     - type: capability
       field: has_stop_and_go
       equals: true
 - id: tesla
-  title: Tesla Settings
+  title: Impostazioni Tesla
   description: ''
   items:
   - key: TeslaCoopSteering
     widget: toggle
-    title: Cooperative Steering (Beta)
+    title: Sterzo cooperativo (Beta)
     enablement:
     - $ref: '#/macros/offroad'
   - key: TeslaMadsScreenButton
     widget: multiple_button
-    title: MADS Screen Activation
-    description: 'Use a multi-finger press on the infotainment screen to toggle MADS.
-      This allows the use of full MADS functionality when enabled. Selecting a higher
-      finger count may reduce accidental activations. Note: Setting this to Off will
-      reset your MADS settings to default.'
+    title: Attivazione MADS dallo schermo
+    description: 'Tocca lo schermo dell''infotainment con più dita per attivare o disattivare MADS. Se attivo, consente di usare tutte le funzioni MADS. Scegliere più dita può ridurre le attivazioni accidentali. Nota: impostandolo su Off le impostazioni MADS tornano ai valori predefiniti.'
     options:
     - value: 0
       label: 'Off'
     - value: 1
-      label: 3-Finger
+      label: 3 dita
     - value: 2
-      label: 4-Finger
+      label: 4 dita
     - value: 3
-      label: 5-Finger
+      label: 5 dita
     visibility:
     - type: capability
       field: tesla_has_vehicle_bus
@@ -79,22 +76,21 @@ sections:
     enablement:
     - $ref: '#/macros/offroad'
 - id: toyota
-  title: Toyota / Lexus Settings
+  title: Impostazioni Toyota / Lexus
   description: ''
   items:
   - key: ToyotaEnforceStockLongitudinal
     widget: toggle
     needs_onroad_cycle: true
-    title: Enforce Factory Longitudinal Control
-    description: sunnypilot will not take over control of gas and brakes. Factory Toyota longitudinal control will be used.
+    title: Forza controllo longitudinale di serie
+    description: 'sunnypilot non prenderà il controllo di acceleratore e freni: verrà usato il controllo longitudinale di serie Toyota.'
     enablement:
     - $ref: '#/macros/not_engaged'
   - key: ToyotaStopAndGoHack
     widget: toggle
     needs_onroad_cycle: true
-    title: Stop and Go Hack (Alpha)
-    description: sunnypilot will allow some Toyota/Lexus cars to auto resume during stop and go traffic. This feature is only
-      applicable to certain models that are able to use longitudinal control. This is an alpha feature. Use at your own risk.
+    title: Hack Stop and Go (Alpha)
+    description: 'sunnypilot permette ad alcune Toyota/Lexus di ripartire da sole nel traffico stop and go. Vale solo per alcuni modelli in grado di usare il controllo longitudinale. Funzione in fase alpha: usala a tuo rischio.'
     enablement:
     - $ref: '#/macros/not_engaged'
     - $ref: '#/macros/longitudinal'
@@ -104,9 +100,8 @@ sections:
   - key: ToyotaTSS2Smooth
     widget: toggle
     needs_onroad_cycle: true
-    title: TSS2 Smooth Longitudinal (Alpha)
-    description: Enable smoother longitudinal control for TSS2 vehicles. Uses a custom speed-dependent integral gain curve
-      for smoother traffic driving.
+    title: Longitudinale fluido TSS2 (Alpha)
+    description: Attiva un controllo longitudinale più fluido per i veicoli TSS2. Usa una curva di guadagno integrale personalizzata in base alla velocità per una guida più dolce nel traffico.
     enablement:
     - $ref: '#/macros/not_engaged'
     - $ref: '#/macros/longitudinal'

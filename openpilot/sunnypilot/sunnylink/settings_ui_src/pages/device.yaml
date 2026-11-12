@@ -1,42 +1,41 @@
 # Page: device
 # Edit this file. Run compile_settings_ui.py to emit settings_ui.json.
 id: device
-label: Device
+label: Dispositivo
 icon: device
 order: 6
 remote_configurable: true
-description: Device behavior, units, and recording settings
+description: Comportamento del dispositivo, unità di misura e registrazione
 sections:
 - id: general
-  title: General
-  description: Power, boot, and unit preferences
+  title: Generale
+  description: Alimentazione, avvio e unità di misura
   items:
   - key: OffroadModeRequested
     widget: toggle
-    title: Force Offroad Mode
+    title: Forza modalità offroad
   - key: DeviceBootMode
     widget: option
-    title: Wake Up Behavior
-    description: 'Controls state of the device after boot/sleep. Default: Device will boot/wake-up normally and will be ready
-      to engage. Offroad: Device will be in Always Offroad mode after boot/wake-up.'
+    title: Comportamento al risveglio
+    description: 'Stabilisce lo stato del dispositivo dopo l''avvio o la sospensione. Predefinito: il dispositivo si avvia/riattiva normalmente ed è pronto all''inserimento. Offroad: dopo l''avvio/risveglio il dispositivo resta in modalità Sempre offroad.'
     options:
     - value: 0
       label: Standard
     - value: 1
-      label: Always Offroad
+      label: Sempre offroad
   - key: QuietMode
     widget: toggle
-    title: Quiet Mode
+    title: Modalità silenziosa
   - key: OnroadUploads
     widget: toggle
-    title: Onroad Uploads
+    title: Caricamenti durante la guida
   - key: MaxTimeOffroad
     widget: option
-    title: Max Time Offroad
-    description: Device will automatically shutdown after set time once the engine is turned off. 30h is the default.
+    title: Tempo massimo offroad
+    description: Il dispositivo si spegne automaticamente dopo il tempo impostato, una volta spento il motore. Il valore predefinito è 30h.
     options:
     - value: 0
-      label: Always On
+      label: Sempre acceso
     - value: 5
       label: 5m
     - value: 10
@@ -58,10 +57,10 @@ sections:
     - value: 1440
       label: 24h
     - value: 1800
-      label: 30h (Default)
+      label: 30h (predefinito)
 - id: language
-  title: Language
+  title: Lingua
   items:
   - key: LanguageSetting
     widget: info
-    title: Language
+    title: Lingua

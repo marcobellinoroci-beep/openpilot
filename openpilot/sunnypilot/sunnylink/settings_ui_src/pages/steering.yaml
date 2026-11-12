@@ -1,26 +1,25 @@
 # Page: steering
 # Edit this file. Run compile_settings_ui.py to emit settings_ui.json.
 id: steering
-label: Steering
+label: Sterzo
 icon: steering_wheel
 order: 1
 remote_configurable: true
-description: Lateral control, lane changes, and steering behavior
+description: Controllo laterale, cambi di corsia e comportamento dello sterzo
 sections:
 - id: mads
-  title: When to Steer
+  title: Quando sterzare
   description: ''
   items:
   - key: Mads
     widget: toggle
-    title: Steer Without Cruise
-    description: Lets zoompilot steer while cruise control is off. When off, steering and cruise engage and disengage
-      together.
+    title: Sterza senza cruise
+    description: Permette a zoompilot di sterzare anche con il cruise control spento. Se disattivo, sterzo e cruise si inseriscono e disinseriscono insieme.
     enablement:
     - $ref: '#/macros/offroad'
   sub_panels:
   - id: mads_settings
-    label: When to Steer
+    label: Quando sterzare
     trigger_key: Mads
     trigger_condition:
       type: param
@@ -29,25 +28,22 @@ sections:
     items:
     - key: MadsMainCruiseAllowed
       widget: toggle
-      title: Steer When Cruise On
-      description: Turning cruise on with its on/off button also turns steering on. Cars without a lane keep button need
-        this on to steer.
+      title: Sterza con cruise acceso
+      description: Accendere il cruise con il suo tasto on/off attiva anche lo sterzo. Le auto senza tasto di mantenimento corsia devono averlo attivo per sterzare.
       enablement:
       - $ref: '#/macros/offroad'
       - $ref: '#/macros/mads_full_platforms'
     - key: MadsUnifiedEngagementMode
       widget: toggle
-      title: Steer When Cruise Set
-      description: Setting or resuming a cruise speed also turns steering on. Steering then stays on until you switch it
-        off or turn off the car.
+      title: Sterza con velocità cruise impostata
+      description: Impostare o riprendere una velocità del cruise attiva anche lo sterzo, che resta attivo finché non lo spegni o spegni l'auto.
       enablement:
       - $ref: '#/macros/offroad'
       - $ref: '#/macros/mads_full_platforms'
     - key: MazdaTjaButton
       widget: toggle
-      title: Mazda TJA Button
-      description: The wheel's TJA button becomes the only steering switch. The MRCC button then only controls cruise. Turn
-        on only if your car has the button.
+      title: Tasto Mazda TJA
+      description: Il tasto TJA sul volante diventa l'unico comando dello sterzo e il tasto MRCC controlla solo il cruise. Attivalo solo se la tua auto ha questo tasto.
       visibility:
       - type: capability
         field: brand
@@ -56,34 +52,33 @@ sections:
       - $ref: '#/macros/offroad'
     - key: MadsSteeringMode
       widget: multiple_button
-      title: Steering on Brake
-      description: What steering does when you press the brake. Remain keeps steering. Pause resumes it when you let go.
-        Disengage turns steering off.
+      title: Sterzo in frenata
+      description: Cosa fa lo sterzo quando premi il freno. Mantieni continua a sterzare. Pausa riprende quando rilasci il freno. Disinserisci spegne lo sterzo.
       options:
       - value: 0
-        label: Remain
+        label: Mantieni
         enablement:
         - $ref: '#/macros/mads_full_platforms'
       - value: 1
-        label: Pause
+        label: Pausa
         enablement:
         - $ref: '#/macros/mads_full_platforms'
       - value: 2
-        label: Disengage
+        label: Disinserisci
       enablement:
       - $ref: '#/macros/offroad'
 - id: blinker
-  title: Blinker Control
-  description: Lateral pause behavior during turn signals
+  title: Controllo con freccia
+  description: Pausa del controllo laterale con la freccia inserita
   items:
   - key: BlinkerPauseLateralControl
     widget: toggle
-    title: Pause Lateral Control with Blinker
-    description: Pause lateral control with blinker when traveling below the desired speed selected.
+    title: Pausa controllo laterale con freccia
+    description: Mette in pausa il controllo laterale con la freccia inserita quando viaggi sotto la velocità selezionata.
     sub_items:
     - key: BlinkerMinLateralControlSpeed
       widget: option
-      title: Minimum Speed to Pause Lateral Control
+      title: Velocità minima per la pausa del controllo laterale
       min: 0
       max: 255
       step: 5
@@ -96,8 +91,8 @@ sections:
         equals: true
     - key: BlinkerLateralReengageDelay
       widget: option
-      title: Post-Blinker Delay
-      description: Delay before lateral control resumes after the turn signal ends.
+      title: Ritardo dopo la freccia
+      description: Attesa prima che il controllo laterale riprenda dopo lo spegnimento della freccia.
       min: 0
       max: 10
       step: 1
@@ -107,8 +102,8 @@ sections:
         key: BlinkerPauseLateralControl
         equals: true
 - id: torque
-  title: Torque Control
-  description: Steering torque tuning and lateral control method
+  title: Controllo di coppia
+  description: Taratura della coppia di sterzo e metodo di controllo laterale
   enablement:
   - type: capability
     field: torque_allowed
@@ -116,8 +111,8 @@ sections:
   items:
   - key: EnforceTorqueControl
     widget: toggle
-    title: Enforce Torque Lateral Control
-    description: Enable this to enforce sunnypilot to steer with Torque lateral control.
+    title: Forza controllo laterale a coppia
+    description: Attiva per obbligare sunnypilot a sterzare con il controllo laterale a coppia (Torque).
     visibility:
     - type: not
       condition:
@@ -134,7 +129,7 @@ sections:
       equals: false
   sub_panels:
   - id: torque_settings
-    label: Torque Settings
+    label: Impostazioni coppia
     trigger_key: EnforceTorqueControl
     trigger_condition:
       type: param
@@ -143,8 +138,8 @@ sections:
     items:
     - key: LateralJerkTorqueController
       widget: toggle
-      title: Lateral Jerk Torque Controller
-      description: Looks ahead at planned steering to reduce sudden corrections, so the wheel moves more smoothly through turns. Works with Self-Tune and custom tuning. Thanks to @twilsonco for the implementation.
+      title: Controller di coppia con jerk laterale
+      description: Anticipa lo sterzo pianificato per ridurre le correzioni brusche, così il volante si muove in modo più fluido in curva. Funziona con Autotaratura e taratura personalizzata. Grazie a @twilsonco per l'implementazione.
       visibility:
       - type: not
         condition:
@@ -158,14 +153,14 @@ sections:
         equals: false
     - key: LiveTorqueParamsToggle
       widget: toggle
-      title: Self-Tune
-      description: Enables self-tune for Torque lateral control for platforms that do not use Torque lateral control by default.
+      title: Autotaratura
+      description: Attiva l'autotaratura del controllo laterale a coppia sulle piattaforme che non lo usano di default.
       enablement:
       - $ref: '#/macros/offroad'
     - key: LiveTorqueParamsRelaxedToggle
       widget: toggle
-      title: Less Restrict Settings for Self-Tune (Beta)
-      description: Less strict settings when using Self-Tune. This allows torqued to be more forgiving when learning values.
+      title: Impostazioni meno restrittive per l'Autotaratura (Beta)
+      description: "Impostazioni meno rigide per l'Autotaratura: torqued è più tollerante mentre apprende i valori."
       enablement:
       - $ref: '#/macros/offroad'
       - type: param
@@ -173,17 +168,14 @@ sections:
         equals: true
     - key: CustomTorqueParams
       widget: toggle
-      title: Enable Custom Tuning
-      description: Enables custom tuning for Torque lateral control. Modifying Lateral Acceleration Factor and Friction below
-        will override the offline values indicated in the YAML files within "opendbc/car/torque_data". The values will also
-        be used live when "Manual Real-Time Tuning" toggle is enabled.
+      title: Attiva taratura personalizzata
+      description: Attiva la taratura personalizzata del controllo laterale a coppia. Modificare Fattore di accelerazione laterale e Attrito qui sotto sostituisce i valori offline indicati nei file YAML in "opendbc/car/torque_data". I valori vengono usati anche in tempo reale quando è attiva l'opzione "Taratura manuale in tempo reale".
       enablement:
       - $ref: '#/macros/offroad'
     - key: TorqueParamsOverrideEnabled
       widget: toggle
-      title: Manual Real-Time Tuning
-      description: Enforces the torque lateral controller to use the fixed values instead of the learned values from Self-Tune.
-        Enabling this toggle overrides Self-Tune values.
+      title: Taratura manuale in tempo reale
+      description: Obbliga il controller laterale a coppia a usare i valori fissi invece di quelli appresi dall'Autotaratura. Attivandolo, i valori dell'Autotaratura vengono sostituiti.
       enablement:
       - $ref: '#/macros/offroad'
       - type: param
@@ -191,12 +183,12 @@ sections:
         equals: true
     - key: TorqueParamsOverrideLatAccelFactor
       widget: option
-      title: Lateral Acceleration Factor
+      title: Fattore di accelerazione laterale
       title_param_suffix:
         param: TorqueParamsOverrideEnabled
         values:
-          'true': (Real-Time & Offline)
-          'false': (Offline Only)
+          'true': (tempo reale e offline)
+          'false': (solo offline)
       min: 0.1
       max: 5.0
       step: 0.1
@@ -213,12 +205,12 @@ sections:
         - type: offroad_only
     - key: TorqueParamsOverrideFriction
       widget: option
-      title: Friction
+      title: Attrito
       title_param_suffix:
         param: TorqueParamsOverrideEnabled
         values:
-          'true': (Real-Time & Offline)
-          'false': (Offline Only)
+          'true': (tempo reale e offline)
+          'false': (solo offline)
       min: 0.0
       max: 1.0
       step: 0.01
@@ -234,76 +226,72 @@ sections:
         - type: offroad_only
     - key: TorqueControlTune
       widget: multiple_button
-      title: Torque Control Tune Version (Small Models)
-      description: Select the version of Torque Control Tune to use while the small model is driving.
+      title: Versione taratura controllo di coppia (modelli piccoli)
+      description: Scegli la versione della taratura del controllo di coppia da usare quando guida il modello piccolo.
       enablement:
       - $ref: '#/macros/offroad'
     - key: TorqueControlTuneBig
       widget: multiple_button
-      title: Torque Control Tune Version (Big Models)
-      description: Select the version of Torque Control Tune to use while a big model is driving.
+      title: Versione taratura controllo di coppia (modelli grandi)
+      description: Scegli la versione della taratura del controllo di coppia da usare quando guida un modello grande.
       enablement:
       - $ref: '#/macros/offroad'
 - id: lane_change
-  title: Lane Change
-  description: Automatic lane change timing and behavior
+  title: Cambio corsia
+  description: Tempi e comportamento del cambio corsia automatico
   items:
   - key: AutoLaneChangeTimer
     widget: option
-    title: Auto Lane Change by Blinker
+    title: Cambio corsia automatico con freccia
     description: |-
-      Set a timer to delay the auto lane change operation when the blinker is used. No nudge on the steering wheel is required to auto lane change if a timer is set. Default is Nudge.
+      Imposta un ritardo per il cambio corsia automatico quando inserisci la freccia. Se imposti un ritardo, non serve dare un colpetto al volante per cambiare corsia. Predefinito: Colpetto.
     details: |-
-      Please use caution when using this feature. Only use the blinker when traffic and road conditions permit.
+      Usa questa funzione con prudenza. Inserisci la freccia solo quando traffico e condizioni della strada lo consentono.
     options:
     - value: -1
       label: 'Off'
     - value: 0
-      label: Nudge
+      label: Colpetto
     - value: 1
-      label: Nudgeless
+      label: Senza colpetto
     - value: 2
-      label: 0.5 second
+      label: 0,5 secondi
     - value: 3
-      label: 1 second
+      label: 1 secondo
     - value: 4
-      label: 2 seconds
+      label: 2 secondi
     - value: 5
-      label: 3 seconds
+      label: 3 secondi
   - key: RoadEdgeLaneChangeEnabled
     widget: multiple_button
-    title: 'Block Lane Change: Road Edge Detection'
-    description: Blocks lane change when the model sees a road edge on the side you signal. Silent shows the alert without
-      the chime.
+    title: 'Blocca cambio corsia: rilevamento bordo strada'
+    description: Blocca il cambio corsia quando il modello vede il bordo della strada dal lato della freccia. Silenzioso mostra l'avviso senza segnale acustico.
     options:
     - value: 0
       label: 'Off'
     - value: 1
-      label: Audible
+      label: Sonoro
     - value: 2
-      label: Silent
+      label: Silenzioso
   - key: LaneChangeSmoothing
     widget: option
-    title: Lane Change Smoothing
-    description: Slow automatic lane changes to a chosen pace. Off is stock; every pace is gentler than stock. The
-      end-of-maneuver correction keeps its authority at every pace, so the car settles into the new lane without a
-      wheel snap.
+    title: Fluidità cambio corsia
+    description: Rallenta i cambi corsia automatici al ritmo scelto. Off è il comportamento di serie; ogni ritmo è più dolce. La correzione di fine manovra mantiene la sua efficacia a ogni ritmo, così l'auto si assesta nella nuova corsia senza scatti del volante.
     options:
     - value: 0
       label: 'Off'
     - value: 1
-      label: Fast
+      label: Veloce
     - value: 2
-      label: Medium
+      label: Medio
     - value: 3
-      label: Slow
+      label: Lento
     - value: 4
-      label: Extra Slow
+      label: Molto lento
   - key: AutoLaneChangeBsmDelay
     widget: toggle
-    title: 'Auto Lane Change: Delay with Blind Spot'
-    description: Toggle to enable a delay timer for lane changes when blind spot monitoring (BSM) detects a vehicle in your blind
-      spot.
+    title: 'Cambio corsia automatico: ritardo con angolo cieco'
+    description: Attiva un ritardo per il cambio corsia quando il monitoraggio dell'angolo cieco (BSM) rileva un veicolo nell'angolo cieco.
     enablement:
     - type: capability
       field: has_bsm
@@ -314,10 +302,10 @@ sections:
       value: 0
   - key: AutoOvertake
     widget: toggle
-    title: Auto Overtake
+    title: Sorpasso automatico
     description: |-
-      Automatically changes to the left lane when the left lane is clear.
-      Works even without using the blinker. Use with caution.
+      Passa automaticamente nella corsia di sinistra quando è libera.
+      Funziona anche senza inserire la freccia. Usare con prudenza.
     details: |-
-      This feature will attempt a left lane change after 2 seconds if the left lane is free,
-      even if there is no slower vehicle ahead. Always stay ready to take control.
+      Questa funzione tenta un cambio corsia a sinistra dopo 2 secondi se la corsia di sinistra è libera,
+      anche se davanti non c'è un veicolo più lento. Sii sempre pronto a riprendere il controllo.

@@ -1,47 +1,45 @@
 # Page: developer
 # Edit this file. Run compile_settings_ui.py to emit settings_ui.json.
 id: developer
-label: Developer
+label: Sviluppatore
 icon: developer
 order: 9
 remote_configurable: true
-description: Debug tools, remote access, and advanced services
+description: Strumenti di debug, accesso remoto e servizi avanzati
 sections:
 - id: connectivity
-  title: Connectivity
-  description: Remote access and debugging interfaces
+  title: Connettività
+  description: Accesso remoto e interfacce di debug
   items:
   - key: AdbEnabled
     widget: toggle
     blocked: true
-    title: Enable ADB
-    description: ADB (Android Debug Bridge) allows connecting to your device over USB or over the network. See https://docs.comma.ai/how-to/connect-to-comma
-      for more info.
+    title: Attiva ADB
+    description: ADB (Android Debug Bridge) permette di collegarsi al dispositivo via USB o tramite rete. Maggiori informazioni su https://docs.comma.ai/how-to/connect-to-comma.
     enablement:
     - $ref: '#/macros/offroad'
   - key: SshEnabled
     widget: toggle
     blocked: true
-    title: Enable SSH
+    title: Attiva SSH
   - key: JoystickDebugMode
     widget: toggle
-    title: Joystick Debug Mode
+    title: Modalità debug joystick
     enablement:
     - $ref: '#/macros/offroad'
   - key: NavigationEnabled
     widget: toggle
-    title: Navigation (Alpha)
-    description: Turn-by-turn navigation with a route map. Set a destination from comma connect.
+    title: Navigazione (Alpha)
+    description: Navigazione svolta per svolta con mappa del percorso. Imposta la destinazione da comma connect.
     visibility:
     - {type: capability, field: device_type, equals: mici}
     - $ref: '#/macros/release_branches_hide'
   - key: ShowDebugInfo
     widget: toggle
-    title: UI Debug Mode
+    title: Modalità debug interfaccia
 - id: test_maneuvers
-  title: Test Maneuvers
-  description: 'DANGER: enabling these maneuvers replaces normal driving behavior with deterministic test sequences. Each
-    toggle requires explicit confirmation per write. Use only in a closed environment.'
+  title: Manovre di test
+  description: 'PERICOLO: attivare queste manovre sostituisce la guida normale con sequenze di test deterministiche. Ogni modifica richiede una conferma esplicita. Usare solo in area chiusa al traffico.'
   visibility:
   - type: any
     conditions:
@@ -64,8 +62,8 @@ sections:
   items:
   - key: LateralManeuverMode
     widget: toggle
-    title: '[TEST] Lateral Maneuver Mode'
-    description: Replaces normal lateral control with a deterministic test sequence. NOT for road use.
+    title: '[TEST] Modalità manovra laterale'
+    description: Sostituisce il normale controllo laterale con una sequenza di test deterministica. NON usare su strada.
     enablement:
     - $ref: '#/macros/not_engaged'
     - type: capability
@@ -73,38 +71,36 @@ sections:
       equals: true
   - key: LongitudinalManeuverMode
     widget: toggle
-    title: '[TEST] Longitudinal Maneuver Mode'
-    description: Replaces normal longitudinal control with a deterministic test sequence. NOT for road use.
+    title: '[TEST] Modalità manovra longitudinale'
+    description: Sostituisce il normale controllo longitudinale con una sequenza di test deterministica. NON usare su strada.
     enablement:
     - $ref: '#/macros/not_engaged'
     - $ref: '#/macros/longitudinal'
 - id: advanced_services
-  title: Advanced Settings
+  title: Impostazioni avanzate
   description: ''
   items:
   - key: ShowAdvancedControls
     widget: toggle
-    title: Show Advanced Controls
-    description: Toggle visibility of advanced sunnypilot controls. This only changes the visibility of the toggles; it does
-      not change the actual enabled/disabled state.
+    title: Mostra controlli avanzati
+    description: Mostra o nasconde i controlli avanzati di sunnypilot. Cambia solo la visibilità delle opzioni, non il loro stato attivo/disattivo.
   - key: EnableGithubRunner
     widget: toggle
-    title: GitHub Runner Service
-    description: Enables or disables the GitHub runner service.
+    title: Servizio GitHub Runner
+    description: Attiva o disattiva il servizio GitHub runner.
     visibility:
     - $ref: '#/macros/release_branches_hide'
     enablement:
     - $ref: '#/macros/advanced_only'
   - key: EnableCopyparty
     widget: toggle
-    title: copyparty Service
-    description: copyparty is a very capable file server, you can use it to download your routes, view your logs and even
-      make some edits on some files from your browser. Requires you to connect to your comma locally via its IP address.
+    title: Servizio copyparty
+    description: 'copyparty è un file server molto completo: puoi usarlo per scaricare i tuoi percorsi, vedere i log e persino modificare alcuni file dal browser. Richiede di collegarti al comma in rete locale tramite il suo indirizzo IP.'
     enablement:
     - $ref: '#/macros/advanced_only'
   - key: QuickBootToggle
     widget: toggle
-    title: Quickboot Mode
+    title: Avvio rapido
     visibility:
     - type: not
       condition:

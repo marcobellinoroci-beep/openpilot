@@ -4,22 +4,22 @@
   "panels": [
     {
       "id": "steering",
-      "label": "Steering",
+      "label": "Sterzo",
       "icon": "steering_wheel",
       "order": 1,
       "remote_configurable": true,
-      "description": "Lateral control, lane changes, and steering behavior",
+      "description": "Controllo laterale, cambi di corsia e comportamento dello sterzo",
       "sections": [
         {
           "id": "mads",
-          "title": "When to Steer",
+          "title": "Quando sterzare",
           "description": "",
           "items": [
             {
               "key": "Mads",
               "widget": "toggle",
-              "title": "Steer Without Cruise",
-              "description": "Lets zoompilot steer while cruise control is off. When off, steering and cruise engage and disengage together.",
+              "title": "Sterza senza cruise",
+              "description": "Permette a zoompilot di sterzare anche con il cruise control spento. Se disattivo, sterzo e cruise si inseriscono e disinseriscono insieme.",
               "enablement": [
                 {
                   "type": "offroad_only"
@@ -30,7 +30,7 @@
           "sub_panels": [
             {
               "id": "mads_settings",
-              "label": "When to Steer",
+              "label": "Quando sterzare",
               "trigger_key": "Mads",
               "trigger_condition": {
                 "type": "param",
@@ -41,8 +41,8 @@
                 {
                   "key": "MadsMainCruiseAllowed",
                   "widget": "toggle",
-                  "title": "Steer When Cruise On",
-                  "description": "Turning cruise on with its on/off button also turns steering on. Cars without a lane keep button need this on to steer.",
+                  "title": "Sterza con cruise acceso",
+                  "description": "Accendere il cruise con il suo tasto on/off attiva anche lo sterzo. Le auto senza tasto di mantenimento corsia devono averlo attivo per sterzare.",
                   "enablement": [
                     {
                       "type": "offroad_only"
@@ -83,8 +83,8 @@
                 {
                   "key": "MadsUnifiedEngagementMode",
                   "widget": "toggle",
-                  "title": "Steer When Cruise Set",
-                  "description": "Setting or resuming a cruise speed also turns steering on. Steering then stays on until you switch it off or turn off the car.",
+                  "title": "Sterza con velocità cruise impostata",
+                  "description": "Impostare o riprendere una velocità del cruise attiva anche lo sterzo, che resta attivo finché non lo spegni o spegni l'auto.",
                   "enablement": [
                     {
                       "type": "offroad_only"
@@ -125,8 +125,8 @@
                 {
                   "key": "MazdaTjaButton",
                   "widget": "toggle",
-                  "title": "Mazda TJA Button",
-                  "description": "The wheel's TJA button becomes the only steering switch. The MRCC button then only controls cruise. Turn on only if your car has the button.",
+                  "title": "Tasto Mazda TJA",
+                  "description": "Il tasto TJA sul volante diventa l'unico comando dello sterzo e il tasto MRCC controlla solo il cruise. Attivalo solo se la tua auto ha questo tasto.",
                   "visibility": [
                     {
                       "type": "capability",
@@ -143,12 +143,12 @@
                 {
                   "key": "MadsSteeringMode",
                   "widget": "multiple_button",
-                  "title": "Steering on Brake",
-                  "description": "What steering does when you press the brake. Remain keeps steering. Pause resumes it when you let go. Disengage turns steering off.",
+                  "title": "Sterzo in frenata",
+                  "description": "Cosa fa lo sterzo quando premi il freno. Mantieni continua a sterzare. Pausa riprende quando rilasci il freno. Disinserisci spegne lo sterzo.",
                   "options": [
                     {
                       "value": 0,
-                      "label": "Remain",
+                      "label": "Mantieni",
                       "enablement": [
                         {
                           "type": "not",
@@ -185,7 +185,7 @@
                     },
                     {
                       "value": 1,
-                      "label": "Pause",
+                      "label": "Pausa",
                       "enablement": [
                         {
                           "type": "not",
@@ -222,7 +222,7 @@
                     },
                     {
                       "value": 2,
-                      "label": "Disengage"
+                      "label": "Disinserisci"
                     }
                   ],
                   "enablement": [
@@ -237,19 +237,19 @@
         },
         {
           "id": "blinker",
-          "title": "Blinker Control",
-          "description": "Lateral pause behavior during turn signals",
+          "title": "Controllo con freccia",
+          "description": "Pausa del controllo laterale con la freccia inserita",
           "items": [
             {
               "key": "BlinkerPauseLateralControl",
               "widget": "toggle",
-              "title": "Pause Lateral Control with Blinker",
-              "description": "Pause lateral control with blinker when traveling below the desired speed selected.",
+              "title": "Pausa controllo laterale con freccia",
+              "description": "Mette in pausa il controllo laterale con la freccia inserita quando viaggi sotto la velocità selezionata.",
               "sub_items": [
                 {
                   "key": "BlinkerMinLateralControlSpeed",
                   "widget": "option",
-                  "title": "Minimum Speed to Pause Lateral Control",
+                  "title": "Velocità minima per la pausa del controllo laterale",
                   "min": 0,
                   "max": 255,
                   "step": 5,
@@ -268,8 +268,8 @@
                 {
                   "key": "BlinkerLateralReengageDelay",
                   "widget": "option",
-                  "title": "Post-Blinker Delay",
-                  "description": "Delay before lateral control resumes after the turn signal ends.",
+                  "title": "Ritardo dopo la freccia",
+                  "description": "Attesa prima che il controllo laterale riprenda dopo lo spegnimento della freccia.",
                   "min": 0,
                   "max": 10,
                   "step": 1,
@@ -288,8 +288,8 @@
         },
         {
           "id": "torque",
-          "title": "Torque Control",
-          "description": "Steering torque tuning and lateral control method",
+          "title": "Controllo di coppia",
+          "description": "Taratura della coppia di sterzo e metodo di controllo laterale",
           "enablement": [
             {
               "type": "capability",
@@ -301,8 +301,8 @@
             {
               "key": "EnforceTorqueControl",
               "widget": "toggle",
-              "title": "Enforce Torque Lateral Control",
-              "description": "Enable this to enforce sunnypilot to steer with Torque lateral control.",
+              "title": "Forza controllo laterale a coppia",
+              "description": "Attiva per obbligare sunnypilot a sterzare con il controllo laterale a coppia (Torque).",
               "visibility": [
                 {
                   "type": "not",
@@ -333,7 +333,7 @@
           "sub_panels": [
             {
               "id": "torque_settings",
-              "label": "Torque Settings",
+              "label": "Impostazioni coppia",
               "trigger_key": "EnforceTorqueControl",
               "trigger_condition": {
                 "type": "param",
@@ -344,8 +344,8 @@
                 {
                   "key": "LateralJerkTorqueController",
                   "widget": "toggle",
-                  "title": "Lateral Jerk Torque Controller",
-                  "description": "Looks ahead at planned steering to reduce sudden corrections, so the wheel moves more smoothly through turns. Works with Self-Tune and custom tuning. Thanks to @twilsonco for the implementation.",
+                  "title": "Controller di coppia con jerk laterale",
+                  "description": "Anticipa lo sterzo pianificato per ridurre le correzioni brusche, così il volante si muove in modo più fluido in curva. Funziona con Autotaratura e taratura personalizzata. Grazie a @twilsonco per l'implementazione.",
                   "visibility": [
                     {
                       "type": "not",
@@ -370,8 +370,8 @@
                 {
                   "key": "LiveTorqueParamsToggle",
                   "widget": "toggle",
-                  "title": "Self-Tune",
-                  "description": "Enables self-tune for Torque lateral control for platforms that do not use Torque lateral control by default.",
+                  "title": "Autotaratura",
+                  "description": "Attiva l'autotaratura del controllo laterale a coppia sulle piattaforme che non lo usano di default.",
                   "enablement": [
                     {
                       "type": "offroad_only"
@@ -381,8 +381,8 @@
                 {
                   "key": "LiveTorqueParamsRelaxedToggle",
                   "widget": "toggle",
-                  "title": "Less Restrict Settings for Self-Tune (Beta)",
-                  "description": "Less strict settings when using Self-Tune. This allows torqued to be more forgiving when learning values.",
+                  "title": "Impostazioni meno restrittive per l'Autotaratura (Beta)",
+                  "description": "Impostazioni meno rigide per l'Autotaratura: torqued è più tollerante mentre apprende i valori.",
                   "enablement": [
                     {
                       "type": "offroad_only"
@@ -397,8 +397,8 @@
                 {
                   "key": "CustomTorqueParams",
                   "widget": "toggle",
-                  "title": "Enable Custom Tuning",
-                  "description": "Enables custom tuning for Torque lateral control. Modifying Lateral Acceleration Factor and Friction below will override the offline values indicated in the YAML files within \"opendbc/car/torque_data\". The values will also be used live when \"Manual Real-Time Tuning\" toggle is enabled.",
+                  "title": "Attiva taratura personalizzata",
+                  "description": "Attiva la taratura personalizzata del controllo laterale a coppia. Modificare Fattore di accelerazione laterale e Attrito qui sotto sostituisce i valori offline indicati nei file YAML in \"opendbc/car/torque_data\". I valori vengono usati anche in tempo reale quando è attiva l'opzione \"Taratura manuale in tempo reale\".",
                   "enablement": [
                     {
                       "type": "offroad_only"
@@ -408,8 +408,8 @@
                 {
                   "key": "TorqueParamsOverrideEnabled",
                   "widget": "toggle",
-                  "title": "Manual Real-Time Tuning",
-                  "description": "Enforces the torque lateral controller to use the fixed values instead of the learned values from Self-Tune. Enabling this toggle overrides Self-Tune values.",
+                  "title": "Taratura manuale in tempo reale",
+                  "description": "Obbliga il controller laterale a coppia a usare i valori fissi invece di quelli appresi dall'Autotaratura. Attivandolo, i valori dell'Autotaratura vengono sostituiti.",
                   "enablement": [
                     {
                       "type": "offroad_only"
@@ -424,12 +424,12 @@
                 {
                   "key": "TorqueParamsOverrideLatAccelFactor",
                   "widget": "option",
-                  "title": "Lateral Acceleration Factor",
+                  "title": "Fattore di accelerazione laterale",
                   "title_param_suffix": {
                     "param": "TorqueParamsOverrideEnabled",
                     "values": {
-                      "true": "(Real-Time & Offline)",
-                      "false": "(Offline Only)"
+                      "true": "(tempo reale e offline)",
+                      "false": "(solo offline)"
                     }
                   },
                   "min": 0.1,
@@ -460,12 +460,12 @@
                 {
                   "key": "TorqueParamsOverrideFriction",
                   "widget": "option",
-                  "title": "Friction",
+                  "title": "Attrito",
                   "title_param_suffix": {
                     "param": "TorqueParamsOverrideEnabled",
                     "values": {
-                      "true": "(Real-Time & Offline)",
-                      "false": "(Offline Only)"
+                      "true": "(tempo reale e offline)",
+                      "false": "(solo offline)"
                     }
                   },
                   "min": 0.0,
@@ -495,8 +495,8 @@
                 {
                   "key": "TorqueControlTune",
                   "widget": "multiple_button",
-                  "title": "Torque Control Tune Version (Small Models)",
-                  "description": "Select the version of Torque Control Tune to use while the small model is driving.",
+                  "title": "Versione taratura controllo di coppia (modelli piccoli)",
+                  "description": "Scegli la versione della taratura del controllo di coppia da usare quando guida il modello piccolo.",
                   "enablement": [
                     {
                       "type": "offroad_only"
@@ -506,8 +506,8 @@
                 {
                   "key": "TorqueControlTuneBig",
                   "widget": "multiple_button",
-                  "title": "Torque Control Tune Version (Big Models)",
-                  "description": "Select the version of Torque Control Tune to use while a big model is driving.",
+                  "title": "Versione taratura controllo di coppia (modelli grandi)",
+                  "description": "Scegli la versione della taratura del controllo di coppia da usare quando guida un modello grande.",
                   "enablement": [
                     {
                       "type": "offroad_only"
@@ -520,15 +520,15 @@
         },
         {
           "id": "lane_change",
-          "title": "Lane Change",
-          "description": "Automatic lane change timing and behavior",
+          "title": "Cambio corsia",
+          "description": "Tempi e comportamento del cambio corsia automatico",
           "items": [
             {
               "key": "AutoLaneChangeTimer",
               "widget": "option",
-              "title": "Auto Lane Change by Blinker",
-              "description": "Set a timer to delay the auto lane change operation when the blinker is used. No nudge on the steering wheel is required to auto lane change if a timer is set. Default is Nudge.",
-              "details": "Please use caution when using this feature. Only use the blinker when traffic and road conditions permit.",
+              "title": "Cambio corsia automatico con freccia",
+              "description": "Imposta un ritardo per il cambio corsia automatico quando inserisci la freccia. Se imposti un ritardo, non serve dare un colpetto al volante per cambiare corsia. Predefinito: Colpetto.",
+              "details": "Usa questa funzione con prudenza. Inserisci la freccia solo quando traffico e condizioni della strada lo consentono.",
               "options": [
                 {
                   "value": -1,
@@ -536,35 +536,35 @@
                 },
                 {
                   "value": 0,
-                  "label": "Nudge"
+                  "label": "Colpetto"
                 },
                 {
                   "value": 1,
-                  "label": "Nudgeless"
+                  "label": "Senza colpetto"
                 },
                 {
                   "value": 2,
-                  "label": "0.5 second"
+                  "label": "0,5 secondi"
                 },
                 {
                   "value": 3,
-                  "label": "1 second"
+                  "label": "1 secondo"
                 },
                 {
                   "value": 4,
-                  "label": "2 seconds"
+                  "label": "2 secondi"
                 },
                 {
                   "value": 5,
-                  "label": "3 seconds"
+                  "label": "3 secondi"
                 }
               ]
             },
             {
               "key": "RoadEdgeLaneChangeEnabled",
               "widget": "multiple_button",
-              "title": "Block Lane Change: Road Edge Detection",
-              "description": "Blocks lane change when the model sees a road edge on the side you signal. Silent shows the alert without the chime.",
+              "title": "Blocca cambio corsia: rilevamento bordo strada",
+              "description": "Blocca il cambio corsia quando il modello vede il bordo della strada dal lato della freccia. Silenzioso mostra l'avviso senza segnale acustico.",
               "options": [
                 {
                   "value": 0,
@@ -572,19 +572,19 @@
                 },
                 {
                   "value": 1,
-                  "label": "Audible"
+                  "label": "Sonoro"
                 },
                 {
                   "value": 2,
-                  "label": "Silent"
+                  "label": "Silenzioso"
                 }
               ]
             },
             {
               "key": "LaneChangeSmoothing",
               "widget": "option",
-              "title": "Lane Change Smoothing",
-              "description": "Slow automatic lane changes to a chosen pace. Off is stock; every pace is gentler than stock. The end-of-maneuver correction keeps its authority at every pace, so the car settles into the new lane without a wheel snap.",
+              "title": "Fluidità cambio corsia",
+              "description": "Rallenta i cambi corsia automatici al ritmo scelto. Off è il comportamento di serie; ogni ritmo è più dolce. La correzione di fine manovra mantiene la sua efficacia a ogni ritmo, così l'auto si assesta nella nuova corsia senza scatti del volante.",
               "options": [
                 {
                   "value": 0,
@@ -592,27 +592,27 @@
                 },
                 {
                   "value": 1,
-                  "label": "Fast"
+                  "label": "Veloce"
                 },
                 {
                   "value": 2,
-                  "label": "Medium"
+                  "label": "Medio"
                 },
                 {
                   "value": 3,
-                  "label": "Slow"
+                  "label": "Lento"
                 },
                 {
                   "value": 4,
-                  "label": "Extra Slow"
+                  "label": "Molto lento"
                 }
               ]
             },
             {
               "key": "AutoLaneChangeBsmDelay",
               "widget": "toggle",
-              "title": "Auto Lane Change: Delay with Blind Spot",
-              "description": "Toggle to enable a delay timer for lane changes when blind spot monitoring (BSM) detects a vehicle in your blind spot.",
+              "title": "Cambio corsia automatico: ritardo con angolo cieco",
+              "description": "Attiva un ritardo per il cambio corsia quando il monitoraggio dell'angolo cieco (BSM) rileva un veicolo nell'angolo cieco.",
               "enablement": [
                 {
                   "type": "capability",
@@ -630,9 +630,9 @@
             {
               "key": "AutoOvertake",
               "widget": "toggle",
-              "title": "Auto Overtake",
-              "description": "Automatically changes to the left lane when the left lane is clear.\nWorks even without using the blinker. Use with caution.",
-              "details": "This feature will attempt a left lane change after 2 seconds if the left lane is free,\neven if there is no slower vehicle ahead. Always stay ready to take control."
+              "title": "Sorpasso automatico",
+              "description": "Passa automaticamente nella corsia di sinistra quando è libera.\nFunziona anche senza inserire la freccia. Usare con prudenza.",
+              "details": "Questa funzione tenta un cambio corsia a sinistra dopo 2 secondi se la corsia di sinistra è libera,\nanche se davanti non c'è un veicolo più lento. Sii sempre pronto a riprendere il controllo."
             }
           ]
         }
@@ -644,11 +644,11 @@
       "icon": "cruise_control",
       "order": 2,
       "remote_configurable": true,
-      "description": "Longitudinal control, speed limits, and cruise behavior",
+      "description": "Controllo longitudinale, limiti di velocità e comportamento del cruise",
       "sections": [
         {
           "id": "alpha_longitudinal",
-          "title": "Alpha Longitudinal",
+          "title": "Longitudinale Alpha",
           "description": "",
           "items": [
             {
@@ -656,8 +656,8 @@
               "widget": "toggle",
               "needs_onroad_cycle": true,
               "blocked": true,
-              "title": "zoompilot Longitudinal Control (Alpha)",
-              "description": "WARNING: zoompilot longitudinal control is in alpha for this car and may disable Automatic Emergency Braking (AEB). On this car, zoompilot defaults to the car's built-in ACC instead of zoompilot's longitudinal control. Enable this to switch to zoompilot longitudinal control. Changing this setting will restart zoompilot if the car is powered on.",
+              "title": "Controllo longitudinale zoompilot (Alpha)",
+              "description": "ATTENZIONE: il controllo longitudinale di zoompilot è in fase alpha per quest'auto e può disattivare la frenata automatica d'emergenza (AEB). Su quest'auto zoompilot usa di default l'ACC di serie invece del proprio controllo longitudinale. Attiva questa opzione per passare al controllo longitudinale di zoompilot. Modificare questa impostazione riavvia zoompilot se l'auto è accesa.",
               "visibility": [
                 {
                   "type": "capability",
@@ -674,8 +674,8 @@
             {
               "key": "ExperimentalModeSetSpeed",
               "widget": "toggle",
-              "title": "Set Speed Assist",
-              "description": "Drive toward your set speed and following distance whenever the driving model holds back. The model still makes every slowdown. The onroad button and a long press of the distance button switch it too.",
+              "title": "Assistenza velocità impostata",
+              "description": "Porta l'auto verso la velocità e la distanza impostate quando il modello di guida resta indietro. Ogni rallentamento resta deciso dal modello. Si attiva o disattiva anche con il pulsante a schermo durante la guida e con una pressione lunga del tasto distanza.",
               "visibility": [
                 {
                   "type": "capability",
@@ -701,18 +701,18 @@
             {
               "key": "DisengageOnAccelerator",
               "widget": "toggle",
-              "title": "Disengage Cruise on Accelerator Pedal",
-              "description": "When enabled, pressing the accelerator pedal will disengage longitudinal control."
+              "title": "Disinserisci il cruise con l'acceleratore",
+              "description": "Se attivo, premere l'acceleratore disinserisce il controllo longitudinale."
             },
             {
               "key": "LongitudinalPersonality",
               "widget": "multiple_button",
-              "title": "Driving Personality",
-              "description": "Standard is recommended. In aggressive mode, sunnypilot will follow lead cars closer and be more aggressive with the gas and brake. In relaxed mode sunnypilot will stay further away from lead cars. On supported cars, you can cycle through these personalities with your steering wheel distance button.",
+              "title": "Stile di guida",
+              "description": "Si consiglia Standard. In modalità aggressiva sunnypilot segue più da vicino il veicolo davanti ed è più deciso con acceleratore e freno. In modalità rilassata sunnypilot mantiene una distanza maggiore dal veicolo davanti. Sulle auto supportate puoi passare da uno stile all'altro con il tasto distanza sul volante.",
               "options": [
                 {
                   "value": 0,
-                  "label": "Aggressive"
+                  "label": "Aggressivo"
                 },
                 {
                   "value": 1,
@@ -720,7 +720,7 @@
                 },
                 {
                   "value": 2,
-                  "label": "Relaxed"
+                  "label": "Rilassato"
                 }
               ],
               "enablement": [
@@ -735,7 +735,7 @@
         },
         {
           "id": "custom_acc_increments",
-          "title": "Custom ACC Speed Intervals",
+          "title": "Incrementi velocità ACC personalizzati",
           "description": "",
           "enablement": [
             {
@@ -771,7 +771,7 @@
             {
               "key": "CustomAccIncrementsEnabled",
               "widget": "toggle",
-              "title": "Enable Custom ACC Speed Intervals",
+              "title": "Attiva incrementi velocità ACC personalizzati",
               "enablement": [
                 {
                   "type": "any",
@@ -820,7 +820,7 @@
           "sub_panels": [
             {
               "id": "custom_acc_intervals",
-              "label": "Custom ACC Speed Intervals Settings",
+              "label": "Impostazioni incrementi velocità ACC",
               "trigger_key": "CustomAccIncrementsEnabled",
               "trigger_condition": {
                 "type": "param",
@@ -831,7 +831,7 @@
                 {
                   "key": "CustomAccShortPressIncrement",
                   "widget": "option",
-                  "title": "Short Press Increment",
+                  "title": "Incremento pressione breve",
                   "min": 1,
                   "max": 10,
                   "step": 1,
@@ -846,7 +846,7 @@
                 {
                   "key": "CustomAccLongPressIncrement",
                   "widget": "option",
-                  "title": "Long Press Increment",
+                  "title": "Incremento pressione lunga",
                   "min": 1,
                   "max": 10,
                   "step": 1,
@@ -864,19 +864,19 @@
         },
         {
           "id": "speed_limits",
-          "title": "Speed Limits",
-          "description": "Speed limit detection and offset behavior",
+          "title": "Limiti di velocità",
+          "description": "Rilevamento dei limiti di velocità e scostamento",
           "items": [],
           "sub_panels": [
             {
               "id": "speed_limit_settings",
-              "label": "Speed Limit Settings",
+              "label": "Impostazioni limiti di velocità",
               "trigger_key": "SpeedLimitMode",
               "items": [
                 {
                   "key": "SpeedLimitMode",
                   "widget": "multiple_button",
-                  "title": "Speed Limit Assist Mode",
+                  "title": "Modalità assistenza limite di velocità",
                   "options": [
                     {
                       "value": 0,
@@ -884,15 +884,15 @@
                     },
                     {
                       "value": 1,
-                      "label": "Information"
+                      "label": "Informazione"
                     },
                     {
                       "value": 2,
-                      "label": "Warning"
+                      "label": "Avviso"
                     },
                     {
                       "value": 3,
-                      "label": "Assist",
+                      "label": "Assistenza",
                       "enablement": [
                         {
                           "type": "any",
@@ -960,8 +960,8 @@
                 {
                   "key": "SpeedLimitPolicy",
                   "widget": "multiple_button",
-                  "title": "Speed Limit Source",
-                  "description": "Auto follows the limit your car shows, and the map where it shows none. The map also slows you before a lower limit ahead.",
+                  "title": "Fonte del limite di velocità",
+                  "description": "Auto segue il limite mostrato dall'auto e, quando l'auto non ne mostra, quello della mappa. La mappa rallenta anche l'auto prima di un limite più basso più avanti.",
                   "options": [
                     {
                       "value": 2,
@@ -969,11 +969,11 @@
                     },
                     {
                       "value": 0,
-                      "label": "Car Only"
+                      "label": "Solo auto"
                     },
                     {
                       "value": 1,
-                      "label": "Map Only"
+                      "label": "Solo mappa"
                     }
                   ],
                   "visibility": [
@@ -987,7 +987,7 @@
                 {
                   "key": "SpeedLimitOffsetType",
                   "widget": "multiple_button",
-                  "title": "Speed Limit Offset Type",
+                  "title": "Tipo di scostamento dal limite",
                   "options": [
                     {
                       "value": 0,
@@ -995,18 +995,18 @@
                     },
                     {
                       "value": 1,
-                      "label": "Fixed"
+                      "label": "Fisso"
                     },
                     {
                       "value": 2,
-                      "label": "Percentage"
+                      "label": "Percentuale"
                     }
                   ]
                 },
                 {
                   "key": "SpeedLimitValueOffset",
                   "widget": "option",
-                  "title": "Speed Limit Offset Value",
+                  "title": "Valore di scostamento dal limite",
                   "min": -30,
                   "max": 30,
                   "step": 1,
@@ -1029,7 +1029,7 @@
         },
         {
           "id": "smart_cruise",
-          "title": "Smart Cruise Control",
+          "title": "Cruise control intelligente",
           "description": "",
           "enablement": [
             {
@@ -1052,8 +1052,8 @@
             {
               "key": "SmartCruiseControlVision",
               "widget": "toggle",
-              "title": "Vision",
-              "description": "Use vision path predictions to estimate the appropriate speed to drive through turns ahead.",
+              "title": "Visione",
+              "description": "Usa le previsioni di traiettoria della telecamera per stimare la velocità adatta alle curve in arrivo.",
               "visibility": [
                 {
                   "type": "any",
@@ -1110,8 +1110,8 @@
             {
               "key": "SmartCruiseControlMap",
               "widget": "toggle",
-              "title": "Map",
-              "description": "Use map data to estimate the appropriate speed to drive through turns ahead.",
+              "title": "Mappa",
+              "description": "Usa i dati della mappa per stimare la velocità adatta alle curve in arrivo.",
               "visibility": [
                 {
                   "type": "any",
@@ -1171,33 +1171,33 @@
     },
     {
       "id": "display",
-      "label": "Display",
+      "label": "Schermo",
       "icon": "display",
       "order": 3,
       "remote_configurable": true,
-      "description": "Screen brightness, timeout, and interactivity settings",
+      "description": "Luminosità, spegnimento e interattività dello schermo",
       "sections": [
         {
           "id": "brightness_timeout",
-          "title": "Brightness & Timeout",
-          "description": "Screen dimming and sleep behavior while driving",
+          "title": "Luminosità e spegnimento",
+          "description": "Attenuazione e spegnimento dello schermo durante la guida",
           "items": [
             {
               "key": "OnroadScreenOffBrightness",
               "widget": "multiple_button",
-              "title": "Onroad Brightness",
+              "title": "Luminosità durante la guida",
               "options": [
                 {
                   "value": 0,
-                  "label": "Auto (Default)"
+                  "label": "Auto (predefinito)"
                 },
                 {
                   "value": 1,
-                  "label": "Auto (Dark)"
+                  "label": "Auto (scuro)"
                 },
                 {
                   "value": 2,
-                  "label": "Screen Off"
+                  "label": "Schermo spento"
                 },
                 {
                   "value": 3,
@@ -1284,11 +1284,11 @@
             {
               "key": "OnroadScreenOffTimer",
               "widget": "multiple_button",
-              "title": "Onroad Brightness Delay",
+              "title": "Ritardo luminosità durante la guida",
               "options": [
                 {
                   "value": 0,
-                  "label": "Always On"
+                  "label": "Sempre acceso"
                 },
                 {
                   "value": 3,
@@ -1351,12 +1351,12 @@
             {
               "key": "InteractivityTimeout",
               "widget": "multiple_button",
-              "title": "Interactivity Timeout",
-              "description": "Apply a custom timeout for settings UI. This is the time after which settings UI closes automatically if user is not interacting with the screen.",
+              "title": "Timeout interazione",
+              "description": "Imposta un timeout personalizzato per le impostazioni: è il tempo dopo il quale le impostazioni si chiudono da sole se non tocchi lo schermo.",
               "options": [
                 {
                   "value": 0,
-                  "label": "Default"
+                  "label": "Predefinito"
                 },
                 {
                   "value": 10,
@@ -1411,20 +1411,20 @@
             {
               "key": "HomeShowActiveModel",
               "widget": "toggle",
-              "title": "Show Driving Model on Home Screen",
-              "description": "Name the active driving model on the offroad home screen."
+              "title": "Mostra il modello di guida nella schermata iniziale",
+              "description": "Mostra il nome del modello di guida attivo nella schermata iniziale offroad."
             },
             {
               "key": "ScreenSaverEnabled",
               "widget": "toggle",
-              "title": "Screen Saver",
-              "description": "Show a screen saver when the device is offroad and idle, instead of turning the screen off."
+              "title": "Salvaschermo",
+              "description": "Mostra un salvaschermo quando il dispositivo è offroad e inattivo, invece di spegnere lo schermo."
             },
             {
               "key": "ScreenSaverTimeout",
               "widget": "multiple_button",
-              "title": "Screen Saver Duration",
-              "description": "How long the screen saver runs before the screen turns off.",
+              "title": "Durata salvaschermo",
+              "description": "Per quanto tempo resta il salvaschermo prima che lo schermo si spenga.",
               "options": [
                 {
                   "value": 60,
@@ -1481,28 +1481,28 @@
     },
     {
       "id": "visuals",
-      "label": "Visuals",
+      "label": "Grafica",
       "icon": "visuals",
       "order": 4,
       "remote_configurable": true,
-      "description": "HUD overlays, alerts, and on-screen display elements",
+      "description": "Elementi HUD, avvisi e indicazioni a schermo",
       "sections": [
         {
           "id": "hud_elements",
-          "title": "HUD Elements",
-          "description": "Overlays shown on the driving screen",
+          "title": "Elementi HUD",
+          "description": "Elementi mostrati sulla schermata di guida",
           "items": [
             {
               "key": "BlindSpot",
               "widget": "toggle",
-              "title": "Show Blind Spot Warnings",
-              "description": "Enabling this will display warnings when a vehicle is detected in your blind spot as long as your car has BSM supported."
+              "title": "Mostra avvisi angolo cieco",
+              "description": "Mostra un avviso quando viene rilevato un veicolo nell'angolo cieco, se l'auto supporta il BSM."
             },
             {
               "key": "TorqueBar",
               "widget": "toggle",
-              "title": "Steering Arc",
-              "description": "Display steering arc on the driving screen when lateral control is enabled.",
+              "title": "Arco di sterzata",
+              "description": "Mostra l'arco di sterzata sulla schermata di guida quando il controllo laterale è attivo.",
               "visibility": [
                 {
                   "type": "not",
@@ -1517,8 +1517,8 @@
             {
               "key": "ConfidenceBall",
               "widget": "toggle",
-              "title": "Confidence Ball",
-              "description": "Shows the model's confidence as a ball on your side of the screen, as on the comma 4: higher is more confident, and while engaged it is green, then yellow, then red as confidence drops.",
+              "title": "Indicatore di affidabilità",
+              "description": "Mostra l'affidabilità del modello con una pallina sul tuo lato dello schermo, come sul comma 4: più è in alto, più il modello è sicuro; quando è inserito è verde, poi gialla, poi rossa man mano che l'affidabilità cala.",
               "visibility": [
                 {
                   "type": "not",
@@ -1533,8 +1533,8 @@
             {
               "key": "ShowTurnSignals",
               "widget": "toggle",
-              "title": "Display Turn Signals",
-              "description": "When enabled, visual turn indicators are drawn on the HUD.",
+              "title": "Mostra frecce",
+              "description": "Se attivo, gli indicatori di direzione vengono mostrati sull'HUD.",
               "visibility": [
                 {
                   "type": "not",
@@ -1549,8 +1549,8 @@
             {
               "key": "RoadNameToggle",
               "widget": "toggle",
-              "title": "Display Road Name",
-              "description": "Displays the name of the road the car is traveling on. The OpenStreetMap database of the location must be downloaded to fetch the road name.",
+              "title": "Mostra nome della strada",
+              "description": "Mostra il nome della strada che stai percorrendo. Per ottenerlo bisogna scaricare il database OpenStreetMap della zona.",
               "visibility": [
                 {
                   "type": "not",
@@ -1565,8 +1565,8 @@
             {
               "key": "StandstillTimer",
               "widget": "toggle",
-              "title": "Standstill Timer",
-              "description": "Show a timer on the HUD when the car is at a standstill.",
+              "title": "Timer da fermo",
+              "description": "Mostra un timer sull'HUD quando l'auto è ferma.",
               "visibility": [
                 {
                   "type": "not",
@@ -1581,8 +1581,8 @@
             {
               "key": "RocketFuel",
               "widget": "toggle",
-              "title": "Real-time Acceleration Bar",
-              "description": "Show an indicator on the left side of the screen to display real-time vehicle acceleration and deceleration. This displays what the car is currently doing, not what the planner is requesting.",
+              "title": "Barra accelerazione in tempo reale",
+              "description": "Mostra un indicatore sul lato sinistro dello schermo con accelerazione e decelerazione del veicolo in tempo reale. Indica cosa sta facendo l'auto, non cosa richiede il pianificatore.",
               "visibility": [
                 {
                   "type": "not",
@@ -1597,7 +1597,7 @@
             {
               "key": "ChevronInfo",
               "widget": "option",
-              "title": "Display Metrics Below Chevron",
+              "title": "Mostra dati sotto il chevron",
               "options": [
                 {
                   "value": 0,
@@ -1605,19 +1605,19 @@
                 },
                 {
                   "value": 1,
-                  "label": "Distance"
+                  "label": "Distanza"
                 },
                 {
                   "value": 2,
-                  "label": "Speed"
+                  "label": "Velocità"
                 },
                 {
                   "value": 3,
-                  "label": "Time"
+                  "label": "Tempo"
                 },
                 {
                   "value": 4,
-                  "label": "All"
+                  "label": "Tutti"
                 }
               ],
               "visibility": [
@@ -1642,8 +1642,8 @@
         },
         {
           "id": "developer_ui",
-          "title": "Developer UI Info",
-          "description": "Speedometer and debug display options",
+          "title": "Info interfaccia sviluppatore",
+          "description": "Opzioni tachimetro e visualizzazione debug",
           "visibility": [
             {
               "type": "not",
@@ -1658,8 +1658,8 @@
             {
               "key": "DevUIInfo",
               "widget": "option",
-              "title": "Developer UI",
-              "description": "Display real-time parameters and metrics from various sources.",
+              "title": "Interfaccia sviluppatore",
+              "description": "Mostra parametri e dati in tempo reale da varie fonti.",
               "options": [
                 {
                   "value": 0,
@@ -1667,54 +1667,54 @@
                 },
                 {
                   "value": 1,
-                  "label": "Bottom"
+                  "label": "In basso"
                 },
                 {
                   "value": 2,
-                  "label": "Right"
+                  "label": "A destra"
                 },
                 {
                   "value": 3,
-                  "label": "Right & Bottom"
+                  "label": "A destra e in basso"
                 }
               ]
             },
             {
               "key": "TrueVEgoUI",
               "widget": "toggle",
-              "title": "Speedometer: Always Display True Speed",
-              "description": "For applicable vehicles, always display the true vehicle current speed from wheel speed sensors."
+              "title": "Tachimetro: mostra sempre la velocità reale",
+              "description": "Sui veicoli compatibili, mostra sempre la velocità reale rilevata dai sensori di velocità delle ruote."
             },
             {
               "key": "HideVEgoUI",
               "widget": "toggle",
-              "title": "Speedometer: Hide from Onroad Screen",
-              "description": "When enabled, the speedometer on the onroad screen is not displayed."
+              "title": "Tachimetro: nascondi dalla schermata di guida",
+              "description": "Se attivo, il tachimetro non viene mostrato nella schermata di guida."
             }
           ]
         },
         {
           "id": "alerts_extras",
-          "title": "Alerts & Extras",
-          "description": "Traffic light alerts and visual flair",
+          "title": "Avvisi ed extra",
+          "description": "Avvisi semaforo ed effetti grafici",
           "items": [
             {
               "key": "GreenLightAlert",
               "widget": "toggle",
-              "title": "Green Traffic Light Alert (Beta)",
-              "description": "A chime and on-screen alert will play when the traffic light you are waiting for turns green and you have no vehicle in front of you. On-screen visual alert is only available on comma 3X. Note: This chime is only designed as a notification. It is the driver's responsibility to observe their environment and make decisions accordingly."
+              "title": "Avviso semaforo verde (Beta)",
+              "description": "Un segnale acustico e un avviso a schermo ti avvisano quando il semaforo che stai aspettando diventa verde e non hai veicoli davanti. L'avviso a schermo è disponibile solo su comma 3X. Nota: il segnale acustico è solo una notifica. Spetta al conducente osservare ciò che lo circonda e decidere di conseguenza."
             },
             {
               "key": "LeadDepartAlert",
               "widget": "toggle",
-              "title": "Lead Departure Alert (Beta)",
-              "description": "A chime and on-screen alert will play when you are stopped, and the vehicle in front of you start moving. On-screen visual alert is only available on comma 3X. Note: This chime is only designed as a notification. It is the driver's responsibility to observe their environment and make decisions accordingly."
+              "title": "Avviso partenza veicolo davanti (Beta)",
+              "description": "Un segnale acustico e un avviso a schermo ti avvisano quando sei fermo e il veicolo davanti riparte. L'avviso a schermo è disponibile solo su comma 3X. Nota: il segnale acustico è solo una notifica. Spetta al conducente osservare ciò che lo circonda e decidere di conseguenza."
             },
             {
               "key": "RainbowMode",
               "widget": "toggle",
-              "title": "Tesla Rainbow Mode",
-              "description": "Display a rainbow effect on the path the model wants to take. It does not affect driving in any way."
+              "title": "Modalità arcobaleno Tesla",
+              "description": "Mostra un effetto arcobaleno sul percorso che il modello vuole seguire. Non influisce in alcun modo sulla guida."
             }
           ]
         }
@@ -1722,11 +1722,11 @@
     },
     {
       "id": "toggles",
-      "label": "Toggles",
+      "label": "Opzioni",
       "icon": "toggles",
       "order": 5,
       "remote_configurable": true,
-      "description": "Core openpilot feature toggles",
+      "description": "Opzioni principali di openpilot",
       "sections": [
         {
           "id": "core_toggles",
@@ -1737,8 +1737,8 @@
               "key": "OpenpilotEnabledToggle",
               "widget": "toggle",
               "needs_onroad_cycle": true,
-              "title": "Enable sunnypilot",
-              "description": "Use the sunnypilot system for adaptive cruise control and lane keep driver assistance. Your attention is required at all times to use this feature.",
+              "title": "Attiva sunnypilot",
+              "description": "Usa il sistema sunnypilot per il cruise control adattivo e l'assistenza al mantenimento della corsia. Questa funzione richiede sempre la tua attenzione.",
               "enablement": [
                 {
                   "type": "offroad_only"
@@ -1748,41 +1748,41 @@
             {
               "key": "IsLdwEnabled",
               "widget": "toggle",
-              "title": "Enable Lane Departure Warnings",
-              "description": "Receive alerts to steer back into the lane when your vehicle drifts over a detected lane line without a turn signal activated while driving over 31 mph (50 km/h)."
+              "title": "Attiva avvisi di uscita dalla corsia",
+              "description": "Ricevi un avviso per rientrare in corsia quando il veicolo supera una linea di corsia senza freccia inserita, sopra i 50 km/h (31 mph)."
             },
             {
               "key": "AlwaysOnDM",
               "widget": "toggle",
-              "title": "Always-On Driver Monitoring",
-              "description": "Enable driver monitoring even when sunnypilot is not engaged."
+              "title": "Monitoraggio conducente sempre attivo",
+              "description": "Attiva il monitoraggio del conducente anche quando sunnypilot non è inserito."
             },
             {
               "key": "IsMetric",
               "widget": "toggle",
-              "title": "Use Metric System",
-              "description": "Display speed in km/h instead of mph."
+              "title": "Usa il sistema metrico",
+              "description": "Mostra la velocità in km/h invece che in mph."
             }
           ]
         },
         {
           "id": "recording",
-          "title": "Recording",
-          "description": "Camera and audio recording during drives",
+          "title": "Registrazione",
+          "description": "Registrazione video e audio durante la guida",
           "items": [
             {
               "key": "RecordFront",
               "widget": "toggle",
               "needs_onroad_cycle": true,
-              "title": "Record and Upload Driver Camera",
-              "description": "Upload data from the driver facing camera and help improve the driver monitoring algorithm."
+              "title": "Registra e carica la telecamera del conducente",
+              "description": "Carica i dati della telecamera rivolta al conducente e aiuta a migliorare l'algoritmo di monitoraggio del conducente."
             },
             {
               "key": "RecordAudio",
               "widget": "toggle",
               "needs_onroad_cycle": true,
-              "title": "Record and Upload Microphone Audio",
-              "description": "Record and store microphone audio while driving. The audio will be included in the dashcam video in comma connect."
+              "title": "Registra e carica l'audio del microfono",
+              "description": "Registra e salva l'audio del microfono durante la guida. L'audio sarà incluso nel video dashcam su comma connect."
             }
           ]
         }
@@ -1790,27 +1790,27 @@
     },
     {
       "id": "device",
-      "label": "Device",
+      "label": "Dispositivo",
       "icon": "device",
       "order": 6,
       "remote_configurable": true,
-      "description": "Device behavior, units, and recording settings",
+      "description": "Comportamento del dispositivo, unità di misura e registrazione",
       "sections": [
         {
           "id": "general",
-          "title": "General",
-          "description": "Power, boot, and unit preferences",
+          "title": "Generale",
+          "description": "Alimentazione, avvio e unità di misura",
           "items": [
             {
               "key": "OffroadModeRequested",
               "widget": "toggle",
-              "title": "Force Offroad Mode"
+              "title": "Forza modalità offroad"
             },
             {
               "key": "DeviceBootMode",
               "widget": "option",
-              "title": "Wake Up Behavior",
-              "description": "Controls state of the device after boot/sleep. Default: Device will boot/wake-up normally and will be ready to engage. Offroad: Device will be in Always Offroad mode after boot/wake-up.",
+              "title": "Comportamento al risveglio",
+              "description": "Stabilisce lo stato del dispositivo dopo l'avvio o la sospensione. Predefinito: il dispositivo si avvia/riattiva normalmente ed è pronto all'inserimento. Offroad: dopo l'avvio/risveglio il dispositivo resta in modalità Sempre offroad.",
               "options": [
                 {
                   "value": 0,
@@ -1818,29 +1818,29 @@
                 },
                 {
                   "value": 1,
-                  "label": "Always Offroad"
+                  "label": "Sempre offroad"
                 }
               ]
             },
             {
               "key": "QuietMode",
               "widget": "toggle",
-              "title": "Quiet Mode"
+              "title": "Modalità silenziosa"
             },
             {
               "key": "OnroadUploads",
               "widget": "toggle",
-              "title": "Onroad Uploads"
+              "title": "Caricamenti durante la guida"
             },
             {
               "key": "MaxTimeOffroad",
               "widget": "option",
-              "title": "Max Time Offroad",
-              "description": "Device will automatically shutdown after set time once the engine is turned off. 30h is the default.",
+              "title": "Tempo massimo offroad",
+              "description": "Il dispositivo si spegne automaticamente dopo il tempo impostato, una volta spento il motore. Il valore predefinito è 30h.",
               "options": [
                 {
                   "value": 0,
-                  "label": "Always On"
+                  "label": "Sempre acceso"
                 },
                 {
                   "value": 5,
@@ -1884,7 +1884,7 @@
                 },
                 {
                   "value": 1800,
-                  "label": "30h (Default)"
+                  "label": "30h (predefinito)"
                 }
               ]
             }
@@ -1892,12 +1892,12 @@
         },
         {
           "id": "language",
-          "title": "Language",
+          "title": "Lingua",
           "items": [
             {
               "key": "LanguageSetting",
               "widget": "info",
-              "title": "Language"
+              "title": "Lingua"
             }
           ]
         }
@@ -1909,18 +1909,18 @@
       "icon": "software",
       "order": 7,
       "remote_configurable": true,
-      "description": "Software update preferences",
+      "description": "Preferenze aggiornamenti software",
       "sections": [
         {
           "id": "updates",
-          "title": "Updates",
-          "description": "Control software updates",
+          "title": "Aggiornamenti",
+          "description": "Gestisci gli aggiornamenti software",
           "items": [
             {
               "key": "DisableUpdates",
               "widget": "toggle",
-              "title": "Disable Updates",
-              "description": "When enabled, software updates will be off. This requires a reboot to take effect.",
+              "title": "Disattiva aggiornamenti",
+              "description": "Se attivo, gli aggiornamenti software sono disattivati. Richiede un riavvio per avere effetto.",
               "enablement": [
                 {
                   "type": "offroad_only"
@@ -1938,23 +1938,23 @@
     },
     {
       "id": "developer",
-      "label": "Developer",
+      "label": "Sviluppatore",
       "icon": "developer",
       "order": 9,
       "remote_configurable": true,
-      "description": "Debug tools, remote access, and advanced services",
+      "description": "Strumenti di debug, accesso remoto e servizi avanzati",
       "sections": [
         {
           "id": "connectivity",
-          "title": "Connectivity",
-          "description": "Remote access and debugging interfaces",
+          "title": "Connettività",
+          "description": "Accesso remoto e interfacce di debug",
           "items": [
             {
               "key": "AdbEnabled",
               "widget": "toggle",
               "blocked": true,
-              "title": "Enable ADB",
-              "description": "ADB (Android Debug Bridge) allows connecting to your device over USB or over the network. See https://docs.comma.ai/how-to/connect-to-comma for more info.",
+              "title": "Attiva ADB",
+              "description": "ADB (Android Debug Bridge) permette di collegarsi al dispositivo via USB o tramite rete. Maggiori informazioni su https://docs.comma.ai/how-to/connect-to-comma.",
               "enablement": [
                 {
                   "type": "offroad_only"
@@ -1965,12 +1965,12 @@
               "key": "SshEnabled",
               "widget": "toggle",
               "blocked": true,
-              "title": "Enable SSH"
+              "title": "Attiva SSH"
             },
             {
               "key": "JoystickDebugMode",
               "widget": "toggle",
-              "title": "Joystick Debug Mode",
+              "title": "Modalità debug joystick",
               "enablement": [
                 {
                   "type": "offroad_only"
@@ -1980,8 +1980,8 @@
             {
               "key": "NavigationEnabled",
               "widget": "toggle",
-              "title": "Navigation (Alpha)",
-              "description": "Turn-by-turn navigation with a route map. Set a destination from comma connect.",
+              "title": "Navigazione (Alpha)",
+              "description": "Navigazione svolta per svolta con mappa del percorso. Imposta la destinazione da comma connect.",
               "visibility": [
                 {
                   "type": "capability",
@@ -2001,14 +2001,14 @@
             {
               "key": "ShowDebugInfo",
               "widget": "toggle",
-              "title": "UI Debug Mode"
+              "title": "Modalità debug interfaccia"
             }
           ]
         },
         {
           "id": "test_maneuvers",
-          "title": "Test Maneuvers",
-          "description": "DANGER: enabling these maneuvers replaces normal driving behavior with deterministic test sequences. Each toggle requires explicit confirmation per write. Use only in a closed environment.",
+          "title": "Manovre di test",
+          "description": "PERICOLO: attivare queste manovre sostituisce la guida normale con sequenze di test deterministiche. Ogni modifica richiede una conferma esplicita. Usare solo in area chiusa al traffico.",
           "visibility": [
             {
               "type": "any",
@@ -2048,8 +2048,8 @@
             {
               "key": "LateralManeuverMode",
               "widget": "toggle",
-              "title": "[TEST] Lateral Maneuver Mode",
-              "description": "Replaces normal lateral control with a deterministic test sequence. NOT for road use.",
+              "title": "[TEST] Modalità manovra laterale",
+              "description": "Sostituisce il normale controllo laterale con una sequenza di test deterministica. NON usare su strada.",
               "enablement": [
                 {
                   "type": "not_engaged"
@@ -2064,8 +2064,8 @@
             {
               "key": "LongitudinalManeuverMode",
               "widget": "toggle",
-              "title": "[TEST] Longitudinal Maneuver Mode",
-              "description": "Replaces normal longitudinal control with a deterministic test sequence. NOT for road use.",
+              "title": "[TEST] Modalità manovra longitudinale",
+              "description": "Sostituisce il normale controllo longitudinale con una sequenza di test deterministica. NON usare su strada.",
               "enablement": [
                 {
                   "type": "not_engaged"
@@ -2081,20 +2081,20 @@
         },
         {
           "id": "advanced_services",
-          "title": "Advanced Settings",
+          "title": "Impostazioni avanzate",
           "description": "",
           "items": [
             {
               "key": "ShowAdvancedControls",
               "widget": "toggle",
-              "title": "Show Advanced Controls",
-              "description": "Toggle visibility of advanced sunnypilot controls. This only changes the visibility of the toggles; it does not change the actual enabled/disabled state."
+              "title": "Mostra controlli avanzati",
+              "description": "Mostra o nasconde i controlli avanzati di sunnypilot. Cambia solo la visibilità delle opzioni, non il loro stato attivo/disattivo."
             },
             {
               "key": "EnableGithubRunner",
               "widget": "toggle",
-              "title": "GitHub Runner Service",
-              "description": "Enables or disables the GitHub runner service.",
+              "title": "Servizio GitHub Runner",
+              "description": "Attiva o disattiva il servizio GitHub runner.",
               "visibility": [
                 {
                   "type": "not",
@@ -2116,8 +2116,8 @@
             {
               "key": "EnableCopyparty",
               "widget": "toggle",
-              "title": "copyparty Service",
-              "description": "copyparty is a very capable file server, you can use it to download your routes, view your logs and even make some edits on some files from your browser. Requires you to connect to your comma locally via its IP address.",
+              "title": "Servizio copyparty",
+              "description": "copyparty è un file server molto completo: puoi usarlo per scaricare i tuoi percorsi, vedere i log e persino modificare alcuni file dal browser. Richiede di collegarti al comma in rete locale tramite il suo indirizzo IP.",
               "enablement": [
                 {
                   "type": "param",
@@ -2129,7 +2129,7 @@
             {
               "key": "QuickBootToggle",
               "widget": "toggle",
-              "title": "Quickboot Mode",
+              "title": "Avvio rapido",
               "visibility": [
                 {
                   "type": "not",
@@ -2169,28 +2169,28 @@
     },
     {
       "id": "models",
-      "label": "Models",
+      "label": "Modelli",
       "icon": "models",
       "order": 10,
       "remote_configurable": false,
-      "description": "Driving model behavior and camera calibration",
+      "description": "Comportamento del modello di guida e calibrazione della telecamera",
       "sections": [
         {
           "id": "model_behavior",
-          "title": "Model Behavior",
-          "description": "Lane desire, lane center assist, and lead-vehicle awareness tuning",
+          "title": "Comportamento del modello",
+          "description": "Regolazione di intenzioni di corsia, centraggio in corsia e rilevamento del veicolo davanti",
           "items": [
             {
               "key": "Blendful",
               "widget": "toggle",
-              "title": "Lane Center Assist (Alpha)",
-              "description": "Adds a gentle nudge toward lane center on top of the model's own steering, stronger when lane lines are clear. Yields around obstacles."
+              "title": "Assistenza centraggio corsia (Alpha)",
+              "description": "Aggiunge una leggera spinta verso il centro della corsia oltre allo sterzo del modello, più decisa quando le linee sono ben visibili. Cede in presenza di ostacoli."
             },
             {
               "key": "SmallModelSteering",
               "widget": "option",
-              "title": "Small Model Steering",
-              "description": "With a big model, the small model steers below this speed. It is steadier when slow. 0 is off. Default is 5 m/s (11 mph, 18 km/h). Not available with the Default model.",
+              "title": "Sterzo con modello piccolo",
+              "description": "Con un modello grande, sotto questa velocità sterza il modello piccolo, più stabile a bassa velocità. 0 = disattivato. Predefinito: 5 m/s (11 mph, 18 km/h). Non disponibile con il modello predefinito.",
               "min": 0,
               "max": 9,
               "step": 0.5,
@@ -2206,14 +2206,14 @@
             {
               "key": "LaneTurnDesire",
               "widget": "toggle",
-              "title": "Use Lane Turn Desires",
-              "description": "If you are driving at 20 mph (32 km/h) or below and have your blinker on, the car will plan a turn in that direction at the nearest drivable path. This prevents situations (like at red lights) where the car might plan the wrong turn direction."
+              "title": "Usa intenzioni di svolta",
+              "description": "Se viaggi a 32 km/h (20 mph) o meno con la freccia inserita, l'auto pianifica una svolta in quella direzione nel primo percorso percorribile. Evita situazioni (ad esempio ai semafori rossi) in cui l'auto potrebbe pianificare la svolta nella direzione sbagliata."
             },
             {
               "key": "LaneTurnValue",
               "widget": "option",
-              "title": "Adjust Lane Turn Speed",
-              "description": "Set the maximum speed for lane turn desires.",
+              "title": "Velocità per le intenzioni di svolta",
+              "description": "Imposta la velocità massima per le intenzioni di svolta.",
               "min": 0,
               "max": 20,
               "step": 1,
@@ -2237,14 +2237,14 @@
             {
               "key": "LagdToggle",
               "widget": "toggle",
-              "title": "Live Learning Steer Delay",
-              "description": "Allow device to learn and adapt car's steering response time"
+              "title": "Apprendimento in tempo reale del ritardo di sterzo",
+              "description": "Permette al dispositivo di imparare e adattarsi al tempo di risposta dello sterzo dell'auto"
             },
             {
               "key": "LagdToggleDelay",
               "widget": "option",
-              "title": "Adjust Software Delay",
-              "description": "Adjust the software delay when Live Learning Steer Delay is toggled off. The default software delay value is 0.2",
+              "title": "Regola ritardo software",
+              "description": "Regola il ritardo software quando l'apprendimento in tempo reale del ritardo di sterzo è disattivato. Il valore predefinito è 0.2",
               "min": 0.05,
               "max": 0.5,
               "step": 0.01,
@@ -2268,14 +2268,14 @@
         },
         {
           "id": "lateral_control",
-          "title": "Lateral Control",
-          "description": "Neural network lateral control for supported models",
+          "title": "Controllo laterale",
+          "description": "Controllo laterale con rete neurale per i modelli supportati",
           "items": [
             {
               "key": "NeuralNetworkLateralControl",
               "widget": "toggle",
-              "title": "Neural Network Lateral Control (NNLC)",
-              "description": "Use a neural network for lateral control instead of the default torque controller.",
+              "title": "Controllo laterale con rete neurale (NNLC)",
+              "description": "Usa una rete neurale per il controllo laterale al posto del controller di coppia predefinito.",
               "visibility": [
                 {
                   "type": "not",
@@ -2311,14 +2311,14 @@
         },
         {
           "id": "camera",
-          "title": "Camera",
-          "description": "Camera position and calibration",
+          "title": "Telecamera",
+          "description": "Posizione e calibrazione della telecamera",
           "items": [
             {
               "key": "CameraOffset",
               "widget": "option",
-              "title": "Adjust Camera Offset",
-              "description": "Virtually shift camera's perspective to move model's center to Left(+ values) or Right (- values)",
+              "title": "Regola offset telecamera",
+              "description": "Sposta virtualmente la prospettiva della telecamera per spostare il centro del modello a sinistra (valori +) o a destra (valori -)",
               "min": -0.35,
               "max": 0.35,
               "step": 0.01,
@@ -2338,13 +2338,13 @@
   ],
   "vehicle_settings": {
     "hyundai": {
-      "title": "Hyundai / Kia / Genesis Settings",
+      "title": "Impostazioni Hyundai / Kia / Genesis",
       "description": "",
       "items": [
         {
           "key": "HyundaiLongitudinalTuning",
           "widget": "multiple_button",
-          "title": "Custom Longitudinal Tuning",
+          "title": "Taratura longitudinale personalizzata",
           "options": [
             {
               "value": 0,
@@ -2352,11 +2352,11 @@
             },
             {
               "value": 1,
-              "label": "Dynamic"
+              "label": "Dinamica"
             },
             {
               "value": 2,
-              "label": "Predictive"
+              "label": "Predittiva"
             }
           ],
           "visibility": [
@@ -2380,7 +2380,7 @@
       ]
     },
     "subaru": {
-      "title": "Subaru Settings",
+      "title": "Impostazioni Subaru",
       "description": "",
       "items": [
         {
@@ -2401,7 +2401,7 @@
         {
           "key": "SubaruStopAndGoManualParkingBrake",
           "widget": "toggle",
-          "title": "Stop and Go for Manual Parking Brake (Beta)",
+          "title": "Stop and Go con freno di stazionamento manuale (Beta)",
           "enablement": [
             {
               "type": "offroad_only"
@@ -2416,13 +2416,13 @@
       ]
     },
     "tesla": {
-      "title": "Tesla Settings",
+      "title": "Impostazioni Tesla",
       "description": "",
       "items": [
         {
           "key": "TeslaCoopSteering",
           "widget": "toggle",
-          "title": "Cooperative Steering (Beta)",
+          "title": "Sterzo cooperativo (Beta)",
           "enablement": [
             {
               "type": "offroad_only"
@@ -2432,8 +2432,8 @@
         {
           "key": "TeslaMadsScreenButton",
           "widget": "multiple_button",
-          "title": "MADS Screen Activation",
-          "description": "Use a multi-finger press on the infotainment screen to toggle MADS. This allows the use of full MADS functionality when enabled. Selecting a higher finger count may reduce accidental activations. Note: Setting this to Off will reset your MADS settings to default.",
+          "title": "Attivazione MADS dallo schermo",
+          "description": "Tocca lo schermo dell'infotainment con più dita per attivare o disattivare MADS. Se attivo, consente di usare tutte le funzioni MADS. Scegliere più dita può ridurre le attivazioni accidentali. Nota: impostandolo su Off le impostazioni MADS tornano ai valori predefiniti.",
           "options": [
             {
               "value": 0,
@@ -2441,15 +2441,15 @@
             },
             {
               "value": 1,
-              "label": "3-Finger"
+              "label": "3 dita"
             },
             {
               "value": 2,
-              "label": "4-Finger"
+              "label": "4 dita"
             },
             {
               "value": 3,
-              "label": "5-Finger"
+              "label": "5 dita"
             }
           ],
           "visibility": [
@@ -2468,15 +2468,15 @@
       ]
     },
     "toyota": {
-      "title": "Toyota / Lexus Settings",
+      "title": "Impostazioni Toyota / Lexus",
       "description": "",
       "items": [
         {
           "key": "ToyotaEnforceStockLongitudinal",
           "widget": "toggle",
           "needs_onroad_cycle": true,
-          "title": "Enforce Factory Longitudinal Control",
-          "description": "sunnypilot will not take over control of gas and brakes. Factory Toyota longitudinal control will be used.",
+          "title": "Forza controllo longitudinale di serie",
+          "description": "sunnypilot non prenderà il controllo di acceleratore e freni: verrà usato il controllo longitudinale di serie Toyota.",
           "enablement": [
             {
               "type": "not_engaged"
@@ -2487,8 +2487,8 @@
           "key": "ToyotaStopAndGoHack",
           "widget": "toggle",
           "needs_onroad_cycle": true,
-          "title": "Stop and Go Hack (Alpha)",
-          "description": "sunnypilot will allow some Toyota/Lexus cars to auto resume during stop and go traffic. This feature is only applicable to certain models that are able to use longitudinal control. This is an alpha feature. Use at your own risk.",
+          "title": "Hack Stop and Go (Alpha)",
+          "description": "sunnypilot permette ad alcune Toyota/Lexus di ripartire da sole nel traffico stop and go. Vale solo per alcuni modelli in grado di usare il controllo longitudinale. Funzione in fase alpha: usala a tuo rischio.",
           "enablement": [
             {
               "type": "not_engaged"
@@ -2509,8 +2509,8 @@
           "key": "ToyotaTSS2Smooth",
           "widget": "toggle",
           "needs_onroad_cycle": true,
-          "title": "TSS2 Smooth Longitudinal (Alpha)",
-          "description": "Enable smoother longitudinal control for TSS2 vehicles. Uses a custom speed-dependent integral gain curve for smoother traffic driving.",
+          "title": "Longitudinale fluido TSS2 (Alpha)",
+          "description": "Attiva un controllo longitudinale più fluido per i veicoli TSS2. Usa una curva di guadagno integrale personalizzata in base alla velocità per una guida più dolce nel traffico.",
           "enablement": [
             {
               "type": "not_engaged"

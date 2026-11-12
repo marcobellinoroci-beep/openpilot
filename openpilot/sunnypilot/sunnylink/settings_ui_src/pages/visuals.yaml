@@ -1,121 +1,114 @@
 # Page: visuals
 # Edit this file. Run compile_settings_ui.py to emit settings_ui.json.
 id: visuals
-label: Visuals
+label: Grafica
 icon: visuals
 order: 4
 remote_configurable: true
-description: HUD overlays, alerts, and on-screen display elements
+description: Elementi HUD, avvisi e indicazioni a schermo
 sections:
 - id: hud_elements
-  title: HUD Elements
-  description: Overlays shown on the driving screen
+  title: Elementi HUD
+  description: Elementi mostrati sulla schermata di guida
   items:
   - key: BlindSpot
     widget: toggle
-    title: Show Blind Spot Warnings
-    description: Enabling this will display warnings when a vehicle is detected in your blind spot as long as your car has
-      BSM supported.
+    title: Mostra avvisi angolo cieco
+    description: Mostra un avviso quando viene rilevato un veicolo nell'angolo cieco, se l'auto supporta il BSM.
   - key: TorqueBar
     widget: toggle
-    title: Steering Arc
-    description: Display steering arc on the driving screen when lateral control is enabled.
+    title: Arco di sterzata
+    description: Mostra l'arco di sterzata sulla schermata di guida quando il controllo laterale è attivo.
     visibility:
     - $ref: '#/macros/hide_on_mici'
   - key: ConfidenceBall
     widget: toggle
-    title: Confidence Ball
-    description: "Shows the model's confidence as a ball on your side of the screen, as on the comma 4: higher is more confident, and while engaged it is green, then yellow, then red as confidence drops."
+    title: Indicatore di affidabilità
+    description: "Mostra l'affidabilità del modello con una pallina sul tuo lato dello schermo, come sul comma 4: più è in alto, più il modello è sicuro; quando è inserito è verde, poi gialla, poi rossa man mano che l'affidabilità cala."
     visibility:
     - $ref: '#/macros/hide_on_mici'
   - key: ShowTurnSignals
     widget: toggle
-    title: Display Turn Signals
-    description: When enabled, visual turn indicators are drawn on the HUD.
+    title: Mostra frecce
+    description: Se attivo, gli indicatori di direzione vengono mostrati sull'HUD.
     visibility:
     - $ref: '#/macros/hide_on_mici'
   - key: RoadNameToggle
     widget: toggle
-    title: Display Road Name
-    description: Displays the name of the road the car is traveling on. The OpenStreetMap database of the location must be
-      downloaded to fetch the road name.
+    title: Mostra nome della strada
+    description: Mostra il nome della strada che stai percorrendo. Per ottenerlo bisogna scaricare il database OpenStreetMap della zona.
     visibility:
     - $ref: '#/macros/hide_on_mici'
   - key: StandstillTimer
     widget: toggle
-    title: Standstill Timer
-    description: Show a timer on the HUD when the car is at a standstill.
+    title: Timer da fermo
+    description: Mostra un timer sull'HUD quando l'auto è ferma.
     visibility:
     - $ref: '#/macros/hide_on_mici'
   - key: RocketFuel
     widget: toggle
-    title: Real-time Acceleration Bar
-    description: Show an indicator on the left side of the screen to display real-time vehicle acceleration and deceleration.
-      This displays what the car is currently doing, not what the planner is requesting.
+    title: Barra accelerazione in tempo reale
+    description: Mostra un indicatore sul lato sinistro dello schermo con accelerazione e decelerazione del veicolo in tempo reale. Indica cosa sta facendo l'auto, non cosa richiede il pianificatore.
     visibility:
     - $ref: '#/macros/hide_on_mici'
   - key: ChevronInfo
     widget: option
-    title: Display Metrics Below Chevron
+    title: Mostra dati sotto il chevron
     options:
     - value: 0
       label: 'Off'
     - value: 1
-      label: Distance
+      label: Distanza
     - value: 2
-      label: Speed
+      label: Velocità
     - value: 3
-      label: Time
+      label: Tempo
     - value: 4
-      label: All
+      label: Tutti
     visibility:
     - $ref: '#/macros/hide_on_mici'
     enablement:
     - $ref: '#/macros/longitudinal'
 - id: developer_ui
-  title: Developer UI Info
-  description: Speedometer and debug display options
+  title: Info interfaccia sviluppatore
+  description: Opzioni tachimetro e visualizzazione debug
   visibility:
   - $ref: '#/macros/hide_on_mici'
   items:
   - key: DevUIInfo
     widget: option
-    title: Developer UI
-    description: Display real-time parameters and metrics from various sources.
+    title: Interfaccia sviluppatore
+    description: Mostra parametri e dati in tempo reale da varie fonti.
     options:
     - value: 0
       label: 'Off'
     - value: 1
-      label: Bottom
+      label: In basso
     - value: 2
-      label: Right
+      label: A destra
     - value: 3
-      label: Right & Bottom
+      label: A destra e in basso
   - key: TrueVEgoUI
     widget: toggle
-    title: 'Speedometer: Always Display True Speed'
-    description: For applicable vehicles, always display the true vehicle current speed from wheel speed sensors.
+    title: 'Tachimetro: mostra sempre la velocità reale'
+    description: Sui veicoli compatibili, mostra sempre la velocità reale rilevata dai sensori di velocità delle ruote.
   - key: HideVEgoUI
     widget: toggle
-    title: 'Speedometer: Hide from Onroad Screen'
-    description: When enabled, the speedometer on the onroad screen is not displayed.
+    title: 'Tachimetro: nascondi dalla schermata di guida'
+    description: Se attivo, il tachimetro non viene mostrato nella schermata di guida.
 - id: alerts_extras
-  title: Alerts & Extras
-  description: Traffic light alerts and visual flair
+  title: Avvisi ed extra
+  description: Avvisi semaforo ed effetti grafici
   items:
   - key: GreenLightAlert
     widget: toggle
-    title: Green Traffic Light Alert (Beta)
-    description: 'A chime and on-screen alert will play when the traffic light you are waiting for turns green and you have
-      no vehicle in front of you. On-screen visual alert is only available on comma 3X. Note: This chime is only designed
-      as a notification. It is the driver''s responsibility to observe their environment and make decisions accordingly.'
+    title: Avviso semaforo verde (Beta)
+    description: 'Un segnale acustico e un avviso a schermo ti avvisano quando il semaforo che stai aspettando diventa verde e non hai veicoli davanti. L''avviso a schermo è disponibile solo su comma 3X. Nota: il segnale acustico è solo una notifica. Spetta al conducente osservare ciò che lo circonda e decidere di conseguenza.'
   - key: LeadDepartAlert
     widget: toggle
-    title: Lead Departure Alert (Beta)
-    description: 'A chime and on-screen alert will play when you are stopped, and the vehicle in front of you start moving.
-      On-screen visual alert is only available on comma 3X. Note: This chime is only designed as a notification. It is the
-      driver''s responsibility to observe their environment and make decisions accordingly.'
+    title: Avviso partenza veicolo davanti (Beta)
+    description: 'Un segnale acustico e un avviso a schermo ti avvisano quando sei fermo e il veicolo davanti riparte. L''avviso a schermo è disponibile solo su comma 3X. Nota: il segnale acustico è solo una notifica. Spetta al conducente osservare ciò che lo circonda e decidere di conseguenza.'
   - key: RainbowMode
     widget: toggle
-    title: Tesla Rainbow Mode
-    description: Display a rainbow effect on the path the model wants to take. It does not affect driving in any way.
+    title: Modalità arcobaleno Tesla
+    description: Mostra un effetto arcobaleno sul percorso che il modello vuole seguire. Non influisce in alcun modo sulla guida.

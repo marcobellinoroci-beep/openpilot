@@ -1,26 +1,26 @@
 # Page: display
 # Edit this file. Run compile_settings_ui.py to emit settings_ui.json.
 id: display
-label: Display
+label: Schermo
 icon: display
 order: 3
 remote_configurable: true
-description: Screen brightness, timeout, and interactivity settings
+description: Luminosità, spegnimento e interattività dello schermo
 sections:
 - id: brightness_timeout
-  title: Brightness & Timeout
-  description: Screen dimming and sleep behavior while driving
+  title: Luminosità e spegnimento
+  description: Attenuazione e spegnimento dello schermo durante la guida
   items:
   - key: OnroadScreenOffBrightness
     widget: multiple_button
-    title: Onroad Brightness
+    title: Luminosità durante la guida
     options:
     - value: 0
-      label: Auto (Default)
+      label: Auto (predefinito)
     - value: 1
-      label: Auto (Dark)
+      label: Auto (scuro)
     - value: 2
-      label: Screen Off
+      label: Schermo spento
     - value: 3
       label: 5 %
     - value: 4
@@ -63,10 +63,10 @@ sections:
       label: 100 %
   - key: OnroadScreenOffTimer
     widget: multiple_button
-    title: Onroad Brightness Delay
+    title: Ritardo luminosità durante la guida
     options:
     - value: 0
-      label: Always On
+      label: Sempre acceso
     - value: 3
       label: 3s
     - value: 5
@@ -98,12 +98,11 @@ sections:
           equals: 1
   - key: InteractivityTimeout
     widget: multiple_button
-    title: Interactivity Timeout
-    description: Apply a custom timeout for settings UI. This is the time after which settings UI closes automatically if
-      user is not interacting with the screen.
+    title: Timeout interazione
+    description: 'Imposta un timeout personalizzato per le impostazioni: è il tempo dopo il quale le impostazioni si chiudono da sole se non tocchi lo schermo.'
     options:
     - value: 0
-      label: Default
+      label: Predefinito
     - value: 10
       label: 10 s
     - value: 20
@@ -130,16 +129,16 @@ sections:
       label: 2 m
   - key: HomeShowActiveModel
     widget: toggle
-    title: Show Driving Model on Home Screen
-    description: Name the active driving model on the offroad home screen.
+    title: Mostra il modello di guida nella schermata iniziale
+    description: Mostra il nome del modello di guida attivo nella schermata iniziale offroad.
   - key: ScreenSaverEnabled
     widget: toggle
-    title: Screen Saver
-    description: Show a screen saver when the device is offroad and idle, instead of turning the screen off.
+    title: Salvaschermo
+    description: Mostra un salvaschermo quando il dispositivo è offroad e inattivo, invece di spegnere lo schermo.
   - key: ScreenSaverTimeout
     widget: multiple_button
-    title: Screen Saver Duration
-    description: How long the screen saver runs before the screen turns off.
+    title: Durata salvaschermo
+    description: Per quanto tempo resta il salvaschermo prima che lo schermo si spenga.
     options:
     - value: 60
       label: 1 m

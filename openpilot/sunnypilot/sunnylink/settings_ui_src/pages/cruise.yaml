@@ -5,20 +5,18 @@ label: Cruise
 icon: cruise_control
 order: 2
 remote_configurable: true
-description: Longitudinal control, speed limits, and cruise behavior
+description: Controllo longitudinale, limiti di velocità e comportamento del cruise
 sections:
 - id: alpha_longitudinal
-  title: Alpha Longitudinal
+  title: Longitudinale Alpha
   description: ''
   items:
   - key: AlphaLongitudinalEnabled
     widget: toggle
     needs_onroad_cycle: true
     blocked: true
-    title: zoompilot Longitudinal Control (Alpha)
-    description: 'WARNING: zoompilot longitudinal control is in alpha for this car and may disable Automatic Emergency Braking
-      (AEB). On this car, zoompilot defaults to the car''s built-in ACC instead of zoompilot''s longitudinal control. Enable
-      this to switch to zoompilot longitudinal control. Changing this setting will restart zoompilot if the car is powered on.'
+    title: Controllo longitudinale zoompilot (Alpha)
+    description: 'ATTENZIONE: il controllo longitudinale di zoompilot è in fase alpha per quest''auto e può disattivare la frenata automatica d''emergenza (AEB). Su quest''auto zoompilot usa di default l''ACC di serie invece del proprio controllo longitudinale. Attiva questa opzione per passare al controllo longitudinale di zoompilot. Modificare questa impostazione riavvia zoompilot se l''auto è accesa.'
     visibility:
     - type: capability
       field: alpha_long_available
@@ -27,8 +25,8 @@ sections:
     - $ref: '#/macros/not_engaged'
   - key: ExperimentalModeSetSpeed
     widget: toggle
-    title: Set Speed Assist
-    description: Drive toward your set speed and following distance whenever the driving model holds back. The model still makes every slowdown. The onroad button and a long press of the distance button switch it too.
+    title: Assistenza velocità impostata
+    description: Porta l'auto verso la velocità e la distanza impostate quando il modello di guida resta indietro. Ogni rallentamento resta deciso dal modello. Si attiva o disattiva anche con il pulsante a schermo durante la guida e con una pressione lunga del tasto distanza.
     visibility:
     - $ref: '#/macros/longitudinal'
     enablement:
@@ -39,25 +37,23 @@ sections:
   items:
   - key: DisengageOnAccelerator
     widget: toggle
-    title: Disengage Cruise on Accelerator Pedal
-    description: When enabled, pressing the accelerator pedal will disengage longitudinal control.
+    title: Disinserisci il cruise con l'acceleratore
+    description: Se attivo, premere l'acceleratore disinserisce il controllo longitudinale.
   - key: LongitudinalPersonality
     widget: multiple_button
-    title: Driving Personality
-    description: Standard is recommended. In aggressive mode, sunnypilot will follow lead cars closer and be more aggressive
-      with the gas and brake. In relaxed mode sunnypilot will stay further away from lead cars. On supported cars, you can
-      cycle through these personalities with your steering wheel distance button.
+    title: Stile di guida
+    description: Si consiglia Standard. In modalità aggressiva sunnypilot segue più da vicino il veicolo davanti ed è più deciso con acceleratore e freno. In modalità rilassata sunnypilot mantiene una distanza maggiore dal veicolo davanti. Sulle auto supportate puoi passare da uno stile all'altro con il tasto distanza sul volante.
     options:
     - value: 0
-      label: Aggressive
+      label: Aggressivo
     - value: 1
       label: Standard
     - value: 2
-      label: Relaxed
+      label: Rilassato
     enablement:
     - $ref: '#/macros/longitudinal'
 - id: custom_acc_increments
-  title: Custom ACC Speed Intervals
+  title: Incrementi velocità ACC personalizzati
   description: ''
   enablement:
   - type: any
@@ -78,7 +74,7 @@ sections:
   items:
   - key: CustomAccIncrementsEnabled
     widget: toggle
-    title: Enable Custom ACC Speed Intervals
+    title: Attiva incrementi velocità ACC personalizzati
     enablement:
     - type: any
       conditions:
@@ -98,7 +94,7 @@ sections:
     - $ref: '#/macros/icbm_feature_not_engaged'
   sub_panels:
   - id: custom_acc_intervals
-    label: Custom ACC Speed Intervals Settings
+    label: Impostazioni incrementi velocità ACC
     trigger_key: CustomAccIncrementsEnabled
     trigger_condition:
       type: param
@@ -107,7 +103,7 @@ sections:
     items:
     - key: CustomAccShortPressIncrement
       widget: option
-      title: Short Press Increment
+      title: Incremento pressione breve
       min: 1
       max: 10
       step: 1
@@ -117,7 +113,7 @@ sections:
         equals: true
     - key: CustomAccLongPressIncrement
       widget: option
-      title: Long Press Increment
+      title: Incremento pressione lunga
       min: 1
       max: 10
       step: 1
@@ -126,26 +122,26 @@ sections:
         key: CustomAccIncrementsEnabled
         equals: true
 - id: speed_limits
-  title: Speed Limits
-  description: Speed limit detection and offset behavior
+  title: Limiti di velocità
+  description: Rilevamento dei limiti di velocità e scostamento
   items: []
   sub_panels:
   - id: speed_limit_settings
-    label: Speed Limit Settings
+    label: Impostazioni limiti di velocità
     trigger_key: SpeedLimitMode
     items:
     - key: SpeedLimitMode
       widget: multiple_button
-      title: Speed Limit Assist Mode
+      title: Modalità assistenza limite di velocità
       options:
       - value: 0
         label: 'Off'
       - value: 1
-        label: Information
+        label: Informazione
       - value: 2
-        label: Warning
+        label: Avviso
       - value: 3
-        label: Assist
+        label: Assistenza
         enablement:
         - type: any
           conditions:
@@ -181,9 +177,8 @@ sections:
               equals: true
     - key: SpeedLimitPolicy
       widget: multiple_button
-      title: Speed Limit Source
-      description: Auto follows the limit your car shows, and the map where it shows none. The map also slows you before
-        a lower limit ahead.
+      title: Fonte del limite di velocità
+      description: Auto segue il limite mostrato dall'auto e, quando l'auto non ne mostra, quello della mappa. La mappa rallenta anche l'auto prima di un limite più basso più avanti.
       visibility:
       - type: capability
         field: has_speed_limit
@@ -192,22 +187,22 @@ sections:
       - value: 2
         label: Auto
       - value: 0
-        label: Car Only
+        label: Solo auto
       - value: 1
-        label: Map Only
+        label: Solo mappa
     - key: SpeedLimitOffsetType
       widget: multiple_button
-      title: Speed Limit Offset Type
+      title: Tipo di scostamento dal limite
       options:
       - value: 0
         label: 'Off'
       - value: 1
-        label: Fixed
+        label: Fisso
       - value: 2
-        label: Percentage
+        label: Percentuale
     - key: SpeedLimitValueOffset
       widget: option
-      title: Speed Limit Offset Value
+      title: Valore di scostamento dal limite
       min: -30
       max: 30
       step: 1
@@ -220,7 +215,7 @@ sections:
         op: '>'
         value: 0
 - id: smart_cruise
-  title: Smart Cruise Control
+  title: Cruise control intelligente
   description: ''
   enablement:
   - type: any
@@ -234,8 +229,8 @@ sections:
   items:
   - key: SmartCruiseControlVision
     widget: toggle
-    title: Vision
-    description: Use vision path predictions to estimate the appropriate speed to drive through turns ahead.
+    title: Visione
+    description: Usa le previsioni di traiettoria della telecamera per stimare la velocità adatta alle curve in arrivo.
     visibility:
     - type: any
       conditions:
@@ -257,8 +252,8 @@ sections:
     - $ref: '#/macros/icbm_scc_not_engaged'
   - key: SmartCruiseControlMap
     widget: toggle
-    title: Map
-    description: Use map data to estimate the appropriate speed to drive through turns ahead.
+    title: Mappa
+    description: Usa i dati della mappa per stimare la velocità adatta alle curve in arrivo.
     visibility:
     - type: any
       conditions:
