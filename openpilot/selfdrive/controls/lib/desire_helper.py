@@ -218,6 +218,7 @@ class DesireHelper:
     self.overtake_timer = 0.0
     self.lead_dropout_timer = 0.0
     # One right-lane return owed after an auto-overtake finishes to the left.
+    # Armed after left auto-overtake; starts only when the driver uses the right blinker.
     self.return_pending = False
     self.return_wait_timer = 0.0
     self.return_settle_timer = 0.0
@@ -269,6 +270,8 @@ class DesireHelper:
       self.lead_dropout_timer = 0.0
 
     # One return to the right lane after the left auto-overtake finishes.
+    # More prudent: does not start by itself. Stays pending until the driver
+    # turns on the right blinker (and the safety checks still pass).
     # right_lane_oncoming defaults to clear. Tesla Model 3 HW4 has no adjacent-lane
     # object feed: radarTracks is empty (radarUnavailable; the Continental radar is
     # not on HW4), liveTracks is deprecated and unpublished, and leadsV3 is ego-path
@@ -278,8 +281,9 @@ class DesireHelper:
       if self.lane_change_state == LaneChangeState.off:
         self.return_settle_timer += DT_MDL
       # Positive steering torque is a left input, opposite a return to the right.
+      # Right blinker is the confirmation signal, so it does not cancel the pending return.
       opposite_torque = carstate.steeringPressed and carstate.steeringTorque > 0
-      if (carstate.leftBlinker or carstate.rightBlinker or opposite_torque or
+      if (carstate.leftBlinker or opposite_torque or
           not self.auto_overtake or not lateral_active or
           self.return_wait_timer >= AUTO_OVERTAKE_RETURN_TIMEOUT):
         self.return_pending = False
@@ -294,8 +298,8 @@ class DesireHelper:
       not right_lane_oncoming and
       not carstate.rightBlindspot and
       not right_edge_detected and
+      carstate.rightBlinker and
       not carstate.leftBlinker and
-      not carstate.rightBlinker and
       lateral_active and
       v_ego >= AUTO_OVERTAKE_SPEED_MIN and
       self.auto_overtake and
