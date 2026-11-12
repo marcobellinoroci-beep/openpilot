@@ -236,15 +236,12 @@ sections:
       widget: multiple_button
       title: Torque Control Tune Version (Small Models)
       description: Select the version of Torque Control Tune to use while the small model is driving.
-      # options come from latcontrol_torque_versions.json via generate_settings_schema's
-      # _inject_dynamic_options; a static list here would be dead data that drifts
       enablement:
       - $ref: '#/macros/offroad'
     - key: TorqueControlTuneBig
       widget: multiple_button
       title: Torque Control Tune Version (Big Models)
       description: Select the version of Torque Control Tune to use while a big model is driving.
-      # options injected like TorqueControlTune's
       enablement:
       - $ref: '#/macros/offroad'
 - id: lane_change
@@ -278,7 +275,6 @@ sections:
     title: 'Block Lane Change: Road Edge Detection'
     description: Blocks lane change when the model sees a road edge on the side you signal. Silent shows the alert without
       the chime.
-    # values are relc.RoadEdgeMode
     options:
     - value: 0
       label: 'Off'
@@ -292,7 +288,6 @@ sections:
     description: Slow automatic lane changes to a chosen pace. Off is stock; every pace is gentler than stock. The
       end-of-maneuver correction keeps its authority at every pace, so the car settles into the new lane without a
       wheel snap.
-    # values are the index into lane_change_smoothing.LEVELS, off first
     options:
     - value: 0
       label: 'Off'
@@ -317,3 +312,12 @@ sections:
       key: AutoLaneChangeTimer
       op: '>'
       value: 0
+  - key: AutoOvertake
+    widget: toggle
+    title: Auto Overtake
+    description: |-
+      Automatically changes to the left lane when the left lane is clear.
+      Works even without using the blinker. Use with caution.
+    details: |-
+      This feature will attempt a left lane change after 2 seconds if the left lane is free,
+      even if there is no slower vehicle ahead. Always stay ready to take control.
