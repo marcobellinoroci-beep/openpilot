@@ -51,6 +51,10 @@ NAV_LANE_CHANGE_RIGHT_MODIFIERS = ('right', 'slight right', 'sharp right')
 NAV_LANE_CHANGE_MAX_DIST = 800.0  # m; request only when the maneuver is closer than this
 NAV_LANE_CHANGE_MIN_DIST = 100.0  # m; too close to the gore point, do not start a change anymore
 NAV_LANE_CHANGE_COOLDOWN = 15.0  # s between two nav-initiated lane changes
+# Tesla built-in navigator (tesla_navd, TeslaNavSource): 0x238 only reports the last 300 m.
+NAV_SOURCE_TESLA = 'tesla'  # navInstruction.maneuverSecondaryText set by tesla_navd
+NAV_LANE_CHANGE_TESLA_MIN_DIST = 30.0  # m
+NAV_LANE_CHANGE_TESLA_MAX_DIST = 300.0  # m
 
 
 def nav_lane_change_request(nav_instruction, valid=True):
@@ -58,8 +62,11 @@ def nav_lane_change_request(nav_instruction, valid=True):
 
   Requests a lane change toward the side of an upcoming 'off ramp' or 'fork' whose
   modifier is left/right (slight/sharp included) when it is between
-  NAV_LANE_CHANGE_MIN_DIST and NAV_LANE_CHANGE_MAX_DIST ahead. The key identifies the
-  maneuver so DesireHelper does at most one lane change per maneuver.
+  NAV_LANE_CHANGE_MIN_DIST and NAV_LANE_CHANGE_MAX_DIST ahead (Mapbox/navd), or between
+  NAV_LANE_CHANGE_TESLA_MIN_DIST and NAV_LANE_CHANGE_TESLA_MAX_DIST when the instruction
+  comes from tesla_navd (maneuverSecondaryText == 'tesla'). The key identifies the
+  maneuver so DesireHelper does at most one lane change per maneuver; tesla_navd puts a
+  per-exit id in maneuverPrimaryText for that.
   """
   none = (LaneChangeDirection.none, None)
   if not valid or nav_instruction is None:
@@ -69,12 +76,17 @@ def nav_lane_change_request(nav_instruction, valid=True):
     modifier = str(nav_instruction.maneuverModifier).strip().lower()
     dist = float(nav_instruction.maneuverDistance)
     text = str(nav_instruction.maneuverPrimaryText)
+    source = str(getattr(nav_instruction, 'maneuverSecondaryText', '') or '')
   except (AttributeError, TypeError, ValueError):
     return none
 
   if m_type not in NAV_LANE_CHANGE_TYPES:
     return none
-  if not (NAV_LANE_CHANGE_MIN_DIST <= dist <= NAV_LANE_CHANGE_MAX_DIST):
+  if source == NAV_SOURCE_TESLA:
+    min_dist, max_dist = NAV_LANE_CHANGE_TESLA_MIN_DIST, NAV_LANE_CHANGE_TESLA_MAX_DIST
+  else:
+    min_dist, max_dist = NAV_LANE_CHANGE_MIN_DIST, NAV_LANE_CHANGE_MAX_DIST
+  if not (min_dist <= dist <= max_dist):
     return none
   if modifier in NAV_LANE_CHANGE_LEFT_MODIFIERS:
     direction = LaneChangeDirection.left
