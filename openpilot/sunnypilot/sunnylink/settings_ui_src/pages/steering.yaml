@@ -309,3 +309,15 @@ sections:
     details: |-
       Questa funzione tenta un cambio corsia a sinistra dopo 2 secondi se la corsia di sinistra è libera,
       anche se davanti non c'è un veicolo più lento. Sii sempre pronto a riprendere il controllo.
+  - key: NavLaneChange
+    widget: toggle
+    title: Cambio corsia da navigatore
+    description: |-
+      Con la navigazione attiva, cambia corsia da solo verso il lato di uscite e bivi in arrivo.
+      Richiede Navigazione attiva e una destinazione impostata. Usare con prudenza.
+    details: |-
+      Quando il navigatore indica un'uscita o un bivio a sinistra o a destra entro circa 800 m,
+      tenta un solo cambio corsia verso quel lato, senza freccia, poi attende almeno 15 secondi.
+      Controlla solo l'angolo cieco dell'auto e la telecamera (corsia presente e libera, bordo strada):
+      non vede i veicoli veloci che arrivano da dietro. Una freccia, il freno o lo sterzo in senso
+      opposto annullano la manovra. Sii sempre pronto a riprendere il controllo.

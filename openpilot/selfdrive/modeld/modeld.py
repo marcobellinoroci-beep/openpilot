@@ -35,7 +35,8 @@ from openpilot.common.realtime import config_realtime_process, DT_MDL
 from openpilot.common.transformations.camera import DEVICE_CAMERAS
 from openpilot.system.camerad.cameras.nv12_info import get_nv12_info
 from openpilot.common.transformations.model import get_warp_matrix
-from openpilot.selfdrive.controls.lib.desire_helper import DesireHelper, is_left_lane_clear, is_right_lane_clear, is_slower_lead
+from openpilot.selfdrive.controls.lib.desire_helper import DesireHelper, is_left_lane_clear, is_right_lane_clear, is_slower_lead, \
+  nav_lane_change_request
 from openpilot.selfdrive.controls.lib.drive_helpers import get_accel_from_plan, should_stop, smooth_value, get_curvature_from_plan
 from openpilot.selfdrive.modeld.parse_model_outputs import Parser
 from openpilot.selfdrive.modeld.fill_model_msg import fill_model_msg, fill_driving_model_data, fill_pose_msg, PublishState
@@ -322,7 +323,7 @@ def main(demo=False):
   pub_socks = ["modelV2", "drivingModelData", "cameraOdometry", "modelDataV2SP"] + (["chestnutGpuState"] if CHESTNUT else [])
   pm = PubMaster(pub_socks)
   sm = SubMaster(["deviceState", "carState", "narrowRoadCameraState", "extrinsicsCalibration", "driverMonitoringState",
-                  "carControl", "controlsState", "lateralDelay"])
+                  "carControl", "controlsState", "lateralDelay", "navInstruction"])
 
   publish_state = PublishState()
   params = Params()
@@ -488,9 +489,14 @@ def main(demo=False):
       slower_lead_detected = is_slower_lead(modelv2_send.modelV2.leadsV3, v_ego, sm['carState'].vCruise)
       left_lane_clear = is_left_lane_clear(modelv2_send.modelV2)
       right_lane_clear = is_right_lane_clear(modelv2_send.modelV2)
+      # NavLaneChange: navd publishes navInstruction (1 Hz) only when NavigationEnabled is on.
+      # A stale or invalid instruction yields no request. DesireHelper gates on the param.
+      nav_ok = sm.alive['navInstruction'] and sm.valid['navInstruction']
+      nav_direction, nav_key = nav_lane_change_request(sm['navInstruction'], nav_ok)
       DH.update(sm['carState'], sm['carControl'].latActive, lane_change_prob, left_edge, right_edge,
                 slower_lead_detected=slower_lead_detected, left_lane_clear=left_lane_clear,
-                right_lane_clear=right_lane_clear)
+                right_lane_clear=right_lane_clear,
+                nav_lane_change_direction=nav_direction, nav_maneuver_key=nav_key)
       modelv2_send.modelV2.meta.laneChangeState = DH.lane_change_state
       modelv2_send.modelV2.meta.laneChangeDirection = DH.lane_change_direction
       mdv2sp_send.valid = modelv2_send.valid

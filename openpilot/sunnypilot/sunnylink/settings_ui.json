@@ -633,6 +633,13 @@
               "title": "Sorpasso automatico",
               "description": "Passa automaticamente nella corsia di sinistra quando è libera.\nFunziona anche senza inserire la freccia. Usare con prudenza.",
               "details": "Questa funzione tenta un cambio corsia a sinistra dopo 2 secondi se la corsia di sinistra è libera,\nanche se davanti non c'è un veicolo più lento. Sii sempre pronto a riprendere il controllo."
+            },
+            {
+              "key": "NavLaneChange",
+              "widget": "toggle",
+              "title": "Cambio corsia da navigatore",
+              "description": "Con la navigazione attiva, cambia corsia da solo verso il lato di uscite e bivi in arrivo.\nRichiede Navigazione attiva e una destinazione impostata. Usare con prudenza.",
+              "details": "Quando il navigatore indica un'uscita o un bivio a sinistra o a destra entro circa 800 m,\ntenta un solo cambio corsia verso quel lato, senza freccia, poi attende almeno 15 secondi.\nControlla solo l'angolo cieco dell'auto e la telecamera (corsia presente e libera, bordo strada):\nnon vede i veicoli veloci che arrivano da dietro. Una freccia, il freno o lo sterzo in senso\nopposto annullano la manovra. Sii sempre pronto a riprendere il controllo."
             }
           ]
         }
@@ -1983,11 +1990,6 @@
               "title": "Navigazione (Alpha)",
               "description": "Navigazione svolta per svolta con mappa del percorso. Imposta la destinazione da comma connect.",
               "visibility": [
-                {
-                  "type": "capability",
-                  "field": "device_type",
-                  "equals": "mici"
-                },
                 {
                   "type": "not",
                   "condition": {
