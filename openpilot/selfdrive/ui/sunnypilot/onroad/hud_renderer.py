@@ -162,6 +162,26 @@ class HudRendererSP(HudRenderer):
     self.turn_signal_controller.render(rect)
     self.circular_alerts_renderer.render(rect)
     self.rocket_fuel.render(rect, ui_state.sm)
+    self._draw_auto_overtake_badge(rect)
+
+  def _draw_auto_overtake_badge(self, rect: rl.Rectangle) -> None:
+    """Small AO badge when AutoOvertake is enabled (cached on ui_state at 5 Hz)."""
+    if not getattr(ui_state, "auto_overtake", False):
+      return
+    # Just below the MAX/set-speed box on the left, away from the speed and
+    # the top-right Set Speed Assist button.
+    font = self._font_semi_bold
+    size = 32
+    text = "AO"
+    tw = measure_text_cached(font, text, size).x
+    pad_x, pad_y = 12, 6
+    bw, bh = tw + pad_x * 2, size + pad_y * 2
+    x = rect.x + 60
+    y = rect.y + 45 + UI_CONFIG.set_speed_height + 10
+    badge = rl.Rectangle(x, y, bw, bh)
+    rl.draw_rectangle_rounded(badge, 0.35, 10, COLORS.BLACK_TRANSLUCENT)
+    rl.draw_rectangle_rounded_lines_ex(badge, 0.35, 10, 3, rl.Color(255, 200, 0, 200))
+    rl.draw_text_ex(font, text, rl.Vector2(x + pad_x, y + pad_y - 2), size, 0, rl.Color(255, 200, 0, 230))
 
   def user_interacting(self) -> bool:
     return self._speed_assist_button.is_pressed

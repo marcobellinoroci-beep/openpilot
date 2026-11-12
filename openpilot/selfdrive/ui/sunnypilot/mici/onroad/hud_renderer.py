@@ -13,6 +13,7 @@ from openpilot.selfdrive.ui.sunnypilot.onroad.speed_assist_badge import draw_gau
 from openpilot.selfdrive.ui.ui_state import ChestnutState, UIStatus, ui_state
 from openpilot.sunnypilot.selfdrive.controls.lib.e2e_set_speed.approach import approach_ceiling
 from openpilot.system.ui.lib.application import gui_app
+from openpilot.system.ui.lib.text_measure import measure_text_cached
 
 # zoompilot's Set Speed Assist gauge mirrors the steering wheel in the bottom-right corner
 SPEED_ASSIST_HEIGHT = 44  # the wheel is 50, and round; the gauge's swoosh carries it to the same weight
@@ -46,6 +47,7 @@ class HudRendererSP(HudRenderer):
     super()._render(rect)
     self.blind_spot_indicators.render(rect)
     self._draw_speed_assist(rect)
+    self._draw_auto_overtake_badge(rect)
 
   def _chestnut_showing(self) -> bool:
     """The model icon wants the corner: while loading, and for its persistence after engaging or a
@@ -85,11 +87,23 @@ class HudRendererSP(HudRenderer):
     return self.blind_spot_indicators.left_detected
 
   def _draw_auto_overtake_badge(self, rect: rl.Rectangle) -> None:
-    """Show small 'AO' badge when AutoOvertake is active."""
-    if not ui_state.params.get_bool("AutoOvertake"):
+    """Small AO badge when AutoOvertake is enabled (cached on ui_state at 5 Hz)."""
+    if not getattr(ui_state, "auto_overtake", False):
       return
-    # Draw a simple text badge in the top-left area
-    rl.draw_text("AO", int(rect.x + 12), int(rect.y + 12), 18, rl.Color(255, 200, 0, 220))
+    # Top-right: set speed is top-left, current speed is centered, wheel is bottom-left,
+    # and the model / Set Speed Assist icon uses the bottom-right.
+    font = self._font_semi_bold
+    size = 22
+    text = "AO"
+    tw = measure_text_cached(font, text, size).x
+    pad_x, pad_y = 8, 4
+    bw, bh = tw + pad_x * 2, size + pad_y * 2
+    x = rect.x + rect.width - 12 - bw
+    y = rect.y + 10
+    badge = rl.Rectangle(x, y, bw, bh)
+    rl.draw_rectangle_rounded(badge, 0.35, 8, rl.Color(0, 0, 0, 166))
+    rl.draw_rectangle_rounded_lines_ex(badge, 0.35, 8, 2, rl.Color(255, 200, 0, 200))
+    rl.draw_text_ex(font, text, rl.Vector2(x + pad_x, y + pad_y - 1), size, 0, rl.Color(255, 200, 0, 230))
 
   def _has_blind_spot_detected(self) -> bool:
     return self.blind_spot_indicators.detected

@@ -23,6 +23,7 @@ from openpilot.selfdrive.modeld.modeld import LAT_SMOOTH_SECONDS
 from openpilot.selfdrive.locationd.helpers import PoseCalibrator, Pose
 
 from openpilot.sunnypilot.selfdrive.controls.controlsd_ext import ControlsExt
+from openpilot.sunnypilot.selfdrive.controls.auto_overtake_button import AutoOvertakeLongPress
 
 State = log.SelfdriveState.OpenpilotState
 LaneChangeState = log.LaneChangeState
@@ -40,6 +41,7 @@ class Controls(ControlsExt):
 
     # Initialize sunnypilot controlsd extension and base model state
     ControlsExt.__init__(self, self.CP, self.params)
+    self._ao_long_press = AutoOvertakeLongPress()
 
     self.CI = interfaces[self.CP.carFingerprint](self.CP, self.CP_SP)
 
@@ -128,38 +130,13 @@ class Controls(ControlsExt):
       CC.leftBlinker = model_v2.meta.laneChangeDirection == LaneChangeDirection.left
       CC.rightBlinker = model_v2.meta.laneChangeDirection == LaneChangeDirection.right
 
-    # Long-press any engagement-related button for 2s to toggle AutoOvertake
-    # More robust detection for Tesla and other cars
-    if not hasattr(self, '_ao_press_timer'):
-      self._ao_press_timer = 0.0
-      self._ao_last_toggle = 0.0
-
-    # Detect button activity via cruise state changes or common button fields
-    button_active = False
-    if hasattr(CS, 'cruiseState'):
-      cs = CS.cruiseState
-      button_active = (getattr(cs, 'set', False) or 
-                       getattr(cs, 'resume', False) or 
-                       getattr(cs, 'cancel', False) or
-                       getattr(cs, 'available', False) and not getattr(cs, 'enabled', True))
-
-    # Also check onroadEvents for button presses if available
-    if self.sm.updated.get('onroadEvents', False):
-      for e in self.sm['onroadEvents']:
-        if e.name in ('buttonEnable', 'buttonCancel', 'buttonSet', 'buttonResume'):
-          button_active = True
-
-    now = self.sm.logMonoTime['carState'] / 1e9 if 'carState' in self.sm.logMonoTime else 0
-    if button_active:
-      self._ao_press_timer += DT_CTRL
-      if self._ao_press_timer >= 2.0 and (now - self._ao_last_toggle) > 3.0:
-        current = self.params.get_bool("AutoOvertake")
-        self.params.put_bool("AutoOvertake", not current)
-        self._ao_last_toggle = now
-        self._ao_press_timer = 0.0
-        cloudlog.info(f"AutoOvertake toggled via long-press to {not current}")
-    else:
-      self._ao_press_timer = max(0.0, self._ao_press_timer - DT_CTRL * 2)
+    # Long-press mainCruise for 2s toggles AutoOvertake. SET/RESUME and gapAdjustCruise
+    # already have long-press actions (speed steps / Set Speed Assist). put_bool is
+    # non-blocking by default (block=False) so the 100 Hz loop is not stalled.
+    if self._ao_long_press.update(CS.buttonEvents, DT_CTRL):
+      new_val = not self.params.get_bool("AutoOvertake")
+      self.params.put_bool("AutoOvertake", new_val, block=False)
+      cloudlog.info(f"AutoOvertake toggled via mainCruise long-press to {new_val}")
 
     if not CC.latActive:
       self.LaC.reset()
