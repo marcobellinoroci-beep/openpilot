@@ -4,12 +4,15 @@ Copyright (c) 2021-, Haibin Wen, sunnypilot, and a number of other contributors.
 This file is part of sunnypilot and is licensed under the MIT License.
 See the LICENSE.md file in the root directory for more details.
 """
+import threading
+import time
 from enum import Enum
 
 from openpilot.cereal import messaging, log, custom
 from opendbc.car.structs import car
 from opendbc.sunnypilot.car.interfaces import has_bsm
 from openpilot.common.params import Params
+from openpilot.common.swaglog import cloudlog
 from openpilot.selfdrive.ui.sunnypilot.layouts.settings.display import OnroadBrightness
 from openpilot.selfdrive.ui.sunnypilot.ui_state_zp import UIStateZP
 from openpilot.sunnypilot.models.helpers import ACTIVE_BUNDLE_KEYS, get_active_source
@@ -22,6 +25,9 @@ OpenpilotState = log.SelfdriveState.OpenpilotState
 MADSState = custom.ModularAssistiveDrivingSystem.ModularAssistiveDrivingSystemState
 
 ONROAD_BRIGHTNESS_TIMER_PAUSED = -1
+# put_bool(block=False) queues the file write. Hold the badge cache so the 5 Hz
+# params poll cannot paint the previous value for the frame or two before it lands.
+_AUTO_OVERTAKE_CACHE_HOLD_S = 1.0
 
 
 class OnroadTimerStatus(Enum):
@@ -66,6 +72,8 @@ class UIStateSP(UIStateZP):
     self.sunnylink_enabled: bool = False
     self.torque_bar: bool = False
     self.auto_overtake: bool = False
+    self._auto_overtake_lock = threading.Lock()
+    self._auto_overtake_sticky_until = 0.0
     self.enforce_torque_control: bool = False
     self.custom_torque_params: bool = False
     self.torque_override_enabled: bool = False
@@ -163,6 +171,23 @@ class UIStateSP(UIStateZP):
 
     return "disengaged"
 
+  def toggle_auto_overtake(self) -> None:
+    """Onroad AO-badge tap. Non-blocking param write; the cache updates before the 5 Hz poll."""
+    if not self.started:
+      return
+    with self._auto_overtake_lock:
+      new_val = not self.auto_overtake
+      self.auto_overtake = new_val
+      self._auto_overtake_sticky_until = time.monotonic() + _AUTO_OVERTAKE_CACHE_HOLD_S
+    self.params.put_bool("AutoOvertake", new_val, block=False)
+    cloudlog.info(f"AutoOvertake toggled via AO badge to {new_val}")
+
+  def _apply_auto_overtake_param(self, fresh: bool) -> None:
+    """Take the file value unless a badge tap's non-blocking write is still in flight."""
+    with self._auto_overtake_lock:
+      if fresh == self.auto_overtake or time.monotonic() >= self._auto_overtake_sticky_until:
+        self.auto_overtake = fresh
+
   def update_params(self) -> None:
     CP_SP_bytes = self.params.get("CarParamsSPPersistent")
     if CP_SP_bytes is not None:
@@ -195,7 +220,7 @@ class UIStateSP(UIStateZP):
     self.standstill_timer = self.params.get_bool("StandstillTimer")
     self.sunnylink_enabled = self.params.get_bool("SunnylinkEnabled")
     self.torque_bar = self.params.get_bool("TorqueBar")
-    self.auto_overtake = self.params.get_bool("AutoOvertake")
+    self._apply_auto_overtake_param(self.params.get_bool("AutoOvertake"))
     self.enforce_torque_control = self.params.get_bool("EnforceTorqueControl")
     self.custom_torque_params = self.params.get_bool("CustomTorqueParams")
     self.torque_override_enabled = self.params.get_bool("TorqueParamsOverrideEnabled")

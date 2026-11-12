@@ -177,6 +177,10 @@ class AugmentedRoadView(CameraView):
     self._navigation = NavigationPanel()
     self._model_renderer = ModelRenderer()
     self._hud_renderer = HudRenderer()
+    if gui_app.sunnypilot_ui():
+      # The AO badge takes the press before this view handles it (same idea as the tici
+      # speed-assist button), so the tap does not also scroll home.
+      self.set_touch_valid_callback(lambda: not self._hud_renderer.user_interacting())
     self._long_indicator = LongIndicator()
     self._alert_renderer = AlertRenderer()
     self._driver_state_renderer = DriverStateRenderer()

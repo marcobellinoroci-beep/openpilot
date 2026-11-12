@@ -25,11 +25,94 @@ from openpilot.selfdrive.ui.onroad.hud_renderer import HudRenderer, UI_CONFIG, F
 from openpilot.system.ui.lib.application import gui_app
 from openpilot.system.ui.lib.multilang import tr
 from openpilot.system.ui.lib.text_measure import measure_text_cached
+from openpilot.system.ui.widgets import Widget
 
 SLA_ACTIVE_COLOR = rl.Color(0x91, 0x9b, 0x95, 0xff)
 
 # the experimental mode button's place, as upstream drew it before retiring chill mode
 EXP_BUTTON_SIZE = 192
+
+# Pixels added on every side of the drawn AO badge. Raylib's point-in-rect test is
+# half-open on the far edges, so this covers a full 100 px on the near sides.
+AO_HIT_PAD = 100.0
+
+AO_ON_BORDER = rl.Color(255, 200, 0, 200)
+AO_ON_TEXT = rl.Color(255, 200, 0, 230)
+AO_OFF_BORDER = rl.Color(200, 200, 200, 120)
+AO_OFF_TEXT = rl.Color(200, 200, 200, 160)
+AO_BG_ON = rl.Color(0, 0, 0, 166)
+AO_BG_OFF = rl.Color(0, 0, 0, 140)
+
+
+def ao_hit_rect(x: float, y: float, width: float, height: float, pad: float = AO_HIT_PAD) -> tuple[float, float, float, float]:
+  """Drawn badge expanded by `pad` pixels on every side."""
+  return (x - pad, y - pad, width + 2 * pad, height + 2 * pad)
+
+
+def ao_hit_contains(px: float, py: float, x: float, y: float, width: float, height: float, pad: float = AO_HIT_PAD) -> bool:
+  """Raylib CheckCollisionPointRec: x in [left, right) and y in [top, bottom)."""
+  hx, hy, hw, hh = ao_hit_rect(x, y, width, height, pad)
+  return hx <= px < hx + hw and hy <= py < hy + hh
+
+
+class AutoOvertakeBadge(Widget):
+  """Onroad AO badge. A tap toggles AutoOvertake. Dimmed 'AO OFF' when the feature is off."""
+
+  def __init__(self, font, size: int, pad_x: int, pad_y: int, border: float, segments: int, text_nudge: float):
+    super().__init__()
+    self._font = font
+    self._size = size
+    self._pad_x = pad_x
+    self._pad_y = pad_y
+    self._border = border
+    self._segments = segments
+    self._text_nudge = text_nudge
+    self._text = "AO"
+    self._on = False
+    self._visual_x = 0.0
+    self._visual_y = 0.0
+    self._visual_w = 0.0
+    self._visual_h = 0.0
+    # The road view handles taps after this badge and ignores them while it is pressed.
+    # This delay keeps a quick tap (press and release in one frame) from also toggling
+    # the sidebar or scrolling home. Same hold as SpeedAssistButton.
+    self._click_delay = 0.075
+
+  def place(self, x: float, y: float, *, align_right: bool = False) -> None:
+    self._on = bool(getattr(ui_state, "auto_overtake", False))
+    self._text = "AO" if self._on else "AO OFF"
+    tw = measure_text_cached(self._font, self._text, self._size).x
+    self._visual_w = tw + self._pad_x * 2
+    self._visual_h = self._size + self._pad_y * 2
+    self._visual_x = (x - self._visual_w) if align_right else x
+    self._visual_y = y
+    hx, hy, hw, hh = ao_hit_rect(self._visual_x, self._visual_y, self._visual_w, self._visual_h)
+    self.set_rect(rl.Rectangle(hx, hy, hw, hh))
+
+  def _handle_mouse_release(self, mouse_pos) -> None:
+    super()._handle_mouse_release(mouse_pos)
+    if ui_state.is_onroad():
+      ui_state.toggle_auto_overtake()
+
+  def _render(self, _rect: rl.Rectangle) -> None:
+    border = AO_ON_BORDER if self._on else AO_OFF_BORDER
+    text_color = AO_ON_TEXT if self._on else AO_OFF_TEXT
+    bg = AO_BG_ON if self._on else AO_BG_OFF
+    if self.is_pressed:
+      border = rl.fade(border, 0.55)
+      text_color = rl.fade(text_color, 0.55)
+      bg = rl.fade(bg, 0.55)
+    badge = rl.Rectangle(self._visual_x, self._visual_y, self._visual_w, self._visual_h)
+    rl.draw_rectangle_rounded(badge, 0.35, self._segments, bg)
+    rl.draw_rectangle_rounded_lines_ex(badge, 0.35, self._segments, self._border, border)
+    rl.draw_text_ex(
+      self._font,
+      self._text,
+      rl.Vector2(self._visual_x + self._pad_x, self._visual_y + self._pad_y - self._text_nudge),
+      self._size,
+      0,
+      text_color,
+    )
 
 
 class HudRendererSP(HudRenderer):
@@ -45,6 +128,7 @@ class HudRendererSP(HudRenderer):
     self.speed_renderer = SpeedRenderer()
     self._torque_bar = TorqueBarZP(scale=3.0, always=True, show_bar=lambda: ui_state.torque_bar)
     self._speed_assist_button = SpeedAssistButton(EXP_BUTTON_SIZE)
+    self._ao_badge = AutoOvertakeBadge(self._font_semi_bold, size=32, pad_x=12, pad_y=6, border=3, segments=10, text_nudge=2)
     self._long_indicator = LongIndicatorTizi()
     self._confidence_ball = ConfidenceBallTizi()
 
@@ -165,23 +249,13 @@ class HudRendererSP(HudRenderer):
     self._draw_auto_overtake_badge(rect)
 
   def _draw_auto_overtake_badge(self, rect: rl.Rectangle) -> None:
-    """Small AO badge when AutoOvertake is enabled (cached on ui_state at 5 Hz)."""
-    if not getattr(ui_state, "auto_overtake", False):
+    """AO badge, tappable while onroad. Dimmed 'AO OFF' when AutoOvertake is disabled.
+    Just below the MAX/set-speed box on the left, away from the speed and
+    the top-right Set Speed Assist button."""
+    if not ui_state.is_onroad():
       return
-    # Just below the MAX/set-speed box on the left, away from the speed and
-    # the top-right Set Speed Assist button.
-    font = self._font_semi_bold
-    size = 32
-    text = "AO"
-    tw = measure_text_cached(font, text, size).x
-    pad_x, pad_y = 12, 6
-    bw, bh = tw + pad_x * 2, size + pad_y * 2
-    x = rect.x + 60
-    y = rect.y + 45 + UI_CONFIG.set_speed_height + 10
-    badge = rl.Rectangle(x, y, bw, bh)
-    rl.draw_rectangle_rounded(badge, 0.35, 10, COLORS.BLACK_TRANSLUCENT)
-    rl.draw_rectangle_rounded_lines_ex(badge, 0.35, 10, 3, rl.Color(255, 200, 0, 200))
-    rl.draw_text_ex(font, text, rl.Vector2(x + pad_x, y + pad_y - 2), size, 0, rl.Color(255, 200, 0, 230))
+    self._ao_badge.place(rect.x + 60, rect.y + 45 + UI_CONFIG.set_speed_height + 10)
+    self._ao_badge.render()
 
   def user_interacting(self) -> bool:
-    return self._speed_assist_button.is_pressed
+    return self._speed_assist_button.is_pressed or self._ao_badge.is_pressed
