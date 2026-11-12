@@ -14,6 +14,9 @@ LANE_CHANGE_TIME_MAX = 10.
 LANE_CHANGE_START_TIME = 0.5
 AUTO_OVERTAKE_DELAY = 2.0
 AUTO_OVERTAKE_SPEED_MIN = 60 * CV.KPH_TO_MS  # 60 km/h == 16.67 m/s
+# Settled in the passing lane, then give up if the right lane never opens.
+AUTO_OVERTAKE_RETURN_SETTLE = 5.0  # s
+AUTO_OVERTAKE_RETURN_TIMEOUT = 30.0  # s
 
 # Lead qualification. x is meters ahead, v is absolute speed in m/s.
 AUTO_OVERTAKE_LEAD_PROB = 0.5
@@ -151,6 +154,54 @@ def is_left_lane_clear(model_v2):
   return True
 
 
+def is_right_lane_clear(model_v2):
+  """True when the right adjacent lane exists and no model lead is sitting in it.
+
+  Mirror of is_left_lane_clear. laneLineProbs[2] is the ego-right line and [3] is
+  the far-right line. Model y is positive to the right, so the right lane is the
+  more-positive band. Same probability and occupancy thresholds as the left lane.
+  Missing lane data returns False.
+  """
+  try:
+    probs = model_v2.laneLineProbs
+    lines = model_v2.laneLines
+    if len(probs) < 4 or len(lines) < 4:
+      return False
+    if not (probs[2] > LEFT_LANE_LINE_PROB_MIN and probs[3] > LEFT_LANE_LINE_PROB_MIN):
+      return False
+    y_near = float(lines[2].y[0])
+    y_far = float(lines[3].y[0])
+  except (IndexError, AttributeError, TypeError, ValueError):
+    return False
+
+  # Far-right line must sit to the right of the ego-right line.
+  if not y_near < y_far:
+    return False
+  y_lo = y_near + LEFT_LANE_OCCUPANCY_MARGIN_M
+  y_hi = y_far - LEFT_LANE_OCCUPANCY_MARGIN_M
+  if y_lo >= y_hi:
+    return False
+
+  try:
+    leads = model_v2.leadsV3
+  except (AttributeError, TypeError):
+    return True
+
+  for lead in leads:
+    try:
+      if not (float(lead.prob) > LEFT_LANE_LEAD_PROB_MIN):
+        continue
+      x = float(lead.x[0])
+      y = float(lead.y[0])
+    except (IndexError, AttributeError, TypeError, ValueError):
+      continue
+    if x <= 0.0 or x >= AUTO_OVERTAKE_LEAD_MAX_X:
+      continue
+    if y_lo < y < y_hi:
+      return False
+  return True
+
+
 class DesireHelper:
   def __init__(self):
     self.lane_change_state = LaneChangeState.off
@@ -166,12 +217,16 @@ class DesireHelper:
     self.auto_overtake_active = False
     self.overtake_timer = 0.0
     self.lead_dropout_timer = 0.0
+    # One right-lane return owed after an auto-overtake finishes to the left.
+    self.return_pending = False
+    self.return_wait_timer = 0.0
+    self.return_settle_timer = 0.0
 
   @staticmethod
   def get_lane_change_direction(CS):
     return LaneChangeDirection.left if CS.leftBlinker else LaneChangeDirection.right
 
-  def update(self, carstate, lateral_active, lane_change_prob, left_edge_detected=False, right_edge_detected=False, slower_lead_detected=False, left_lane_clear=True):
+  def update(self, carstate, lateral_active, lane_change_prob, left_edge_detected=False, right_edge_detected=False, slower_lead_detected=False, left_lane_clear=True, right_lane_clear=True, right_lane_oncoming=False):
     self.alc.update_params()
     self.lane_turn_controller.update_params()
     self.auto_overtake = self.params.get_bool("AutoOvertake")
@@ -199,6 +254,7 @@ class DesireHelper:
       not carstate.leftBlindspot and
       not left_edge_detected and
       left_lane_clear and
+      not self.return_pending and
       self.lane_change_state == LaneChangeState.off and
       self.alc.lane_change_set_timer != AutoLaneChangeMode.OFF
     )
@@ -212,6 +268,41 @@ class DesireHelper:
       self.overtake_timer = 0.0
       self.lead_dropout_timer = 0.0
 
+    # One return to the right lane after the left auto-overtake finishes.
+    # right_lane_oncoming defaults to clear. Tesla Model 3 HW4 has no adjacent-lane
+    # object feed: radarTracks is empty (radarUnavailable; the Continental radar is
+    # not on HW4), liveTracks is deprecated and unpublished, and leadsV3 is ego-path
+    # hypotheses with unsigned norm speed, so it cannot see oncoming traffic.
+    if self.return_pending:
+      self.return_wait_timer += DT_MDL
+      if self.lane_change_state == LaneChangeState.off:
+        self.return_settle_timer += DT_MDL
+      # Positive steering torque is a left input, opposite a return to the right.
+      opposite_torque = carstate.steeringPressed and carstate.steeringTorque > 0
+      if (carstate.leftBlinker or carstate.rightBlinker or opposite_torque or
+          not self.auto_overtake or not lateral_active or
+          self.return_wait_timer >= AUTO_OVERTAKE_RETURN_TIMEOUT):
+        self.return_pending = False
+        self.return_wait_timer = 0.0
+        self.return_settle_timer = 0.0
+
+    return_ready = (
+      self.return_pending and
+      self.return_settle_timer >= AUTO_OVERTAKE_RETURN_SETTLE and
+      not slower_lead_detected and
+      right_lane_clear and
+      not right_lane_oncoming and
+      not carstate.rightBlindspot and
+      not right_edge_detected and
+      not carstate.leftBlinker and
+      not carstate.rightBlinker and
+      lateral_active and
+      v_ego >= AUTO_OVERTAKE_SPEED_MIN and
+      self.auto_overtake and
+      self.lane_change_state == LaneChangeState.off and
+      self.alc.lane_change_set_timer != AutoLaneChangeMode.OFF
+    )
+
     if not lateral_active or self.lane_change_timer > LANE_CHANGE_TIME_MAX + self.alc.lane_change_time_extra or \
        self.alc.lane_change_set_timer == AutoLaneChangeMode.OFF:
       self.lane_change_state = LaneChangeState.off
@@ -222,10 +313,16 @@ class DesireHelper:
       auto_overtake_trigger = self.overtake_timer >= AUTO_OVERTAKE_DELAY
 
       if self.lane_change_state == LaneChangeState.off and \
-         ((one_blinker and not self.prev_one_blinker) or auto_overtake_trigger) and not below_lane_change_speed:
+         ((one_blinker and not self.prev_one_blinker) or auto_overtake_trigger or return_ready) and not below_lane_change_speed:
         self.lane_change_state = LaneChangeState.preLaneChange
         self.lane_change_timer = 0.0
-        if auto_overtake_trigger:
+        if return_ready:
+          self.lane_change_direction = LaneChangeDirection.right
+          self.auto_overtake_active = True
+          self.return_pending = False
+          self.return_wait_timer = 0.0
+          self.return_settle_timer = 0.0
+        elif auto_overtake_trigger:
           self.lane_change_direction = LaneChangeDirection.left
           self.auto_overtake_active = True
           self.overtake_timer = 0.0
@@ -267,6 +364,12 @@ class DesireHelper:
         self.lane_change_timer += DT_MDL
 
         if lane_change_prob < 0.02 and self.lane_change_timer >= LANE_CHANGE_START_TIME:
+          # This tree finishes a lane change back to off (it does not enter laneChangeFinishing).
+          finished_auto_left = (
+            self.auto_overtake_active and
+            self.lane_change_direction == LaneChangeDirection.left and
+            not one_blinker
+          )
           self.lane_change_timer = 0.0
           self.auto_overtake_active = False
           if one_blinker:
@@ -275,6 +378,10 @@ class DesireHelper:
           else:
             self.lane_change_state = LaneChangeState.off
             self.lane_change_direction = LaneChangeDirection.none
+            if finished_auto_left:
+              self.return_pending = True
+              self.return_wait_timer = 0.0
+              self.return_settle_timer = 0.0
 
     self.prev_one_blinker = one_blinker and lateral_active
 
