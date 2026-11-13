@@ -18,7 +18,19 @@ sections:
   - key: FollowRightLine
     widget: toggle
     title: Segui solo la linea di destra (Alpha)
-    description: "Mantiene l'auto a distanza fissa dal riferimento di destra e ignora la linea di sinistra: 1,8 m dalla linea di destra, oppure 1,45 m dal bordo strada se la linea manca. Sposta al massimo 35 cm (compreso l'offset telecamera), solo tra 30 e 110 km/h, in rettilineo o curve dolci, senza frecce, cambi corsia o mani sul volante. Non vede le auto in senso opposto: resta responsabilità tua."
+    description: "Mantiene l'auto a distanza fissa dal riferimento di destra e ignora la linea di sinistra: 1,8 m dalla linea di destra, oppure 1,45 m dal bordo strada se la linea manca (regolabile con l'offset sotto). Sposta al massimo 35 cm (compreso l'offset telecamera), solo tra 30 e 110 km/h, in rettilineo o curve dolci, senza frecce, cambi corsia o mani sul volante. Si annulla subito per 3 s se il modello sta aggirando qualcosa o c'è un veicolo vicino davanti. Non vede le auto in senso opposto né i ciclisti fuori traiettoria: resta responsabilità tua."
+  - key: FollowRightMargin
+    widget: option
+    title: Offset distanza dal margine destro
+    description: "Sposta la distanza tenuta da Segui solo la linea di destra: valori + allontanano l'auto dal margine destro, valori - la avvicinano. 0 = 1,8 m dalla linea (centro auto) o 1,45 m dal bordo strada. Dal bordo strada mai sotto 1,25 m. Lo spostamento totale resta al massimo 35 cm."
+    min: -30
+    max: 50
+    step: 10
+    unit: cm
+    enablement:
+    - type: param
+      key: FollowRightLine
+      equals: true
   - key: SmallModelSteering
     widget: option
     title: Sterzo con modello piccolo

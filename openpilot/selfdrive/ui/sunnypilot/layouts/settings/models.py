@@ -137,10 +137,16 @@ class ModelsLayout(Widget):
                            "in rettilineo o curve dolci, senza frecce, cambi corsia o mani sul volante. " +
                            "Non vede le auto in senso opposto: resta responsabilità tua.")
     self.follow_right_toggle = toggle_item_sp(tr("Segui solo la linea di destra (Alpha)"), follow_right_desc, param="FollowRightLine")
+    self.follow_right_margin = option_item_sp(tr("Offset distanza dal margine destro"), "FollowRightMargin", -30, 50,
+                                              tr("Valori + allontanano l'auto dal margine destro, valori - la avvicinano. " +
+                                                 "0 = 1,8 m dalla linea (centro auto) o 1,45 m dal bordo strada. Mai sotto 1,25 m dal bordo."),
+                                              10, None, lambda: ui_state.params.get_bool("FollowRightLine"), "", style.BUTTON_ACTION_WIDTH,
+                                              None, False, lambda v: f"{int(v):+d} cm" if v else "0 cm")
 
     # as the comma 4 panel: jetlink and small model steering just before refresh
     self.items = [self.small_model_item, self.big_model_item, self.cancel_download_item, self.download_item,
-                  self.blendful_toggle, self.follow_right_toggle, self.lane_turn_value_control, self.delay_control, self.camera_offset,
+                  self.blendful_toggle, self.follow_right_toggle, self.follow_right_margin,
+                  self.lane_turn_value_control, self.delay_control, self.camera_offset,
                   self.accelerator_link_item, self.small_steering_control, self.refresh_item, self.clear_cache_item]
     self._refresh_accelerator_items()
 

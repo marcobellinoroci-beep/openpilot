@@ -265,6 +265,7 @@ inline static std::unordered_map<std::string, ParamKeyAttributes> keys = {
     {"LaneTurnValue", {PERSISTENT | BACKUP, FLOAT, "19.0"}},
     {"Blendful", {PERSISTENT | BACKUP, BOOL, "0"}},
     {"FollowRightLine", {PERSISTENT | BACKUP, BOOL, "0"}},
+    {"FollowRightMargin", {PERSISTENT | BACKUP, INT, "0"}},  // cm added to the FollowRightLine distance, -30..50
     {"BlendfulReadout", {PERSISTENT | BACKUP, BOOL, "0"}},
     {"SmallModelSteering", {PERSISTENT | BACKUP, FLOAT, "5.0"}},
     {"PlanplusControl", {PERSISTENT | BACKUP, FLOAT, "1.0"}},

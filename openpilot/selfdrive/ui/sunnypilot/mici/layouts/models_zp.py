@@ -96,8 +96,16 @@ class ModelOptions:
                                                        "1,8 m dalla linea, 1,45 m dal bordo, max 35 cm, 30-110 km/h.\n" +
                                                        "Non vede le auto in senso opposto."))
 
+    self.follow_right_margin = BigParamOption(tr("offset margine dx"), "FollowRightMargin", min_value=-30, max_value=50,
+                                              value_change_step=10, label_callback=lambda v: f"{int(v):+d} cm" if v else "0 cm",
+                                              picker_label_callback=lambda v: f"{int(v):+d}" if v else "0", picker_unit="cm",
+                                              description=tr("Distanza dal margine destro per segui linea destra.\n" +
+                                                             "+ più lontano, - più vicino. 0 = 1,8 m dalla linea, 1,45 m dal bordo.\n" +
+                                                             "Mai sotto 1,25 m dal bordo strada."))
+    self.follow_right_margin.set_enabled(lambda: ui_state.params.get_bool("FollowRightLine"))
+
     # between the panel's lane center and jetlink rows; small_steering sits after jetlink
-    self.items = [self.follow_right, self.lane_turn, self.steer_delay, self.camera_offset]
+    self.items = [self.follow_right, self.follow_right_margin, self.lane_turn, self.steer_delay, self.camera_offset]
 
   def refresh(self):
     for item in (*self.items, self.small_steering):
