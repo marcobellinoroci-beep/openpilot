@@ -769,6 +769,31 @@
                   "equals": true
                 }
               ]
+            },
+            {
+              "key": "StopDistance",
+              "widget": "option",
+              "title": "Distanza da fermo dietro un'auto",
+              "description": "Distanza a cui zoompilot si ferma dietro un'auto ferma o quasi ferma (semaforo, incrocio, coda). 6 m è il valore originale.\nNon cambia la distanza di sicurezza in marcia: l'effetto sparisce quando l'auto davanti supera circa 20 km/h.",
+              "details": "La distanza è misurata dalla sola telecamera (niente radar): da vicino può sbagliare di circa un metro.\nIl valore è un riferimento del pianificatore, non la distanza esatta tra i paraurti, e il modello di guida può\nfermarsi comunque prima. Riduci a piccoli passi e resta pronto a frenare, soprattutto in salita.",
+              "min": 3.5,
+              "max": 6,
+              "step": 0.5,
+              "unit": "meters",
+              "visibility": [
+                {
+                  "type": "capability",
+                  "field": "has_longitudinal_control",
+                  "equals": true
+                }
+              ],
+              "enablement": [
+                {
+                  "type": "capability",
+                  "field": "has_longitudinal_control",
+                  "equals": true
+                }
+              ]
             }
           ]
         },

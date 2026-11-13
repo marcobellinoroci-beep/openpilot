@@ -54,6 +54,10 @@ FCW_IDXS = T_IDXS < 5.0
 T_DIFFS = np.diff(T_IDXS, prepend=[0.])
 COMFORT_BRAKE = 2.5
 STOP_DISTANCE = 6.0
+# StopDistance: gap to a stopped lead, applied as a shift of the obstacle so the compiled solver is unchanged.
+# Full shift for a lead at or below 2 m/s, none from 6 m/s: the time gap at speed is untouched.
+STOP_DISTANCE_MIN, STOP_DISTANCE_MAX = 3.5, STOP_DISTANCE
+STOP_DISTANCE_FADE_BP = [2.0, 6.0]  # lead speed, m/s
 MIN_X_LEAD_FACTOR = 0.5
 
 def get_jerk_factor(personality=log.LongitudinalPersonality.standard):
@@ -79,6 +83,14 @@ def get_T_FOLLOW(personality=log.LongitudinalPersonality.standard):
 
 def get_stopped_equivalence_factor(v_lead):
   return (v_lead**2) / (2 * COMFORT_BRAKE)
+
+def get_stop_distance_offset(v_lead, stop_distance):
+  """How much farther the obstacle is placed so the standstill gap becomes stop_distance instead of STOP_DISTANCE.
+  0.0 (exactly) at the default, so the plan is bit-identical to upstream."""
+  offset = STOP_DISTANCE - float(np.clip(stop_distance, STOP_DISTANCE_MIN, STOP_DISTANCE_MAX))
+  if offset == 0.0:
+    return 0.0
+  return offset * np.interp(v_lead, STOP_DISTANCE_FADE_BP, [1.0, 0.0])
 
 def get_safe_obstacle_distance(v_ego, t_follow):
   return (v_ego**2) / (2 * COMFORT_BRAKE) + t_follow * v_ego + STOP_DISTANCE
@@ -214,6 +226,7 @@ class LongitudinalMpc:
   def __init__(self, dt=DT_MDL):
     self.dt = dt
     self.solver = AcadosOcpSolverCython(MODEL_NAME, ACADOS_SOLVER_TYPE, N)
+    self.stop_distance = STOP_DISTANCE
     self.reset()
     self.source = LongitudinalPlanSource.cruise
 
@@ -315,8 +328,10 @@ class LongitudinalMpc:
     # To estimate a safe distance from a moving lead, we calculate how much stopping
     # distance that lead needs as a minimum. We can add that to the current distance
     # and then treat that as a stopped car/obstacle at this new distance.
-    lead_0_obstacle = lead_xv_0[:,0] + get_stopped_equivalence_factor(lead_xv_0[:,1])
-    lead_1_obstacle = lead_xv_1[:,0] + get_stopped_equivalence_factor(lead_xv_1[:,1])
+    lead_0_obstacle = lead_xv_0[:,0] + get_stopped_equivalence_factor(lead_xv_0[:,1]) + \
+                      get_stop_distance_offset(lead_xv_0[:,1], self.stop_distance)
+    lead_1_obstacle = lead_xv_1[:,0] + get_stopped_equivalence_factor(lead_xv_1[:,1]) + \
+                      get_stop_distance_offset(lead_xv_1[:,1], self.stop_distance)
 
     x_obstacles = np.column_stack([lead_0_obstacle, lead_1_obstacle])
     self.source = MPC_SOURCES[np.argmin(x_obstacles[0])]

@@ -13,11 +13,13 @@ from openpilot.cereal import messaging, custom
 from opendbc.car import structs
 from opendbc.car.interfaces import ACCEL_MAX
 from openpilot.common.constants import CV
+from openpilot.common.params import Params
 from openpilot.common.realtime import DT_MDL
 from openpilot.common.swaglog import cloudlog
 from openpilot.selfdrive.car.cruise import V_CRUISE_MAX
 from openpilot.selfdrive.controls.lib.accel_boost import AccelBoost
 from openpilot.selfdrive.controls.lib.drive_helpers import CONTROL_N, get_accel_from_plan
+from openpilot.selfdrive.controls.lib.longitudinal_mpc_lib.long_mpc import STOP_DISTANCE, STOP_DISTANCE_MIN, STOP_DISTANCE_MAX
 from openpilot.selfdrive.modeld.constants import ModelConstants
 from openpilot.sunnypilot.selfdrive.controls.lib.e2e_set_speed.approach import approach_accel
 from openpilot.sunnypilot.selfdrive.controls.lib.e2e_set_speed.accel_boost import SetSpeedAssistGatedBoost
@@ -52,6 +54,9 @@ class LongitudinalPlannerSP:
     self.e2e_set_speed = E2ESetSpeedController()
     self.lead_forecast = LeadForecast()
     self.lead_forecast.install(mpc)
+    self.mpc = mpc
+    self._stop_distance_params = Params()
+    self._stop_distance_frame = -1
     self.scc = make_smart_cruise_control(CP)
     self.CP = CP
     self.CP_SP = CP_SP
@@ -167,6 +172,19 @@ class LongitudinalPlannerSP:
       return ACCEL_MAX, False
     return a_e2e, should_stop_model
 
+  def _update_stop_distance(self) -> None:
+    """StopDistance (m) -> the MPC's standstill gap to a stopped/slow lead, read once a second."""
+    self._stop_distance_frame += 1
+    if self._stop_distance_frame % int(1. / DT_MDL) != 0:
+      return
+    try:
+      value = float(self._stop_distance_params.get("StopDistance", return_default=True))
+    except (TypeError, ValueError):
+      value = STOP_DISTANCE
+    if not math.isfinite(value):
+      value = STOP_DISTANCE
+    self.mpc.stop_distance = float(np.clip(value, STOP_DISTANCE_MIN, STOP_DISTANCE_MAX))
+
   def apply_e2e_assists(self, should_stop: bool, a_target: float) -> tuple[bool, float]:
     """RoundaboutAssist speed cap and the ConfirmStartFromStop hold. Only ever add braking: the target can only go
     down (the cap is a min, never below the planner's own target) and should_stop can only become True."""
@@ -182,6 +200,7 @@ class LongitudinalPlannerSP:
       self.accel_boost = SetSpeedAssistGatedBoost(lambda: self.e2e_set_speed.enabled)
     self.events_sp.clear()
     self.lead_forecast.update(sm)
+    self._update_stop_distance()
 
     self.e2e_alerts_helper.update(sm, self.events_sp)
 
