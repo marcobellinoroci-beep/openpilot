@@ -16,6 +16,14 @@ GREEN_LIGHT_X_THRESHOLD = 30
 LEAD_DEPART_DIST_THRESHOLD = 1.0
 TRIGGER_TIMER_THRESHOLD = 0.3
 
+# ConfirmStartFromStop: engaged with openpilot longitudinal, after a real stop the car waits for a touch of
+# the gas; one chime when the model wants to go
+START_STANDSTILL_SPEED = 0.1  # m/s
+START_STANDSTILL_TIME = 1.0  # s stopped before the hold starts (not while crawling)
+START_GO_TIME = 0.1  # s the model must keep asking to go before the chime (2 frames)
+START_HOLD_MAX_SPEED = 0.5  # m/s: never hold a car that is already rolling
+START_REARM_SPEED = 2.0  # m/s: moving this fast ends the episode
+
 
 class E2EStates:
   INACTIVE = 0
@@ -50,10 +58,21 @@ class E2EAlertsHelper:
     self.lead_depart_confirmed_lead = False
     self.lead_depart_armed = False
 
+    self.confirm_start_enabled = self._params.get_bool("ConfirmStartFromStop")
+    self.openpilot_long = False  # set by the planner from CarParams
+    self.start_chime = False
+    self.start_hold = False  # the planner must keep asking to stop
+    self.start_standstill_timer = 0.0
+    self.start_armed = False  # a real stop happened this episode: hold until gas
+    self.start_released = False  # the driver touched the gas this episode
+    self.start_go_timer = 0.0
+    self.start_chimed = False
+
   def _read_params(self) -> None:
     if self.frame % int(PARAMS_UPDATE_PERIOD / DT_MDL) == 0:
       self.green_light_alert_enabled = self._params.get_bool("GreenLightAlert")
       self.lead_depart_alert_enabled = self._params.get_bool("LeadDepartAlert")
+      self.confirm_start_enabled = self._params.get_bool("ConfirmStartFromStop")
 
   def update_alert_trigger(self, sm: messaging.SubMaster):
     CS = sm['carState']
@@ -122,6 +141,50 @@ class E2EAlertsHelper:
 
     return green_light_trigger, lead_depart_trigger
 
+  def _reset_start(self) -> None:
+    self.start_hold = False
+    self.start_standstill_timer = self.start_go_timer = 0.0
+    self.start_armed = self.start_released = self.start_chimed = False
+
+  def update_confirm_start(self, sm: messaging.SubMaster) -> bool:
+    """ConfirmStartFromStop. Sets start_hold (the planner then adds a stop request) and returns True on the one
+    frame the chime plays. Engaged with openpilot longitudinal, after >= 1 s stopped: hold until any gas press;
+    chime once when the model asks to go. Off, disengaged, gas, or rolling: no hold."""
+    CS = sm['carState']
+    CC = sm['carControl']
+    # CC.enabled stays on through a gas override (longActive drops), so a gas tap releases the episode instead
+    # of starting a new one
+    engaged = CC.enabled and self.openpilot_long
+
+    if not self.confirm_start_enabled or not engaged:
+      self._reset_start()
+      return False
+
+    if CS.vEgo > START_REARM_SPEED:
+      self._reset_start()
+      return False
+
+    if CS.gasPressed:
+      self.start_released = True  # the driver starts: release now, for the rest of this episode
+
+    if CS.vEgo < START_STANDSTILL_SPEED:
+      self.start_standstill_timer += DT_MDL
+      if self.start_standstill_timer >= START_STANDSTILL_TIME and not self.start_released:
+        self.start_armed = True
+    else:
+      self.start_standstill_timer = 0.0
+
+    self.start_hold = self.start_armed and not self.start_released and CS.vEgo < START_HOLD_MAX_SPEED
+
+    chime = False
+    if self.start_hold and not sm['modelV2'].action.shouldStop:
+      self.start_go_timer += DT_MDL
+      if self.start_go_timer >= START_GO_TIME and not self.start_chimed:
+        self.start_chimed = chime = True
+    else:
+      self.start_go_timer = 0.0
+    return chime
+
   @staticmethod
   def update_state_machine(state: int, enabled: bool, allowed: bool, triggered: bool) -> tuple[int, bool]:
     if state != E2EStates.INACTIVE:
@@ -164,7 +227,9 @@ class E2EAlertsHelper:
       lead_depart_trigger
     )
 
-    if self.green_light_alert or self.lead_depart_alert:
+    self.start_chime = self.update_confirm_start(sm)
+
+    if self.green_light_alert or self.lead_depart_alert or self.start_chime:
       events_sp.add(custom.OnroadEventSP.EventName.e2eChime)
 
     self.frame += 1

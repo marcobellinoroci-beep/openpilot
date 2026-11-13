@@ -33,7 +33,7 @@ def test_moved_switches_appear_once(params):
   assert developer._alpha_long_toggle not in developer._scroller._items
 
   alpha = AlphaLongitudinalToggles()
-  assert [key for key, _ in alpha._refresh_toggles] == ["AlphaLongitudinalEnabled", "ExperimentalModeSetSpeed"]
+  assert [key for key, _ in alpha._refresh_toggles] == ["AlphaLongitudinalEnabled", "ExperimentalModeSetSpeed", "ConfirmStartFromStop"]
   assert alpha.items == [item for _, item in alpha._refresh_toggles]
 
 

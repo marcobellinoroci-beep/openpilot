@@ -184,6 +184,7 @@ inline static std::unordered_map<std::string, ParamKeyAttributes> keys = {
     {"IsReleaseSpBranch", {CLEAR_ON_MANAGER_START, BOOL}},
     {"LastGPSPositionLLK", {PERSISTENT, STRING}},
     {"LeadDepartAlert", {PERSISTENT | BACKUP, BOOL, "0"}},
+    {"ConfirmStartFromStop", {PERSISTENT | BACKUP, BOOL, "0"}},  // engaged openpilot long: after a stop, hold until the gas is touched; one chime
     {"MapboxToken", {PERSISTENT, STRING}},  // unset = empty; not BACKUP: kept out of sunnylink backups
     {"MaxTimeOffroad", {PERSISTENT | BACKUP, INT, "1800"}},
     {"ModelRunnerTypeCache", {CLEAR_ON_ONROAD_TRANSITION, INT}},

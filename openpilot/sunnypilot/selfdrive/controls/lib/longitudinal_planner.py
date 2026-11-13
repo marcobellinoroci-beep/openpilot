@@ -66,6 +66,7 @@ class LongitudinalPlannerSP:
     self.generation = int(model_bundle.generation) if (model_bundle := get_active_bundle()) else None
     self.source = LongitudinalPlanSource.cruise
     self.e2e_alerts_helper = E2EAlertsHelper()
+    self.e2e_alerts_helper.openpilot_long = CP.openpilotLongitudinalControl
 
     self.output_v_target = 0.
     self.output_a_target = 0.
@@ -165,6 +166,13 @@ class LongitudinalPlannerSP:
     if not is_e2e:
       return ACCEL_MAX, False
     return a_e2e, should_stop_model
+
+  def apply_confirm_start(self, should_stop: bool, a_target: float) -> tuple[bool, float]:
+    """ConfirmStartFromStop: while the hold is on, add a stop request. Only ever adds braking: should_stop can
+    only become True and the target can only go down."""
+    if self.e2e_alerts_helper.start_hold:
+      return True, min(a_target, 0.0)
+    return should_stop, a_target
 
   def update(self, sm: messaging.SubMaster) -> None:
     if not isinstance(self.accel_boost, SetSpeedAssistGatedBoost):

@@ -697,6 +697,26 @@
                   "equals": true
                 }
               ]
+            },
+            {
+              "key": "ConfirmStartFromStop",
+              "widget": "toggle",
+              "title": "Conferma partenza da fermo (Beta)",
+              "description": "Da fermo con zoompilot inserito e il controllo longitudinale di zoompilot attivo (ad esempio al semaforo rosso), l'auto non riparte da sola: aspetta un tocco dell'acceleratore. Quando ripartirebbe (ad esempio con il verde o quando l'auto davanti si muove) suona un solo bip. Si attiva dopo almeno 1 s di fermo; il freno, il disinserimento e la frenata d'emergenza funzionano come sempre.",
+              "visibility": [
+                {
+                  "type": "capability",
+                  "field": "has_longitudinal_control",
+                  "equals": true
+                }
+              ],
+              "enablement": [
+                {
+                  "type": "capability",
+                  "field": "has_longitudinal_control",
+                  "equals": true
+                }
+              ]
             }
           ]
         },

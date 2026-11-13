@@ -41,9 +41,17 @@ class AlphaLongitudinalToggles:
                              "of the distance button switch it too."),
       param="ExperimentalModeSetSpeed")
 
+    self._confirm_start_toggle = toggle_item_sp(
+      title=lambda: tr("Conferma partenza da fermo (Beta)"),
+      description=lambda: tr("Da fermo con zoompilot inserito e il controllo longitudinale di zoompilot attivo, l'auto non " +
+                             "riparte da sola: aspetta un tocco dell'acceleratore. Quando ripartirebbe (ad esempio con il verde) " +
+                             "suona un solo bip. Il freno, il disinserimento e la frenata d'emergenza funzionano come sempre."),
+      param="ConfirmStartFromStop")
+
     self._refresh_toggles = (
       ("AlphaLongitudinalEnabled", self._alpha_long_toggle),
       ("ExperimentalModeSetSpeed", self._set_speed_toggle),
+      ("ConfirmStartFromStop", self._confirm_start_toggle),
     )
     self.items = [item for _, item in self._refresh_toggles]
 
@@ -55,8 +63,10 @@ class AlphaLongitudinalToggles:
     has_long = CP is not None and ui_state.has_longitudinal_control
     self._alpha_long_toggle.set_visible(CP is not None and CP.alphaLongitudinalAvailable)
     self._set_speed_toggle.set_visible(longitudinal_reachable(ui_state))
+    self._confirm_start_toggle.set_visible(longitudinal_reachable(ui_state))
     # alpha off: locked, keeping its value
     self._set_speed_toggle.action_item.set_enabled(has_long)
+    self._confirm_start_toggle.action_item.set_enabled(has_long)
 
   def refresh(self):
     for key, item in self._refresh_toggles:

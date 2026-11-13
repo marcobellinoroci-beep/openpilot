@@ -4,7 +4,7 @@ Copyright (c) 2026-, Zeph Leggett.
 This file is part of zoompilot and is licensed under the MIT License.
 See the LICENSE.md file in the root directory for more details.
 
-The alpha switch and Set Speed Assist, at the top of the mici Cruise panel. Developer drops its
+The alpha switch, Set Speed Assist and Confirm Start From Stop, at the top of the mici Cruise panel. Developer drops its
 copy of the alpha switch (DeveloperLayoutMiciSP) so it appears once.
 """
 from openpilot.selfdrive.ui.mici.layouts.settings.developer import AlphaLongConfirmPage
@@ -28,9 +28,15 @@ class AlphaLongitudinalTogglesMici:
                                                               "The model still makes every slowdown.\n" +
                                                               "Long press home or hold the distance button to switch it."))
 
+    self._confirm_start_toggle = BigParamControlSP(tr("conferma partenza"), "ConfirmStartFromStop",
+                                                   description=tr("Da fermo l'auto aspetta un tocco dell'acceleratore prima di ripartire.\n" +
+                                                                  "Un bip quando ripartirebbe (es. semaforo verde).\n" +
+                                                                  "Freno e frenata d'emergenza funzionano come sempre."))
+
     self._refresh_toggles = (
       ("AlphaLongitudinalEnabled", self._alpha_long_toggle),
       ("ExperimentalModeSetSpeed", self._set_speed_toggle),
+      ("ConfirmStartFromStop", self._confirm_start_toggle),
     )
     self.items = [item for _, item in self._refresh_toggles]
 
@@ -44,8 +50,10 @@ class AlphaLongitudinalTogglesMici:
     has_long = CP is not None and ui_state.has_longitudinal_control
     self._alpha_long_toggle.set_visible(CP is not None and CP.alphaLongitudinalAvailable and not ui_state.is_release)
     self._set_speed_toggle.set_visible(longitudinal_reachable(ui_state))
+    self._confirm_start_toggle.set_visible(longitudinal_reachable(ui_state))
     # alpha off: locked, keeping its value
     self._set_speed_toggle.set_superseded(not has_long)
+    self._confirm_start_toggle.set_superseded(not has_long)
 
   def refresh(self):
     for key, item in self._refresh_toggles:
