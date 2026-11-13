@@ -20,7 +20,10 @@ TeslaNavSource is on, process_config does not start navd/mapsd.
 import time
 
 import openpilot.cereal.messaging as messaging
+from openpilot.common.params import Params
 from openpilot.common.swaglog import cloudlog
+from openpilot.sunnypilot.selfdrive.navigation.tesla_nav_status import STATE_NO_ROUTE, STATE_NOT_SEEN, STATE_ROUTE, STATE_WAITING, \
+  StatusWriter
 
 MAP_DATA_ADDR = 0x238
 BUS_PRIMARY = 0
@@ -153,6 +156,23 @@ class TeslaNavTracker:
       self.logged_not_seen = True
       cloudlog.warning(f"tesla_navd: UI_driverAssistMapData 0x238 not seen on bus 0 or 2 after {NOT_SEEN_LOG_AFTER:.0f} s")
 
+  def status(self, t: float) -> dict:
+    """Status for the settings row (TeslaNavStatus). Read-only: does not touch exit tracking."""
+    fresh = [b for b, st in self.buses.items() if st.last_seen is not None and t - st.last_seen < BUS_FALLBACK_TIMEOUT]
+    if not fresh:
+      ever_seen = any(st.last_seen is not None for st in self.buses.values())
+      return {'state': STATE_WAITING if not ever_seen and t - self.start_time <= NOT_SEEN_LOG_AFTER else STATE_NOT_SEEN}
+    bus = self.active_bus if self.active_bus in fresh else fresh[0]
+    d = self.latest
+    if d is None or self.latest_time is None or t - self.latest_time > FRAME_TIMEOUT or not d['route_active']:
+      return {'state': STATE_NO_ROUTE, 'bus': bus}
+    out = {'state': STATE_ROUTE, 'bus': bus}
+    dist = self._dist(d)
+    if dist is not None and d['left'] != d['right']:
+      out['side'] = 'left' if d['left'] else 'right'
+      out['dist'] = int(dist)
+    return out
+
   # --- output ---
   def maneuver(self, t: float):
     """(valid, side 'left'|'right'|None, distance m|None, exit_id)."""
@@ -193,6 +213,7 @@ def main():
   tracker = TeslaNavTracker(time.monotonic())
   cloudlog.warning("tesla_navd: started, listening for 0x238 on bus 0 (fallback bus 2)")
   last_pub = 0.0
+  status_writer = StatusWriter(Params().put)  # non-blocking put, only on change, max 1 Hz
   while True:
     msgs = messaging.drain_sock(can_sock, wait_for_one=True)
     t = time.monotonic()
@@ -201,6 +222,7 @@ def main():
         if c.address == MAP_DATA_ADDR and c.src in (BUS_PRIMARY, BUS_FALLBACK):
           tracker.on_frame(c.src, bytes(c.dat), t)
     tracker.check_logs(t)
+    status_writer.update(tracker.status(t), t)
     if t - last_pub >= PUBLISH_PERIOD:
       last_pub = t
       valid, fields = tracker.instruction_fields(t)
