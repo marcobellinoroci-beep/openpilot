@@ -309,6 +309,25 @@ sections:
     details: |-
       Questa funzione tenta un cambio corsia a sinistra dopo 2 secondi se la corsia di sinistra è libera,
       anche se davanti non c'è un veicolo più lento. Sii sempre pronto a riprendere il controllo.
+  - key: OvertakeReturnDelay
+    widget: option
+    title: Ritardo minimo di rientro dopo sorpasso
+    description: |-
+      Tempo minimo nella corsia di sorpasso, dalla fine del sorpasso automatico, prima che il rientro a destra possa iniziare.
+      Il rientro parte sempre e solo con la freccia destra: se la metti prima, l'auto aspetta la fine del ritardo.
+    details: |-
+      Con la freccia destra inserita in anticipo, il rientro inizia quando il ritardo è finito, la freccia è ancora
+      inserita e a destra non ci sono angolo cieco occupato, bordo strada o un veicolo visto nella corsia di destra.
+      Spegnere la freccia annulla l'attesa. La telecamera vede solo raramente i veicoli nella corsia di destra:
+      il ritardo e la tua freccia restano la protezione principale. 0 = nessun ritardo (comportamento precedente).
+    min: 0
+    max: 10
+    step: 0.5
+    unit: second
+    enablement:
+    - type: param
+      key: AutoOvertake
+      equals: true
   - key: NavLaneChange
     widget: toggle
     title: Cambio corsia da navigatore

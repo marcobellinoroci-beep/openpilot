@@ -155,6 +155,7 @@ inline static std::unordered_map<std::string, ParamKeyAttributes> keys = {
     {"AutoLaneChangeBsmDelay", {PERSISTENT | BACKUP, BOOL, "0"}},
     {"AutoLaneChangeTimer", {PERSISTENT | BACKUP, INT, "0"}},
     {"AutoOvertake", {PERSISTENT | BACKUP, BOOL, "1"}},
+    {"OvertakeReturnDelay", {PERSISTENT | BACKUP, FLOAT, "2.5"}},  // s in the passing lane before a right-blinker return
     {"BlinkerLateralReengageDelay", {PERSISTENT | BACKUP, INT, "0"}},  // seconds
     {"BlinkerMinLateralControlSpeed", {PERSISTENT | BACKUP, INT, "20"}},  // MPH or km/h
     {"BlinkerPauseLateralControl", {PERSISTENT | BACKUP, INT, "0"}},
