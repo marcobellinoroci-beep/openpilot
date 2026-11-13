@@ -12,17 +12,19 @@ from openpilot.common.params import Params
 from openpilot.sunnypilot.livedelay.helpers import get_lat_delay
 from openpilot.sunnypilot.modeld_v2.blendful import Blendful
 from openpilot.sunnypilot.modeld_v2.camera_offset_helper import CameraOffsetHelper
+from openpilot.sunnypilot.modeld_v2.follow_right import FollowRightLine
 
 PARAMS_FRAMES = 60
 
 
 class ModelSettings:
-  """The model settings both modelds run: Lane Center Assist (Blendful), camera offset and steer delay."""
+  """The model settings both modelds run: Lane Center Assist (Blendful), camera offset, FollowRightLine and steer delay."""
 
   def __init__(self):
     self.blendful = Blendful()
     self.blendful_enabled = False
     self.camera_offset = CameraOffsetHelper()
+    self.follow_right = FollowRightLine()
 
   def refresh(self, sm, params: Params, model) -> bool:
     """Reads the params every PARAMS_FRAMES frames; True on the frames it read them."""
@@ -31,7 +33,13 @@ class ModelSettings:
     model.lat_delay = get_lat_delay(params, sm["lateralDelay"].lateralDelay)
     self.camera_offset.set_offset(params.get("CameraOffset", return_default=True))
     self.blendful_enabled = params.get_bool("Blendful")
+    self.follow_right.enabled = params.get_bool("FollowRightLine")
     return True
+
+  def update_follow_right(self, modelv2, sm, desire, lane_change_state, v_ego: float, curvature: float) -> None:
+    """FollowRightLine: extra camera offset toward the right reference, applied at the next calibration update."""
+    self.camera_offset.extra_offset = self.follow_right.update(modelv2, sm['carState'], sm['carControl'].latActive, desire, lane_change_state,
+                                                               v_ego, curvature, self.camera_offset.actual_camera_offset)
 
   def blendful_callback(self, model_output, v_ego: float, desire, lane_change_state) -> Callable[[float], float]:
     active = desire == log.Desire.none and lane_change_state == log.LaneChangeState.off

@@ -15,6 +15,10 @@ sections:
     widget: toggle
     title: Assistenza centraggio corsia (Alpha)
     description: Aggiunge una leggera spinta verso il centro della corsia oltre allo sterzo del modello, più decisa quando le linee sono ben visibili. Cede in presenza di ostacoli.
+  - key: FollowRightLine
+    widget: toggle
+    title: Segui solo la linea di destra (Alpha)
+    description: "Mantiene l'auto a distanza fissa dal riferimento di destra e ignora la linea di sinistra: 1,8 m dalla linea di destra, oppure 1,45 m dal bordo strada se la linea manca. Sposta al massimo 35 cm (compreso l'offset telecamera), solo tra 30 e 110 km/h, in rettilineo o curve dolci, senza frecce, cambi corsia o mani sul volante. Non vede le auto in senso opposto: resta responsabilità tua."
   - key: SmallModelSteering
     widget: option
     title: Sterzo con modello piccolo

@@ -13,6 +13,7 @@ class CameraOffsetHelper:
   def __init__(self):
     self.camera_offset = 0.0
     self.actual_camera_offset = 0.0
+    self.extra_offset = 0.0  # FollowRightLine: already ramped, added after the CameraOffset smoothing
 
   @staticmethod
   def get_v_horizon(intrinsics, rpy_calib):
@@ -36,15 +37,16 @@ class CameraOffsetHelper:
 
   def update(self, model_transform_main, model_transform_extra, sm, main_wide_camera, extra_wide_camera=True):
     self.actual_camera_offset = (0.9 * self.actual_camera_offset) + (0.1 * self.camera_offset)
+    total_offset = self.actual_camera_offset + self.extra_offset
     dc = DEVICE_CAMERAS[(str(sm['deviceState'].deviceType), str(sm['narrowRoadCameraState'].sensor))]
     height = sm["extrinsicsCalibration"].height[0] if sm['extrinsicsCalibration'].height else 1.22
     rpy_calib = sm['extrinsicsCalibration'].rpyCalib
 
     intrinsics_main = dc.wide_road.intrinsics if main_wide_camera else dc.narrow_road.intrinsics
     v_horizon_main = self.get_v_horizon(intrinsics_main, rpy_calib)
-    model_transform_main = self.apply_camera_offset(model_transform_main, height, self.actual_camera_offset, v_horizon_main)
+    model_transform_main = self.apply_camera_offset(model_transform_main, height, total_offset, v_horizon_main)
 
     intrinsics_extra = dc.wide_road.intrinsics if extra_wide_camera else dc.narrow_road.intrinsics
     v_horizon_extra = self.get_v_horizon(intrinsics_extra, rpy_calib)
-    model_transform_extra = self.apply_camera_offset(model_transform_extra, height, self.actual_camera_offset, v_horizon_extra)
+    model_transform_extra = self.apply_camera_offset(model_transform_extra, height, total_offset, v_horizon_extra)
     return model_transform_main, model_transform_extra

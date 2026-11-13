@@ -497,6 +497,8 @@ def main(demo=False):
                 slower_lead_detected=slower_lead_detected, left_lane_clear=left_lane_clear,
                 right_lane_clear=right_lane_clear,
                 nav_lane_change_direction=nav_direction, nav_maneuver_key=nav_key)
+      # FollowRightLine: off during any lane change (nav, auto-overtake, blinker) since DH state is checked
+      settings.update_follow_right(modelv2_send.modelV2, sm, DH.desire, DH.lane_change_state, v_ego, action.desiredCurvature)
       modelv2_send.modelV2.meta.laneChangeState = DH.lane_change_state
       modelv2_send.modelV2.meta.laneChangeDirection = DH.lane_change_direction
       mdv2sp_send.valid = modelv2_send.valid

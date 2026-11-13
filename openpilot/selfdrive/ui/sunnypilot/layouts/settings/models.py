@@ -28,7 +28,7 @@ from openpilot.system.ui.widgets.toggle import ON_COLOR
 from openpilot.system.ui.sunnypilot.lib.styles import style
 from openpilot.system.ui.sunnypilot.lib.switch import Switch
 from openpilot.system.ui.sunnypilot.lib.utils import NoElideButtonAction, ScrollingButtonAction
-from openpilot.system.ui.sunnypilot.widgets.list_view import ListItemSP, option_item_sp, multiple_button_item_sp
+from openpilot.system.ui.sunnypilot.widgets.list_view import ListItemSP, option_item_sp, multiple_button_item_sp, toggle_item_sp
 from openpilot.system.ui.sunnypilot.widgets.download_status import download_status_item
 from openpilot.system.ui.sunnypilot.widgets.tree_dialog import TreeOptionDialog, TreeNode, TreeFolder
 
@@ -131,9 +131,16 @@ class ModelsLayout(Widget):
                                         1, None, True, "", style.BUTTON_ACTION_WIDTH, None, True,
                                         lambda v: f"{v / 100:.2f} m")
 
+    follow_right_desc = tr("Mantiene l'auto a distanza fissa dal riferimento di destra e ignora la linea di sinistra: " +
+                           "1,8 m dalla linea di destra, oppure 1,45 m dal bordo strada se la linea manca. " +
+                           "Sposta al massimo 35 cm (compreso l'offset telecamera), solo tra 30 e 110 km/h, " +
+                           "in rettilineo o curve dolci, senza frecce, cambi corsia o mani sul volante. " +
+                           "Non vede le auto in senso opposto: resta responsabilità tua.")
+    self.follow_right_toggle = toggle_item_sp(tr("Segui solo la linea di destra (Alpha)"), follow_right_desc, param="FollowRightLine")
+
     # as the comma 4 panel: jetlink and small model steering just before refresh
     self.items = [self.small_model_item, self.big_model_item, self.cancel_download_item, self.download_item,
-                  self.blendful_toggle, self.lane_turn_value_control, self.delay_control, self.camera_offset,
+                  self.blendful_toggle, self.follow_right_toggle, self.lane_turn_value_control, self.delay_control, self.camera_offset,
                   self.accelerator_link_item, self.small_steering_control, self.refresh_item, self.clear_cache_item]
     self._refresh_accelerator_items()
 

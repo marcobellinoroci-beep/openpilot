@@ -9,6 +9,7 @@ The tici models panel's driving options, for the comma 4 models panel.
 from collections.abc import Callable
 
 from openpilot.common.constants import CV
+from openpilot.selfdrive.ui.mici.widgets.button import BigParamControl
 from openpilot.selfdrive.ui.sunnypilot.accelerator_link import small_steering_meaningful
 from openpilot.selfdrive.ui.sunnypilot.mici.widgets.button import BigMultiParamToggleSP, BigParamOption, speed_unit
 from openpilot.system.ui.sunnypilot.lib.switch import Switch
@@ -90,8 +91,13 @@ class ModelOptions:
                                  description=tr("Shifts where the model thinks the camera sits.\n" +
                                                 "Positive moves the car left, negative right."))
 
+    self.follow_right = BigParamControl(tr("segui linea destra"), "FollowRightLine",
+                                        description=tr("Alpha. Segue solo la linea di destra (o il bordo strada) e ignora la sinistra.\n" +
+                                                       "1,8 m dalla linea, 1,45 m dal bordo, max 35 cm, 30-110 km/h.\n" +
+                                                       "Non vede le auto in senso opposto."))
+
     # between the panel's lane center and jetlink rows; small_steering sits after jetlink
-    self.items = [self.lane_turn, self.steer_delay, self.camera_offset]
+    self.items = [self.follow_right, self.lane_turn, self.steer_delay, self.camera_offset]
 
   def refresh(self):
     for item in (*self.items, self.small_steering):
