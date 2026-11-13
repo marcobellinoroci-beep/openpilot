@@ -240,6 +240,24 @@ EVENTS_ZP: dict[int, dict[str, Alert | AlertCallbackType]] = {
     ET.WARNING: speed_assist_switched_alert,
   },
 
+  # an automatic lane change about to start or under way (modelDataV2SP.zoompilot.autoLaneChange, raised every
+  # frame while it lasts): one prompt when it appears, the text while active. Above laneChange (LOW) so it shows.
+  EventNameZP.autoOvertake: {
+    ET.WARNING: Alert(
+      "Sorpasso auto" if IS_MICI else "Sorpasso automatico",
+      "",
+      AlertStatus.normal, AlertSize.small,
+      Priority.MID, VisualAlert.none, AudibleAlert.prompt, .2),
+  },
+
+  EventNameZP.autoOvertakeReturn: {
+    ET.WARNING: Alert(
+      "Rientro auto" if IS_MICI else "Rientro automatico",
+      "",
+      AlertStatus.normal, AlertSize.small,
+      Priority.MID, VisualAlert.none, AudibleAlert.prompt, .2),
+  },
+
   # an accelerator ready while something is in control: it swaps in only when
   # nothing is, so the next engagement after a full disengage drives it. Raised
   # for 3 s (accelerator_events), and no longer than the wait for the swap

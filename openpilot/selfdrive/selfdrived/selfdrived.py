@@ -385,6 +385,13 @@ class SelfdriveD:
                                                     LaneChangeState.laneChangeFinishing):
       self.events.add(EventName.laneChange)
 
+    # Automatic overtake / automatic return about to start or under way: one chime, text while active
+    auto_lane_change = self.sm['modelDataV2SP'].zoompilot.autoLaneChange
+    if auto_lane_change == custom.ModelDataV2ZP.AutoLaneChange.overtake:
+      self.events_sp.zp.add(custom.OnroadEventZP.EventName.autoOvertake)
+    elif auto_lane_change == custom.ModelDataV2ZP.AutoLaneChange.overtakeReturn:
+      self.events_sp.zp.add(custom.OnroadEventZP.EventName.autoOvertakeReturn)
+
     # Handle lane turn
     lane_turn_direction = self.sm['modelDataV2SP'].laneTurnDirection
     if lane_turn_direction == TurnDirection.turnLeft:

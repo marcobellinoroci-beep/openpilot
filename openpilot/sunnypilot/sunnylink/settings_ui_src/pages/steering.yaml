@@ -304,11 +304,13 @@ sections:
     widget: toggle
     title: Sorpasso automatico
     description: |-
-      Passa automaticamente nella corsia di sinistra quando è libera.
-      Funziona anche senza inserire la freccia. Usare con prudenza.
+      Passa automaticamente nella corsia di sinistra quando è libera. Solo in autostrada.
+      Funziona anche senza inserire la freccia. Un bip e la scritta "Sorpasso automatico" all'avvio. Usare con prudenza.
     details: |-
       Questa funzione tenta un cambio corsia a sinistra dopo 2 secondi se la corsia di sinistra è libera,
-      anche se davanti non c'è un veicolo più lento. Sii sempre pronto a riprendere il controllo.
+      anche se davanti non c'è un veicolo più lento. Parte solo in autostrada: lo riconosce dal limite di velocità
+      dell'auto (Tesla) di almeno 110 km/h; con limite sconosciuto o più basso (anche tratti a 90-100 km/h) non parte.
+      Sii sempre pronto a riprendere il controllo.
   - key: OvertakeReturnDelay
     widget: option
     title: Ritardo minimo di rientro dopo sorpasso
@@ -324,6 +326,23 @@ sections:
     max: 10
     step: 0.5
     unit: second
+    enablement:
+    - type: param
+      key: AutoOvertake
+      equals: true
+  - key: AutoOvertakeReturn
+    widget: toggle
+    title: Rientro automatico dopo sorpasso
+    description: |-
+      Dopo il sorpasso automatico rientra a destra da solo, senza freccia, solo in autostrada e mai prima del ritardo minimo di rientro.
+      Un bip e la scritta "Rientro automatico" all'avvio. Devi sempre sorvegliare.
+    details: |-
+      Il rientro parte quando, oltre al ritardo minimo e ad almeno 5 secondi nella corsia di sorpasso, per 1 secondo
+      di fila: limite di velocità dell'auto di almeno 110 km/h, nessun angolo cieco a destra, nessun bordo strada,
+      nessun veicolo visto nella corsia di destra e nessun veicolo più lento davanti. La comma non vede in modo affidabile
+      i veicoli davanti nella corsia di destra (la Tesla HW4 non ha radar): controlla tu prima di ogni rientro.
+      Freccia sinistra, sterzo verso sinistra o un veicolo nell'angolo cieco destro annullano il rientro. La freccia destra
+      funziona come prima.
     enablement:
     - type: param
       key: AutoOvertake

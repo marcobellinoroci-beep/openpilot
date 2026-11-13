@@ -41,7 +41,7 @@ from openpilot.common.realtime import config_realtime_process, DT_MDL
 from openpilot.common.transformations.camera import DEVICE_CAMERAS
 from openpilot.common.transformations.model import get_warp_matrix
 from openpilot.selfdrive.controls.lib.desire_helper import DesireHelper, is_left_lane_clear, is_right_lane_clear, is_slower_lead, \
-  nav_lane_change_request
+  nav_lane_change_request, road_is_highway
 from openpilot.selfdrive.controls.lib.drive_helpers import get_accel_from_plan, smooth_value
 
 from openpilot.sunnypilot.modeld_v2.fill_model_msg import fill_model_msg, fill_pose_msg, PublishState, get_curvature_from_output
@@ -352,7 +352,7 @@ def main(demo=False):
   pub_socks = ["modelV2", "drivingModelData", "cameraOdometry", "modelDataV2SP"] + (["chestnutGpuState"] if CHESTNUT else [])
   pm = PubMaster(pub_socks)
   sm = SubMaster(["deviceState", "carState", "narrowRoadCameraState", "extrinsicsCalibration", "driverMonitoringState",
-                  "carControl", "controlsState", "lateralDelay", "navInstruction"])
+                  "carControl", "controlsState", "lateralDelay", "navInstruction", "carStateSP"])
 
   publish_state = PublishState()
   chestnut_state = None
@@ -536,16 +536,19 @@ def main(demo=False):
       # A stale or invalid instruction yields no request. DesireHelper gates on the param.
       nav_ok = sm.alive['navInstruction'] and sm.valid['navInstruction']
       nav_direction, nav_key = nav_lane_change_request(sm['navInstruction'], nav_ok)
+      # Auto-overtake and its automatic return: highway only, from the car's fused speed limit (fail closed)
+      highway = road_is_highway(sm['carStateSP'], sm.alive['carStateSP'] and sm.valid['carStateSP'])
       DH.update(sm['carState'], sm['carControl'].latActive, lane_change_prob, left_edge, right_edge,
                 slower_lead_detected=slower_lead_detected, left_lane_clear=left_lane_clear,
                 right_lane_clear=right_lane_clear,
-                nav_lane_change_direction=nav_direction, nav_maneuver_key=nav_key)
+                nav_lane_change_direction=nav_direction, nav_maneuver_key=nav_key, highway=highway)
       # FollowRightLine: off during any lane change (nav, auto-overtake, blinker) since DH state is checked
       settings.update_follow_right(modelv2_send.modelV2, sm, DH.desire, DH.lane_change_state, v_ego, action.desiredCurvature)
       modelv2_send.modelV2.meta.laneChangeState = DH.lane_change_state
       modelv2_send.modelV2.meta.laneChangeDirection = DH.lane_change_direction
       mdv2sp_send.valid = modelv2_send.valid
       mdv2sp_send.modelDataV2SP.laneTurnDirection = DH.lane_turn_direction
+      mdv2sp_send.modelDataV2SP.zoompilot.autoLaneChange = DH.auto_lane_change_kind
       settings.blendful.fill(mdv2sp_send.modelDataV2SP)
       drivingdata_send.drivingModelData.meta.laneChangeState = DH.lane_change_state
       drivingdata_send.drivingModelData.meta.laneChangeDirection = DH.lane_change_direction

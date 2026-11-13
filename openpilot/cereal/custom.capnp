@@ -570,6 +570,16 @@ struct ModelDataV2ZP @0xb99ad9cc1f2c3736 {
     unavailable @4;
     ready @5;      # link up, engine loaded, waiting for a window to switch
   }
+
+  # The automatic lane change about to start or under way (DesireHelper.auto_lane_change_kind), for the
+  # driver alert. Driver blinker changes and nav lane changes are none.
+  autoLaneChange @1 :AutoLaneChange;
+
+  enum AutoLaneChange {
+    none @0;
+    overtake @1;  # AutoOvertake, to the left
+    overtakeReturn @2;  # AutoOvertakeReturn, back to the right without the blinker
+  }
 }
 
 # zoompilot's own onroad events, raised and logged by selfdrived beside sunnypilot's
@@ -607,6 +617,8 @@ struct OnroadEventZP @0xeff60a9f4d5cb12f {
     stockLkasArming @10;
     stockCruiseFailed @11;
     speedAssistSwitched @12;
+    autoOvertake @13;
+    autoOvertakeReturn @14;
   }
 }
 
