@@ -1029,6 +1029,37 @@ class TestAlphaLongSwitchMici:
     assert not params.get_bool("OffroadMode")  # applied by hardwared, never the UI
 
 
+class TestMapboxTokenMici:
+  """Developer's Mapbox token: SET/EDIT with a masked preview only, empty confirm removes it."""
+
+  def test_set_edit_and_remove(self, params, monkeypatch):
+    from openpilot.system.ui.lib.application import gui_app
+    from openpilot.selfdrive.ui.sunnypilot.mici.layouts.developer import DeveloperLayoutMiciSP
+
+    params.remove("MapboxToken")
+    developer = DeveloperLayoutMiciSP()
+    btn = developer._mapbox_token_btn
+    assert btn in developer._scroller.items
+    assert btn.value == "SET"
+
+    pushed = []
+    monkeypatch.setattr(gui_app, "push_widget", lambda w: pushed.append(w))
+    token = "pk.FAKE-test-token-0000-WXYZ"  # not a real token
+    btn._click_callback()
+    assert pushed[-1]._keyboard.text() == ""  # never prefilled with the saved token
+    pushed[-1]._keyboard.set_text(f"  {token}  ")
+    pushed[-1]._confirm_callback()
+    pushed[-1]._dismiss_callback()  # runs at the end of the dismiss animation
+    wait_until(lambda: params.get("MapboxToken") == token)
+    assert btn.value == "EDIT  pk.FAK…WXYZ" and token not in btn.value
+
+    btn._click_callback()
+    pushed[-1]._confirm_callback()  # empty field
+    pushed[-1]._dismiss_callback()
+    wait_until(lambda: params.get("MapboxToken") is None)
+    assert btn.value == "SET"
+
+
 class TestAlphaLongitudinalPanelMici:
   """The alpha switch and Set Speed Assist head Cruise, once, with no sub-panel."""
 
