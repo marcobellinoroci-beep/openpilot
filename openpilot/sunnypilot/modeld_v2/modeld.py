@@ -41,7 +41,7 @@ from openpilot.common.realtime import config_realtime_process, DT_MDL
 from openpilot.common.transformations.camera import DEVICE_CAMERAS
 from openpilot.common.transformations.model import get_warp_matrix
 from openpilot.selfdrive.controls.lib.desire_helper import DesireHelper, is_left_lane_clear, is_right_lane_clear, is_slower_lead, \
-  nav_lane_change_request, road_is_highway
+  nav_lane_change_request, road_is_highway, stopped_lead_status
 from openpilot.selfdrive.controls.lib.drive_helpers import get_accel_from_plan, smooth_value
 
 from openpilot.sunnypilot.modeld_v2.fill_model_msg import fill_model_msg, fill_pose_msg, PublishState, get_curvature_from_output
@@ -530,6 +530,8 @@ def main(demo=False):
       # leadsV3.v is absolute m/s; vCruise is kph. Left lane uses laneLineProbs[0] and [1],
       # right lane uses [2] and [3]. No HW4 feed for oncoming traffic; that kwarg stays clear.
       slower_lead_detected = is_slower_lead(modelv2_send.modelV2.leadsV3, v_ego, sm['carState'].vCruise)
+      # stopped vehicle ahead: overtaken only inside its distance window (desire only, planning untouched)
+      stopped_lead = stopped_lead_status(modelv2_send.modelV2.leadsV3, v_ego)
       left_lane_clear = is_left_lane_clear(modelv2_send.modelV2)
       right_lane_clear = is_right_lane_clear(modelv2_send.modelV2)
       # NavLaneChange: navd publishes navInstruction (1 Hz) only when NavigationEnabled is on.
@@ -541,7 +543,8 @@ def main(demo=False):
       DH.update(sm['carState'], sm['carControl'].latActive, lane_change_prob, left_edge, right_edge,
                 slower_lead_detected=slower_lead_detected, left_lane_clear=left_lane_clear,
                 right_lane_clear=right_lane_clear,
-                nav_lane_change_direction=nav_direction, nav_maneuver_key=nav_key, highway=highway)
+                nav_lane_change_direction=nav_direction, nav_maneuver_key=nav_key, highway=highway,
+                stopped_lead=stopped_lead)
       # FollowRightLine: off during any lane change (nav, auto-overtake, blinker) since DH state is checked
       settings.update_follow_right(modelv2_send.modelV2, sm, DH.desire, DH.lane_change_state, v_ego, action.desiredCurvature)
       modelv2_send.modelV2.meta.laneChangeState = DH.lane_change_state

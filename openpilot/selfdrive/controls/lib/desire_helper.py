@@ -45,6 +45,36 @@ def road_is_highway(car_state_sp, fresh: bool) -> bool:
   return speed_limit >= HIGHWAY_SPEED_LIMIT_MIN
 
 
+class StoppedLead:
+  NONE = 0     # no stopped lead (slower-lead logic unchanged)
+  OUTSIDE = 1  # stopped lead, but too close / too far / not confident enough: no overtake, just braking
+  WINDOW = 2   # stopped lead inside the overtake window
+
+
+def stopped_lead_status(leads, v_ego) -> int:
+  """Classify leadsV3[0] as a stopped vehicle ahead. Never affects longitudinal planning.
+
+  Any lead the slower-lead check would see (prob > AUTO_OVERTAKE_LEAD_PROB, x > 0) that is
+  stopped (v < STOPPED_LEAD_V_MAX) is at least OUTSIDE. It is WINDOW only when also
+  prob > STOPPED_LEAD_PROB and max(STOPPED_LEAD_X_MIN, STOPPED_LEAD_TIME_GAP * v_ego) <= x <= STOPPED_LEAD_X_MAX.
+  """
+  if not leads:
+    return StoppedLead.NONE
+  lead = leads[0]
+  try:
+    v_lead = float(lead.v[0])
+    x = float(lead.x[0])
+    prob = float(lead.prob)
+    v_ego = float(v_ego)
+  except (IndexError, AttributeError, TypeError, ValueError):
+    return StoppedLead.NONE
+  if not (prob > AUTO_OVERTAKE_LEAD_PROB and x > 0.0 and v_lead < STOPPED_LEAD_V_MAX):
+    return StoppedLead.NONE
+  if prob > STOPPED_LEAD_PROB and max(STOPPED_LEAD_X_MIN, STOPPED_LEAD_TIME_GAP * v_ego) <= x <= STOPPED_LEAD_X_MAX:
+    return StoppedLead.WINDOW
+  return StoppedLead.OUTSIDE
+
+
 class AutoLaneChangeKind:
   NONE = 0
   OVERTAKE = 1  # automatic overtake to the left
@@ -73,6 +103,15 @@ AUTO_OVERTAKE_VCRUISE_UNSET_KPH = 255.0
 AUTO_OVERTAKE_LEAD_BELOW_SET_SPEED = 1.0  # m/s; v_lead must be at least this far under the set speed
 # One model frame is 0.05 s. A dropout shorter than this must not zero overtake_timer.
 AUTO_OVERTAKE_LEAD_DROPOUT_HOLD = 0.5  # s
+
+# Stopped vehicle ahead in the ego path. Overtaken only through its own explicit path, and only
+# while it is far enough for the lane change to finish comfortably; otherwise the car just brakes.
+STOPPED_LEAD_PROB = 0.7
+STOPPED_LEAD_V_MAX = 1.0  # m/s; v_lead below this is a stopped vehicle
+STOPPED_LEAD_X_MIN = 30.0  # m
+STOPPED_LEAD_TIME_GAP = 2.5  # s; x must also be >= this * v_ego
+STOPPED_LEAD_X_MAX = 150.0  # m; farther model leads are not trusted for this
+STOPPED_LEAD_CONFIRM = 1.0  # s; the window must hold this long before the change starts
 
 # Left adjacent lane. laneLineProbs[0] is the far-left line, [1] is the ego-left line.
 # Both have to be confident or the lane is not treated as present.
@@ -302,6 +341,7 @@ class DesireHelper:
     self.auto_overtake_active = False
     self.overtake_timer = 0.0
     self.lead_dropout_timer = 0.0
+    self.stopped_lead_timer = 0.0
     # One right-lane return owed after an auto-overtake finishes to the left.
     # Armed after left auto-overtake; starts only when the driver uses the right blinker.
     self.return_pending = False
@@ -337,7 +377,8 @@ class DesireHelper:
 
   def update(self, carstate, lateral_active, lane_change_prob, left_edge_detected=False, right_edge_detected=False,
              slower_lead_detected=False, left_lane_clear=True, right_lane_clear=True, right_lane_oncoming=False,
-             nav_lane_change_direction=LaneChangeDirection.none, nav_maneuver_key=None, highway=False):
+             nav_lane_change_direction=LaneChangeDirection.none, nav_maneuver_key=None, highway=False,
+             stopped_lead=StoppedLead.NONE):
     self.alc.update_params()
     self.lane_turn_controller.update_params()
     self.auto_overtake = self.params.get_bool("AutoOvertake")
@@ -408,6 +449,10 @@ class DesireHelper:
       self.lane_change_state == LaneChangeState.off and
       self.alc.lane_change_set_timer != AutoLaneChangeMode.OFF
     )
+    # A stopped lead is overtaken only via its own window (below), never as a plain slower lead.
+    if stopped_lead != StoppedLead.NONE:
+      slower_lead_detected = False
+    self.stopped_lead_timer = self.stopped_lead_timer + DT_MDL if overtake_ready and stopped_lead == StoppedLead.WINDOW else 0.0
     if overtake_ready and slower_lead_detected:
       self.overtake_timer += DT_MDL
       self.lead_dropout_timer = 0.0
@@ -415,6 +460,10 @@ class DesireHelper:
       self.lead_dropout_timer += DT_MDL
       self.overtake_timer += DT_MDL
     else:
+      self.overtake_timer = 0.0
+      self.lead_dropout_timer = 0.0
+    if stopped_lead != StoppedLead.NONE:
+      # no dropout grace for a lead that has stopped: only the stopped-lead window can start the change
       self.overtake_timer = 0.0
       self.lead_dropout_timer = 0.0
 
@@ -515,7 +564,7 @@ class DesireHelper:
       self.nav_lane_change_active = False
       self.auto_return_active = False
     else:
-      auto_overtake_trigger = self.overtake_timer >= AUTO_OVERTAKE_DELAY
+      auto_overtake_trigger = self.overtake_timer >= AUTO_OVERTAKE_DELAY or self.stopped_lead_timer >= STOPPED_LEAD_CONFIRM
 
       if self.lane_change_state == LaneChangeState.off and \
          (blinker_edge or auto_overtake_trigger or return_ready or nav_ready or held_return_ready or
@@ -548,6 +597,7 @@ class DesireHelper:
           self.lane_change_direction = LaneChangeDirection.left
           self.auto_overtake_active = True
           self.overtake_timer = 0.0
+          self.stopped_lead_timer = 0.0
         else:
           # Initialize lane change direction to prevent UI alert flicker
           self.lane_change_direction = self.get_lane_change_direction(carstate)
