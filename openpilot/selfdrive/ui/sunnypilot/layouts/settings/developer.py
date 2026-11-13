@@ -6,7 +6,6 @@ See the LICENSE.md file in the root directory for more details.
 """
 import datetime
 import os
-import time
 from pathlib import Path
 
 from openpilot.selfdrive.ui.ui_state import ui_state
@@ -17,15 +16,13 @@ from openpilot.system.ui.lib.application import gui_app
 from openpilot.system.ui.lib.multilang import tr
 from openpilot.system.ui.widgets import DialogResult
 from openpilot.system.ui.widgets.confirm_dialog import ConfirmDialog
-from openpilot.system.ui.widgets.list_view import button_item, text_item
+from openpilot.system.ui.widgets.list_view import button_item
 
 from openpilot.system.ui.sunnypilot.widgets.html_render import HtmlModalSP
 from openpilot.system.ui.sunnypilot.widgets.input_dialog import InputDialogSP
 from openpilot.system.ui.sunnypilot.widgets.list_view import toggle_item_sp
-from openpilot.sunnypilot.selfdrive.navigation.tesla_nav_status import STATUS_PARAM as TESLA_NAV_STATUS_PARAM, format_status
 
 PREBUILT_PATH = os.path.join(Paths.comma_home(), "prebuilt") if PC else "/data/openpilot/prebuilt"
-TESLA_NAV_STATUS_REFRESH = 1.0  # s between param reads for the "Navigatore Tesla" row
 
 
 class DeveloperLayoutSP(DeveloperLayout):
@@ -68,28 +65,9 @@ class DeveloperLayoutSP(DeveloperLayout):
     self.nav_destination_btn = button_item(tr("Destinazione"), self._nav_destination_button_text, self._nav_destination_description,
                                            callback=self._on_nav_destination_clicked)
 
-    # Navigation: read-only live status of tesla_navd (TeslaNavStatus), for checking without SSH/connect.
-    self._tesla_nav_status_text = ""
-    self._tesla_nav_status_time = 0.0
-    self.tesla_nav_status_item = text_item(tr("Navigatore Tesla"), self._tesla_nav_status,
-                                           tr("Stato della lettura delle uscite dal navigatore Tesla (Usa navigatore Tesla). " +
-                                              "Solo lettura, si aggiorna ogni secondo."))
-
     # zoompilot: no Error Log row, nothing writes error.log since sentry was removed
     self.items: list = [self.show_advanced_controls, self.enable_github_runner_toggle, self.enable_copyparty_toggle, self.prebuilt_toggle,
-                        self.mapbox_token_btn, self.nav_destination_btn, self.tesla_nav_status_item,]
-
-  def _tesla_nav_status(self) -> str:
-    # Called every frame by the row: read the params at most once per second.
-    now = time.monotonic()
-    if not self._tesla_nav_status_text or now - self._tesla_nav_status_time >= TESLA_NAV_STATUS_REFRESH:
-      self._tesla_nav_status_time = now
-      try:
-        status = ui_state.params.get(TESLA_NAV_STATUS_PARAM)
-      except Exception:
-        status = None
-      self._tesla_nav_status_text = tr(format_status(ui_state.params.get_bool("TeslaNavSource"), status, ui_state.started))
-    return self._tesla_nav_status_text
+                        self.mapbox_token_btn, self.nav_destination_btn,]
 
   @staticmethod
   def _mapbox_token() -> str:

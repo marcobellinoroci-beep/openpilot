@@ -640,20 +640,6 @@
               "title": "Cambio corsia da navigatore",
               "description": "Con la navigazione attiva, cambia corsia da solo verso il lato di uscite e bivi in arrivo.\nRichiede Navigazione attiva e una destinazione impostata. Usare con prudenza.",
               "details": "Quando il navigatore indica un'uscita o un bivio a sinistra o a destra entro circa 800 m,\ntenta un solo cambio corsia verso quel lato, senza freccia, poi attende almeno 15 secondi.\nControlla solo l'angolo cieco dell'auto e la telecamera (corsia presente e libera, bordo strada):\nnon vede i veicoli veloci che arrivano da dietro. Una freccia, il freno o lo sterzo in senso\nopposto annullano la manovra. Sii sempre pronto a riprendere il controllo."
-            },
-            {
-              "key": "TeslaNavSource",
-              "widget": "toggle",
-              "title": "Usa navigatore Tesla",
-              "description": "Legge le uscite dal navigatore Tesla (solo gli ultimi 300 m) invece che da Mapbox.\nRichiede Cambio corsia da navigatore. Sperimentale.",
-              "details": "Imposta la destinazione sul navigatore della Tesla. Quando indica un'uscita a sinistra o a destra\nnegli ultimi 300 m, il cambio corsia da navigatore usa questo dato. Con questa opzione attiva\nla navigazione Mapbox (Navigazione Alpha) non viene avviata. Solo lettura dei dati dell'auto.",
-              "visibility": [
-                {
-                  "type": "capability",
-                  "field": "brand",
-                  "equals": "tesla"
-                }
-              ]
             }
           ]
         }

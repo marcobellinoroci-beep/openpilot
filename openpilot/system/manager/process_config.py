@@ -64,11 +64,7 @@ def only_onroad(started: bool, params: Params, CP: car.CarParams) -> bool:
   return started
 
 def navigation(started: bool, params: Params, CP: car.CarParams) -> bool:
-  # TeslaNavSource replaces navd/mapsd: only one navInstruction publisher may run.
-  return started and params.get_bool("NavigationEnabled") and not tesla_nav_source(started, params, CP)
-
-def tesla_nav_source(started: bool, params: Params, CP: car.CarParams) -> bool:
-  return started and params.get_bool("TeslaNavSource") and CP.brand == "tesla"
+  return started and params.get_bool("NavigationEnabled")
 
 def only_offroad(started: bool, params: Params, CP: car.CarParams) -> bool:
   return not started
@@ -186,9 +182,6 @@ procs += [
   # mapd
   NativeProcess("mapd", Paths.mapd_root(), ["bash", "-c", f"{MAPD_PATH} > /dev/null 2>&1"], mapd_ready),
   PythonProcess("mapd_manager", "openpilot.sunnypilot.mapd.mapd_manager", always_run),
-
-  # Tesla built-in navigator -> navInstruction (read-only CAN decode)
-  PythonProcess("tesla_navd", "openpilot.sunnypilot.selfdrive.navigation.tesla_navd", tesla_nav_source),
 
   # locationd
   NativeProcess("locationd_llk", "openpilot/sunnypilot/selfdrive/locationd", ["./locationd"], only_onroad),

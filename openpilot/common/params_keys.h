@@ -250,8 +250,6 @@ inline static std::unordered_map<std::string, ParamKeyAttributes> keys = {
     {"SubaruStopAndGoManualParkingBrake", {PERSISTENT | BACKUP, BOOL, "0"}},
     {"TeslaCoopSteering", {PERSISTENT | BACKUP, BOOL, "0"}},
     {"TeslaMadsScreenButton", {PERSISTENT | BACKUP, INT, "0"}},
-    {"TeslaNavSource", {PERSISTENT | BACKUP, BOOL, "0"}},
-    {"TeslaNavStatus", {CLEAR_ON_MANAGER_START | CLEAR_ON_ONROAD_TRANSITION, JSON}},  // tesla_navd status for the UI; written only on change, max 1 Hz. Not BACKUP
     {"ToyotaEnforceStockLongitudinal", {PERSISTENT | BACKUP, BOOL, "0"}},
     {"ToyotaStopAndGoHack", {PERSISTENT | BACKUP, BOOL, "0"}},
     {"ToyotaTSS2Smooth", {PERSISTENT | BACKUP, BOOL, "0"}},
