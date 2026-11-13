@@ -167,10 +167,13 @@ class LongitudinalPlannerSP:
       return ACCEL_MAX, False
     return a_e2e, should_stop_model
 
-  def apply_confirm_start(self, should_stop: bool, a_target: float) -> tuple[bool, float]:
-    """ConfirmStartFromStop: while the hold is on, add a stop request. Only ever adds braking: should_stop can
-    only become True and the target can only go down."""
-    if self.e2e_alerts_helper.start_hold:
+  def apply_e2e_assists(self, should_stop: bool, a_target: float) -> tuple[bool, float]:
+    """RoundaboutAssist speed cap and the ConfirmStartFromStop hold. Only ever add braking: the target can only go
+    down (the cap is a min, never below the planner's own target) and should_stop can only become True."""
+    helper = self.e2e_alerts_helper
+    if helper.roundabout_a_cap is not None:
+      a_target = min(a_target, helper.roundabout_a_cap)
+    if helper.start_hold:
       return True, min(a_target, 0.0)
     return should_stop, a_target
 

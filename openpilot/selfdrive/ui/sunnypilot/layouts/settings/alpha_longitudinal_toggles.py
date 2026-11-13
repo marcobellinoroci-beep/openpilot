@@ -48,10 +48,18 @@ class AlphaLongitudinalToggles:
                              "suona un solo bip. Il freno, il disinserimento e la frenata d'emergenza funzionano come sempre."),
       param="ConfirmStartFromStop")
 
+    self._roundabout_toggle = toggle_item_sp(
+      title=lambda: tr("Avviso rotonda (Beta)"),
+      description=lambda: tr("Con un percorso Mapbox attivo, una rotatoria entro 150 m: un solo bip e velocità limitata " +
+                             "dolcemente a circa 27 km/h. Se ti fermi lì, l'auto aspetta un tocco dell'acceleratore. " +
+                             "L'acceleratore annulla il limite. Non guarda a sinistra per te: la precedenza resta compito tuo."),
+      param="RoundaboutAssist")
+
     self._refresh_toggles = (
       ("AlphaLongitudinalEnabled", self._alpha_long_toggle),
       ("ExperimentalModeSetSpeed", self._set_speed_toggle),
       ("ConfirmStartFromStop", self._confirm_start_toggle),
+      ("RoundaboutAssist", self._roundabout_toggle),
     )
     self.items = [item for _, item in self._refresh_toggles]
 
@@ -64,9 +72,11 @@ class AlphaLongitudinalToggles:
     self._alpha_long_toggle.set_visible(CP is not None and CP.alphaLongitudinalAvailable)
     self._set_speed_toggle.set_visible(longitudinal_reachable(ui_state))
     self._confirm_start_toggle.set_visible(longitudinal_reachable(ui_state))
+    self._roundabout_toggle.set_visible(longitudinal_reachable(ui_state))
     # alpha off: locked, keeping its value
     self._set_speed_toggle.action_item.set_enabled(has_long)
     self._confirm_start_toggle.action_item.set_enabled(has_long)
+    self._roundabout_toggle.action_item.set_enabled(has_long)
 
   def refresh(self):
     for key, item in self._refresh_toggles:

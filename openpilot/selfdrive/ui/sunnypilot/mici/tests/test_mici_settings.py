@@ -1041,7 +1041,8 @@ class TestAlphaLongitudinalPanelMici:
 
     cruise = CruiseLayoutMici()
     alpha = cruise._alpha_long
-    assert [key for key, _ in alpha._refresh_toggles] == ["AlphaLongitudinalEnabled", "ExperimentalModeSetSpeed", "ConfirmStartFromStop"]
+    assert [key for key, _ in alpha._refresh_toggles] == ["AlphaLongitudinalEnabled", "ExperimentalModeSetSpeed", "ConfirmStartFromStop",
+                                                         "RoundaboutAssist"]
     assert cruise._scroller.items[:len(alpha.items)] == alpha.items == [item for _, item in alpha._refresh_toggles]
 
   def test_settings_opens_the_sp_panels(self, params, monkeypatch):

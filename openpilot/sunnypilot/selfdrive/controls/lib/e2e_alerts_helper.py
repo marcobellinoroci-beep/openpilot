@@ -24,6 +24,28 @@ START_GO_TIME = 0.1  # s the model must keep asking to go before the chime (2 fr
 START_HOLD_MAX_SPEED = 0.5  # m/s: never hold a car that is already rolling
 START_REARM_SPEED = 2.0  # m/s: moving this fast ends the episode
 
+# RoundaboutAssist: engaged with openpilot longitudinal and a Mapbox route, a roundabout as the next maneuver within
+# ROUNDABOUT_ZONE_DIST: one chime, a gentle speed cap, and a stop in the zone is held until the gas (the
+# ConfirmStartFromStop hold). It does not look for traffic: the driver still gives way.
+# Mapbox maneuver types for roundabouts (navd does not request roundabout_exits, so no 'exit roundabout' steps)
+ROUNDABOUT_TYPES = ('roundabout', 'rotary', 'roundabout turn')
+ROUNDABOUT_ZONE_DIST = 150.0  # m to the maneuver point (the entry)
+ROUNDABOUT_NAV_TIMEOUT = 2.0  # s; navd publishes at 1 Hz, older than this is stale
+ROUNDABOUT_V_CAP = 7.5  # m/s (27 km/h)
+ROUNDABOUT_A_MIN = -1.0  # m/s^2: the cap never asks for harder braking than this
+ROUNDABOUT_CAP_MARGIN = 10.0  # m before the maneuver point where the cap should be reached
+ROUNDABOUT_CAP_GAIN = 0.5  # 1/s: below the cap, accelerate at most (cap - v) * gain
+ROUNDABOUT_NEW_JUMP = 50.0  # m; the distance growing this much means a new maneuver
+
+
+def roundabout_accel_cap(v_ego: float, dist: float) -> float:
+  """Highest accel allowed toward a roundabout dist m ahead: the gentlest decel that reaches ROUNDABOUT_V_CAP
+  ROUNDABOUT_CAP_MARGIN before it, never below ROUNDABOUT_A_MIN; under the cap, a gentle approach to it."""
+  if v_ego <= ROUNDABOUT_V_CAP:
+    return (ROUNDABOUT_V_CAP - v_ego) * ROUNDABOUT_CAP_GAIN
+  d = max(dist - ROUNDABOUT_CAP_MARGIN, 1.0)
+  return max((ROUNDABOUT_V_CAP ** 2 - v_ego ** 2) / (2.0 * d), ROUNDABOUT_A_MIN)
+
 
 class E2EStates:
   INACTIVE = 0
@@ -67,12 +89,25 @@ class E2EAlertsHelper:
     self.start_released = False  # the driver touched the gas this episode
     self.start_go_timer = 0.0
     self.start_chimed = False
+    self.start_roundabout = False  # this hold was armed in a roundabout zone
+
+    self.roundabout_enabled = self._params.get_bool("RoundaboutAssist")
+    self.roundabout_chime = False
+    self.roundabout_zone = False  # a roundabout within ROUNDABOUT_ZONE_DIST (arms the stop hold)
+    self.roundabout_a_cap: float | None = None  # accel cap for the planner, None when not capping
+    self.nav_age = float('inf')  # s since the last navInstruction
+    self.nav_travel = 0.0  # m driven since the last navInstruction (navd is 1 Hz: dead-reckon in between)
+    self.roundabout_key = None  # the roundabout maneuver being approached
+    self.roundabout_last_dist = 0.0
+    self.roundabout_chimed = False
+    self.roundabout_released = False  # the driver pressed the gas for this roundabout
 
   def _read_params(self) -> None:
     if self.frame % int(PARAMS_UPDATE_PERIOD / DT_MDL) == 0:
       self.green_light_alert_enabled = self._params.get_bool("GreenLightAlert")
       self.lead_depart_alert_enabled = self._params.get_bool("LeadDepartAlert")
       self.confirm_start_enabled = self._params.get_bool("ConfirmStartFromStop")
+      self.roundabout_enabled = self._params.get_bool("RoundaboutAssist")
 
   def update_alert_trigger(self, sm: messaging.SubMaster):
     CS = sm['carState']
@@ -144,7 +179,7 @@ class E2EAlertsHelper:
   def _reset_start(self) -> None:
     self.start_hold = False
     self.start_standstill_timer = self.start_go_timer = 0.0
-    self.start_armed = self.start_released = self.start_chimed = False
+    self.start_armed = self.start_released = self.start_chimed = self.start_roundabout = False
 
   def update_confirm_start(self, sm: messaging.SubMaster) -> bool:
     """ConfirmStartFromStop. Sets start_hold (the planner then adds a stop request) and returns True on the one
@@ -155,8 +190,10 @@ class E2EAlertsHelper:
     # CC.enabled stays on through a gas override (longActive drops), so a gas tap releases the episode instead
     # of starting a new one
     engaged = CC.enabled and self.openpilot_long
+    # RoundaboutAssist arms the same hold in a roundabout zone, and keeps a hold it armed until the gas
+    roundabout = self.roundabout_enabled and (self.roundabout_zone or self.start_roundabout)
 
-    if not self.confirm_start_enabled or not engaged:
+    if not (self.confirm_start_enabled or roundabout) or not engaged:
       self._reset_start()
       return False
 
@@ -171,6 +208,7 @@ class E2EAlertsHelper:
       self.start_standstill_timer += DT_MDL
       if self.start_standstill_timer >= START_STANDSTILL_TIME and not self.start_released:
         self.start_armed = True
+        self.start_roundabout = self.start_roundabout or self.roundabout_zone
     else:
       self.start_standstill_timer = 0.0
 
@@ -183,6 +221,50 @@ class E2EAlertsHelper:
         self.start_chimed = chime = True
     else:
       self.start_go_timer = 0.0
+    return chime
+
+  def roundabout_ahead(self, sm: messaging.SubMaster) -> tuple[tuple[str, str, str], float] | None:
+    """(maneuver key, distance) of a roundabout that is the next maneuver of a fresh, valid route, else None."""
+    if self.nav_age > ROUNDABOUT_NAV_TIMEOUT or not sm.valid.get('navInstruction', False):
+      return None
+    nav = sm['navInstruction']
+    m_type = str(nav.maneuverType).strip().lower()
+    if m_type not in ROUNDABOUT_TYPES:
+      return None
+    return (m_type, str(nav.maneuverModifier), str(nav.maneuverPrimaryText)), float(nav.maneuverDistance)
+
+  def update_roundabout(self, sm: messaging.SubMaster) -> bool:
+    """RoundaboutAssist. Sets roundabout_zone and roundabout_a_cap; True on the one frame the chime plays."""
+    CS = sm['carState']
+    if sm.updated.get('navInstruction', False):
+      self.nav_age = self.nav_travel = 0.0
+    else:
+      self.nav_age += DT_MDL
+      self.nav_travel += max(CS.vEgo, 0.0) * DT_MDL
+    self.roundabout_zone = False
+    self.roundabout_a_cap = None
+
+    ahead = self.roundabout_ahead(sm)
+    if ahead is None:
+      return False
+    key, dist = ahead
+    dist -= self.nav_travel
+    if key != self.roundabout_key or dist > self.roundabout_last_dist + ROUNDABOUT_NEW_JUMP:
+      self.roundabout_key = key  # a new roundabout: chime and cap again
+      self.roundabout_chimed = self.roundabout_released = False
+    self.roundabout_last_dist = dist
+
+    engaged = sm['carControl'].enabled and self.openpilot_long
+    if not self.roundabout_enabled or not engaged or not 0.0 <= dist <= ROUNDABOUT_ZONE_DIST:
+      return False  # off, disengaged, too far, or passed
+
+    self.roundabout_zone = True
+    if CS.gasPressed:
+      self.roundabout_released = True  # the driver takes over the speed for this roundabout
+    if not self.roundabout_released:
+      self.roundabout_a_cap = roundabout_accel_cap(CS.vEgo, dist)
+    chime = not self.roundabout_chimed
+    self.roundabout_chimed = True
     return chime
 
   @staticmethod
@@ -227,9 +309,10 @@ class E2EAlertsHelper:
       lead_depart_trigger
     )
 
+    self.roundabout_chime = self.update_roundabout(sm)
     self.start_chime = self.update_confirm_start(sm)
 
-    if self.green_light_alert or self.lead_depart_alert or self.start_chime:
+    if self.green_light_alert or self.lead_depart_alert or self.start_chime or self.roundabout_chime:
       events_sp.add(custom.OnroadEventSP.EventName.e2eChime)
 
     self.frame += 1

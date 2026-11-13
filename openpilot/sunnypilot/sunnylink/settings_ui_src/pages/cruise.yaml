@@ -39,6 +39,14 @@ sections:
     - $ref: '#/macros/longitudinal'
     enablement:
     - $ref: '#/macros/longitudinal'
+  - key: RoundaboutAssist
+    widget: toggle
+    title: Avviso rotonda (Beta)
+    description: "Con un percorso del navigatore Mapbox attivo, zoompilot inserito e il controllo longitudinale di zoompilot attivo: quando la prossima manovra è una rotatoria entro 150 m suona un solo bip e la velocità viene limitata dolcemente a circa 27 km/h (frenata massima 1 m/s²). Se ti fermi vicino alla rotatoria, l'auto resta ferma finché non tocchi l'acceleratore. L'acceleratore annulla il limite per quella rotatoria. Non guarda a sinistra per te: dare la precedenza resta compito tuo. Senza percorso Mapbox non fa nulla."
+    visibility:
+    - $ref: '#/macros/longitudinal'
+    enablement:
+    - $ref: '#/macros/longitudinal'
 - id: core_cruise_features
   title: ''
   description: ''
