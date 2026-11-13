@@ -109,7 +109,7 @@ AUTO_OVERTAKE_LEAD_DROPOUT_HOLD = 0.5  # s
 STOPPED_LEAD_PROB = 0.7
 STOPPED_LEAD_V_MAX = 1.0  # m/s; v_lead below this is a stopped vehicle
 STOPPED_LEAD_X_MIN = 30.0  # m
-STOPPED_LEAD_TIME_GAP = 2.5  # s; x must also be >= this * v_ego
+STOPPED_LEAD_TIME_GAP = 2.0  # s; x must also be >= this * v_ego
 STOPPED_LEAD_X_MAX = 150.0  # m; farther model leads are not trusted for this
 STOPPED_LEAD_CONFIRM = 1.0  # s; the window must hold this long before the change starts
 

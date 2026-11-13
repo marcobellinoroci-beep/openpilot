@@ -310,7 +310,7 @@ sections:
       Questa funzione tenta un cambio corsia a sinistra dopo 2 secondi se la corsia di sinistra è libera,
       anche se davanti non c'è un veicolo più lento. Parte solo in autostrada: lo riconosce dal limite di velocità
       dell'auto (Tesla) di almeno 110 km/h; con limite sconosciuto o più basso (anche tratti a 90-100 km/h) non parte.
-      Supera anche un veicolo fermo davanti nella tua corsia, solo se è abbastanza lontano (almeno 30 m e 2,5 secondi
+      Supera anche un veicolo fermo davanti nella tua corsia, solo se è abbastanza lontano (almeno 30 m e 2 secondi
       alla velocità attuale), la corsia di sinistra è libera e vai ad almeno 60 km/h; in coda o se è troppo vicino
       frena soltanto. La frenata per il veicolo fermo non cambia. Sii sempre pronto a riprendere il controllo.
   - key: OvertakeReturnDelay
