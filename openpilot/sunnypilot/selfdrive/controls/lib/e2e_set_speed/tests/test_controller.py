@@ -141,7 +141,7 @@ def test_far_plan_speeds_do_not_move_the_lift():
   assert np.ptp(lifts) == 0.
 
 
-@pytest.mark.parametrize("lat, fade", [(0.4, 1.), (0.8, 0.5), (1.2, 0.)])
+@pytest.mark.parametrize("lat, fade", [(0.4, 1.), (0.9, 1.), (1.25, 0.5), (1.6, 0.)])
 def test_a_bend_ahead_fades_the_lift(lat, fade):
   ctl = new_controller()
   run(ctl, SETTLE_FRAMES, build_sm(V_EGO, yaw_rate=bend_ahead(lat)))

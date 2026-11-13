@@ -54,8 +54,12 @@ FULL_SPEED = 8.0  # m/s
 # The model's acceleration wanders +-0.15 m/s^2 below 0.3 Hz in cruise and settles near -0.05..-0.1
 # at the set speed, where it pushes back toward its own pace; the gain ramps below both.
 GAIN_BP = [-0.3, -0.1]  # m/s^2
-# No lift where the road ahead bends harder than this at the current speed.
-FADE_LAT_BP = [0.6, 1.0]  # m/s^2
+# No lift where the road ahead bends harder than this at the current speed. Was [0.6, 1.0]: at
+# 130 km/h that dropped the lift for any bend tighter than ~2200 m radius and the car fell back to
+# the model's pace (~9 km/h under the set speed) on gentle motorway bends. Curve braking itself is
+# unchanged: the lift never exceeds the floor (cruise with SCC-V/SCC-M targets, lead MPC) and lets
+# go as soon as the model brakes (GAIN_BP).
+FADE_LAT_BP = [1.0, 1.5]  # m/s^2
 LAT_HORIZON = 10.0  # s
 
 # The lift rises at upstream's cruise jerk, as the cruise candidate it stands in for. This is the
