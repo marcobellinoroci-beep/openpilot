@@ -133,6 +133,7 @@ export const Settings = {
       if (param?.requires_offroad && this.values.IsOnroad) return "This setting can only be changed while parked."
       if (param?.requires_parked && !this.values.VehicleParked && !(param.key === "ForceOffroad" && this.values.ForceOffroad)) return "This setting can only be changed while the vehicle is in Park."
       if (param?.disabled_when_key_true && this.values[param.disabled_when_key_true]) return param.disabled_reason || "Disabled by another setting."
+      if (param?.requires_key_true && !this.values[param.requires_key_true]) return param.disabled_reason || "Required setting is off."
       if (param?.requires_nonempty_key) {
         const val = this.values[param.requires_nonempty_key]
         if (!val || val === "{}" || val === "") return param.disabled_reason || "Required configuration missing."
@@ -165,7 +166,7 @@ export const Settings = {
             </div>
           </div>
           <template v-for="section in searchResults" :key="section.slug">
-            <GalaxySection :title="tr(section.name, section.name) + ' (' + section.matches.length + ')'" :icon="section.icon || 'bi-search'" :default-open="false">
+            <GalaxySection :title="tr(section.name, section.name) + ' (' + section.matches.length + ')'" :icon="section.icon || 'bi-search'" :custom="!!section.custom" :default-open="false">
               <LongitudinalMode v-if="section.matches.some(isModeParam)" :section="modeSection(section)" :values="values" @change="onParamChange" />
               <template v-for="p in section.matches" :key="p.key">
                 <PersonalityProfiles v-if="p.key === 'CustomPersonalities'" :manage-open="!!expanded[p.key]" @manage="toggleManage(p.key)" @change="onParamChange" />
@@ -179,7 +180,10 @@ export const Settings = {
         <div v-else>
           <div class="gx-tabs" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px;">
             <button v-for="s in sections" :key="s.slug" type="button"
-              class="gx-chip" :style="s.slug === activeSectionSlug ? 'background: var(--primary); color: var(--on-primary);' : 'background: var(--surface-variant); color: var(--on-surface-variant); cursor:pointer;'"
+              class="gx-chip" :class="{ 'gx-chip--custom-section': s.custom }"
+              :style="s.custom
+                ? (s.slug === activeSectionSlug ? 'background:#FF9800; color:#000;' : 'background: rgba(255,152,0,0.18); color:#FF9800; border:1px solid #FF9800; cursor:pointer;')
+                : (s.slug === activeSectionSlug ? 'background: var(--primary); color: var(--on-primary);' : 'background: var(--surface-variant); color: var(--on-surface-variant); cursor:pointer;')"
               @click="selectSection(s.slug)">
               {{ tr(s.name, s.name) }}
             </button>
@@ -195,7 +199,7 @@ export const Settings = {
           <div v-else class="gx-card">
             <div class="gx-section__header">
               <i class="bi" :class="activeSection.icon"></i>
-              <span class="gx-section__title">{{ tr(activeSection.name, activeSection.name) }}</span>
+              <span class="gx-section__title" :class="{ 'gx-section__title--custom': activeSection.custom }">{{ tr(activeSection.name, activeSection.name) }}</span>
             </div>
             <LongitudinalMode v-if="modeSection(activeSection)" :section="modeSection(activeSection)" :values="values" @change="onParamChange" />
             <SettingTree :params="ordinaryParams(activeSection)" :parent-key="null" :values="values"

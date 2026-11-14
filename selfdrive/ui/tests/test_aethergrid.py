@@ -164,6 +164,10 @@ def _install_aethergrid_stubs():
   asset_loader_mod.starpilot_texture = lambda *_a, **_k: _make_texture()
   sys.modules["openpilot.selfdrive.ui.layouts.settings.starpilot.asset_loader"] = asset_loader_mod
 
+  ui_param_cache_mod = types.ModuleType("openpilot.selfdrive.ui.lib.ui_param_cache")
+  ui_param_cache_mod.shared_ui_params = types.SimpleNamespace()
+  sys.modules["openpilot.selfdrive.ui.lib.ui_param_cache"] = ui_param_cache_mod
+
 
 def _install_panel_stubs(aethergrid):
   sectioned_mod = types.ModuleType(SECTIONED_PANEL_MODULE_NAME)

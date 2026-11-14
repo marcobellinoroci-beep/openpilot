@@ -79,6 +79,27 @@
   color: var(--color-black);
 }
 
+.ds-tab--custom {
+  color: #FF9800;
+  border-color: #FF9800;
+}
+
+.ds-tab--custom:hover {
+  color: #FF9800;
+  border-color: #FFB74D;
+}
+
+.ds-tab--custom.active {
+  background: #FF9800;
+  border-color: #FF9800;
+  color: #000;
+}
+
+.ds-section--custom .ds-section-title,
+.ds-section--custom .ds-section-header i {
+  color: #FF9800;
+}
+
 /* ――― Search / Filter ――― */
 .ds-search-row {
   align-items: center;
@@ -207,6 +228,22 @@
   flex: 1;
   font-size: var(--font-size-sm);
   margin-right: var(--margin-base);
+}
+
+.ds-row-label--custom {
+  color: #FF9800;
+}
+
+.ds-custom-badge {
+  background: rgba(255, 152, 0, 0.18);
+  border: 1px solid #FF9800;
+  border-radius: 999px;
+  color: #FF9800;
+  font-size: 0.68rem;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.02em;
+  padding: 0.18rem 0.45rem;
+  text-transform: uppercase;
 }
 
 .ds-row-heading {

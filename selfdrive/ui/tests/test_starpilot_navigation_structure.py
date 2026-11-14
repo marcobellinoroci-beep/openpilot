@@ -62,9 +62,15 @@ def test_root_hub_contains_the_six_categories_in_order():
     "System",
     "Appearance",
     "Vehicle Settings",
+    "Marco",
   ]
-  assert len(StarPilotLayout.CATEGORIES) == 6
+  assert len(StarPilotLayout.CATEGORIES) == 7
   assert all(item["title"] != "Navigation & Maps" for item in StarPilotLayout.CATEGORIES)
+  marco = next(item for item in StarPilotLayout.CATEGORIES if item["title"] == "Marco")
+  assert marco["panel"] == "MARCO"
+  assert marco.get("custom") is True
+  assert StarPilotLayout.PANEL_TYPE_MAP["MARCO"] == StarPilotPanelType.MARCO
+  assert StarPilotPanelType.MARCO.value == 14
 
 
 def test_driving_controls_contains_nested_navigation_folder_and_leaf_routes():
@@ -101,12 +107,14 @@ def test_driving_model_is_a_root_leaf_and_existing_panel_routes_are_preserved():
 
 
 class _FakeHubTile:
-  def __init__(self, title, desc, icon_key, on_click, bg_color=None):
+  def __init__(self, title, desc, icon_key, on_click, bg_color=None, get_status=None, title_color=None):
     self.title = title
     self.desc = desc
     self.icon_key = icon_key
     self.on_click = on_click
     self.bg_color = bg_color
+    self.get_status = get_status
+    self.title_color = title_color
 
 
 class _FakeGrid:
@@ -171,7 +179,7 @@ def _click_title(layout, title):
 
 def test_nested_hub_navigation_back_and_depth_values(monkeypatch):
   layout, depths = _make_layout(monkeypatch)
-  assert len(layout._main_grid.tiles) == 6
+  assert len(layout._main_grid.tiles) == 7
   assert depths == []
 
   _click_title(layout, "Driving Controls")

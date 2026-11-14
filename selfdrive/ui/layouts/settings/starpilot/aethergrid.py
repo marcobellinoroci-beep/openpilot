@@ -15,6 +15,7 @@ from openpilot.system.ui.widgets.label import gui_label
 
 from openpilot.selfdrive.ui.layouts.settings.starpilot.scribble import draw_custom_icon
 from openpilot.selfdrive.ui.lib.ui_param_cache import shared_ui_params
+from openpilot.starpilot.common.custom_settings import CUSTOM_SETTING_KEYS, CUSTOM_SETTING_TITLE_COLOR_RGBA
 
 
 GEOMETRY_OFFSET = 10
@@ -30,6 +31,8 @@ _HUD_BG_DISABLED = rl.Color(6, 5, 10, 235)
 _HUD_BORDER_OFF = rl.Color(28, 27, 34, 255)
 _HUD_TEXT_DIM = rl.Color(220, 220, 230, 220)
 # Constellation accent node colors (replaces top dash LED)
+CUSTOM_SETTING_TITLE_COLOR = rl.Color(*CUSTOM_SETTING_TITLE_COLOR_RGBA)
+
 _CONST_PRIMARY = rl.Color(235, 240, 255, 255)
 _CONST_SECONDARY = rl.Color(180, 195, 220, 255)
 _CONST_TERTIARY = rl.Color(145, 155, 175, 255)
@@ -1598,6 +1601,7 @@ def draw_standard_toggle_row(
   hovered: bool = False,
   pressed: bool = False,
   is_last: bool = False,
+  title_color: rl.Color | None = None,
   style: PanelStyle = DEFAULT_PANEL_STYLE,
 ):
   """Draw a standard toggle settings row with consistent sizing."""
@@ -1611,6 +1615,7 @@ def draw_standard_toggle_row(
     pressed=pressed,
     is_last=is_last,
     show_chevron=False,
+    title_color=title_color,
     style=style,
   )
 
@@ -3276,7 +3281,8 @@ class AetherSettingsView(PanelManagerView):
                parent_toggle: ParentToggle | None = None,
                tab_defs: list[dict] | None = None,
                panel_style=None, fade_height: float = AETHER_LIST_METRICS.fade_height,
-               metrics = COMPACT_PANEL_METRICS):
+               metrics = COMPACT_PANEL_METRICS,
+               header_title_color: rl.Color | None = None):
     super().__init__()
     self._panel_style = panel_style or DEFAULT_PANEL_STYLE
     self._fade_height = fade_height
@@ -3285,6 +3291,7 @@ class AetherSettingsView(PanelManagerView):
     self._sections = sections
     self._header_title = header_title
     self._header_subtitle = header_subtitle
+    self._header_title_color = header_title_color
     self._parent_toggle = parent_toggle
     self._has_header = bool(header_title) or parent_toggle is not None
     self._tab_defs = tab_defs
@@ -3395,6 +3402,7 @@ class AetherSettingsView(PanelManagerView):
     draw_settings_panel_header(
       text_rect, title, subtitle, max_title_width=1.0, max_subtitle_width=1.0,
       min_title_height=AETHER_LIST_METRICS.toggle_height if self._parent_toggle else 0.0,
+      title_color=self._header_title_color or AetherListColors.HEADER,
     )
 
     if self._parent_toggle:
@@ -3559,13 +3567,14 @@ class AetherSettingsView(PanelManagerView):
 
     enabled = row.enabled() if row.enabled is not None else True
     subtitle = row.disabled_label if not enabled and row.disabled_label else row.subtitle
+    title_color = CUSTOM_SETTING_TITLE_COLOR if enabled and row.id in CUSTOM_SETTING_KEYS else None
 
     if row.type == "toggle":
       toggle_value = row.get_state() if row.get_state else False
       draw_standard_toggle_row(
         rect, tr(row.title), tr(subtitle), toggle_value,
         enabled=enabled, hovered=hovered, pressed=pressed,
-        is_last=is_last, style=self._panel_style,
+        is_last=is_last, title_color=title_color, style=self._panel_style,
       )
     elif row.type == "value":
       value_text = row.get_value() if row.get_value else ""
@@ -3579,6 +3588,7 @@ class AetherSettingsView(PanelManagerView):
         pressed=pressed,
         is_last=is_last,
         show_chevron=row.on_click is not None,
+        title_color=title_color,
         style=self._panel_style,
       )
     elif row.type == "action":
@@ -3990,12 +4000,14 @@ class HubTile(AetherTile):
     on_click: Callable | None = None,
     bg_color: rl.Color | str | None = None,
     get_status: Callable[[], str] | None = None,
+    title_color: rl.Color | None = None,
   ):
     if bg_color:
       super().__init__(surface_color=bg_color, on_click=on_click)
     else:
       super().__init__(on_click=on_click)
     self.get_status = get_status
+    self.title_color = title_color
     self.title = title
     self.desc = desc
     self.custom_icon_key = icon_key if icon_key in ("sound", "steering", "navigate", "system", "display", "vehicle", "road", "aicar") else None
@@ -4039,7 +4051,7 @@ class HubTile(AetherTile):
 
     draw_text_fit_common(self._font_title, title_text,
                         rl.Vector2(rx + content_pad, content_top),
-                        max_w, title_size, align_center=True, color=rl.WHITE)
+                        max_w, title_size, align_center=True, color=self.title_color or rl.WHITE)
     content_top += title_size * FONT_SCALE
 
     if desc_to_render:

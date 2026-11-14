@@ -2,6 +2,8 @@ import json
 import re
 from pathlib import Path
 
+from openpilot.starpilot.common.custom_settings import CUSTOM_SETTING_KEYS, CUSTOM_SETTING_SECTION_NAME
+
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
 LAYOUT_PATH = REPO_ROOT / "starpilot/common/assets/device_settings_layout.json"
@@ -421,6 +423,33 @@ def test_hidden_feature_defaults_remain_enabled():
     "RelaxedPersonalityProfile",
   ):
     assert _declared_default(key) == "1"
+
+
+def test_custom_fork_settings_are_marked_in_layout():
+  layout = _layout()
+  sections = _params_by_section(layout)
+  marco = next(section for section in layout if section["name"] == CUSTOM_SETTING_SECTION_NAME)
+  assert marco.get("custom") is True
+  assert set(sections[CUSTOM_SETTING_SECTION_NAME]) == set(CUSTOM_SETTING_KEYS)
+  assert CUSTOM_SETTING_KEYS.isdisjoint(sections["Lateral (Steering)"])
+
+  custom_keys = {
+    key
+    for params in sections.values()
+    for key, param in params.items()
+    if param.get("custom") is True
+  }
+  assert custom_keys == set(CUSTOM_SETTING_KEYS)
+  for params in sections.values():
+    for key in CUSTOM_SETTING_KEYS & params.keys():
+      assert params[key].get("custom") is True
+
+  marco_params = sections[CUSTOM_SETTING_SECTION_NAME]
+  assert marco_params["AutoOvertake"]["is_parent_toggle"] is True
+  assert marco_params["AutoOvertake"]["requires_key_true"] == "LaneChanges"
+  assert marco_params["NavLaneChange"]["requires_key_true"] == "LaneChanges"
+  assert marco_params["AutoOvertakeReturn"]["parent_key"] == "AutoOvertake"
+  assert marco_params["OvertakeReturnDelay"]["parent_key"] == "AutoOvertake"
 
 
 def test_toyota_auto_hold_is_galaxy_only():

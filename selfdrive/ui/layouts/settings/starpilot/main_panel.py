@@ -16,8 +16,9 @@ from openpilot.selfdrive.ui.layouts.settings.starpilot.navigation import StarPil
 from openpilot.selfdrive.ui.layouts.settings.starpilot.system_settings import StarPilotSystemLayout
 from openpilot.selfdrive.ui.layouts.settings.starpilot.appearance import StarPilotAppearanceLayout
 from openpilot.selfdrive.ui.layouts.settings.starpilot.vehicle import StarPilotVehicleSettingsLayout
+from openpilot.selfdrive.ui.layouts.settings.starpilot.marco import StarPilotMarcoLayout
 
-from openpilot.selfdrive.ui.layouts.settings.starpilot.aethergrid import TileGrid, HubTile, SPACING, BreadcrumbController, AETHER_LIST_METRICS, AetherListColors, draw_hud_background
+from openpilot.selfdrive.ui.layouts.settings.starpilot.aethergrid import TileGrid, HubTile, SPACING, BreadcrumbController, AETHER_LIST_METRICS, AetherListColors, CUSTOM_SETTING_TITLE_COLOR, draw_hud_background
 
 class StarPilotLayout(Widget):
   CATEGORIES = [
@@ -62,6 +63,12 @@ class StarPilotLayout(Widget):
       "icon": "vehicle",
       "panel": "VEHICLE",
     },
+    {
+      "title": "Marco",
+      "icon": "steering",
+      "panel": "MARCO",
+      "custom": True,
+    },
   ]
 
   PANEL_TYPE_MAP = {
@@ -74,6 +81,7 @@ class StarPilotLayout(Widget):
     "NAVIGATION": StarPilotPanelType.NAVIGATION,
     "VISUALS": StarPilotPanelType.VISUALS,
     "VEHICLE": StarPilotPanelType.VEHICLE,
+    "MARCO": StarPilotPanelType.MARCO,
   }
 
   def __init__(self):
@@ -105,6 +113,7 @@ class StarPilotLayout(Widget):
       StarPilotPanelType.NAVIGATION: StarPilotPanelInfo(tr_noop("Navigation"), StarPilotNavigationLayout()),
       StarPilotPanelType.VISUALS: StarPilotPanelInfo(tr_noop("Appearance"), StarPilotAppearanceLayout()),
       StarPilotPanelType.VEHICLE: StarPilotPanelInfo(tr_noop("Vehicle Settings"), StarPilotVehicleSettingsLayout()),
+      StarPilotPanelType.MARCO: StarPilotPanelInfo(tr_noop("Marco"), StarPilotMarcoLayout()),
     }
 
     self._setup_sub_panels(
@@ -116,6 +125,7 @@ class StarPilotLayout(Widget):
       StarPilotPanelType.NAVIGATION,
       StarPilotPanelType.VISUALS,
       StarPilotPanelType.VEHICLE,
+      StarPilotPanelType.MARCO,
     )
 
     self._breadcrumbs = BreadcrumbController()
@@ -243,7 +253,8 @@ class StarPilotLayout(Widget):
         desc=tr(node.get("desc", "")),
         icon_key=node["icon"],
         on_click=on_click,
-        bg_color=node.get("color")
+        bg_color=node.get("color"),
+        title_color=CUSTOM_SETTING_TITLE_COLOR if node.get("custom") else None,
       )
       self._main_grid.add_tile(tile)
 

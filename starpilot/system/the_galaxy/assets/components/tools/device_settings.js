@@ -1649,6 +1649,9 @@ function getSettingLockReason(param) {
   if (param?.disabled_when_key_true && state.values[param.disabled_when_key_true]) {
     return param.disabled_reason || "Disabled by another setting."
   }
+  if (param?.requires_key_true && !state.values[param.requires_key_true]) {
+    return param.disabled_reason || "Required setting is off."
+  }
   if (param?.requires_nonempty_key) {
     const val = state.values[param.requires_nonempty_key]
     if (!val || val === "{}" || val === "") {
@@ -2723,7 +2726,8 @@ function renderSettingRow(p) {
       <div class="ds-row-info">
         <div class="ds-row-text">
           <div class="ds-row-heading">
-            <span class="ds-row-label">${p.label}</span>
+            <span class="ds-row-label ${p.custom ? "ds-row-label--custom" : ""}">${p.label}</span>
+            ${p.custom ? html`<span class="ds-custom-badge">Custom</span>` : ""}
             ${flmParamStatus ? html`<span class="ds-flm-badge">Currently overridden by FLM</span>` : ""}
           </div>
           ${p.description_steps
@@ -2912,7 +2916,7 @@ export function DeviceSettings({ params }) {
           </div>
 
           ${searchResults.map(section => html`
-            <div class="ds-section">
+            <div class="ds-section ${section.custom ? "ds-section--custom" : ""}">
               <div class="ds-section-header ds-static-header">
                 <i class="bi ${section.icon}"></i>
                 <span class="ds-section-title">${section.name} (${section.matches.length})</span>
@@ -2948,7 +2952,7 @@ export function DeviceSettings({ params }) {
           <div class="ds-tabs" id="ds-tabs">
             ${sections.map(section => html`
               <button
-                class="ds-tab ${section.slug === state.activeSectionSlug ? "active" : ""}"
+                class="ds-tab ${section.slug === state.activeSectionSlug ? "active" : ""} ${section.custom ? "ds-tab--custom" : ""}"
                 @click="${(e) => {
           handleSectionTabClick(section.slug, e)
         }}">
@@ -2963,7 +2967,7 @@ export function DeviceSettings({ params }) {
             <span>${state.allKeys.length} total mapped</span>
           </div>
 
-          <div class="ds-section">
+          <div class="ds-section ${activeSection.custom ? "ds-section--custom" : ""}">
             <div class="ds-section-header ds-static-header">
               <i class="bi ${activeSection.icon}"></i>
               <span class="ds-section-title">${activeSection.name} (${visibleParams.length})</span>

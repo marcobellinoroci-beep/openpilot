@@ -276,7 +276,8 @@ export const GalaxyToggleCard = {
     <div v-else>
       <div class="gx-row" :class="{ disabled: locked, 'gx-row--favorites': isFavorites, 'gx-row--stack': isSlider || isSelect }">
         <div class="gx-row__info">
-          <span class="gx-row__label">{{ tr(displayParam.label, displayParam.label) }}
+          <span class="gx-row__label" :class="{ 'gx-row__label--custom': displayParam.custom }">{{ tr(displayParam.label, displayParam.label) }}
+            <span v-if="displayParam.custom" class="gx-chip gx-chip--custom">{{ tr("Custom") }}</span>
             <span v-if="displayParam.settings_tier === 'advanced'" class="gx-chip gx-chip--advanced">{{ tr("Advanced") }}</span>
           </span>
           <span v-if="displayParam.description" class="gx-row__desc">{{ tr(displayParam.description, displayParam.description) }}</span>

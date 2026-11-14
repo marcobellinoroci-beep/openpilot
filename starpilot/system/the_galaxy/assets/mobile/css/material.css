@@ -775,6 +775,10 @@ body.is-scrolling .gx-tile {
   letter-spacing: -0.01em;
 }
 
+.gx-section__title--custom {
+  color: #FF9800;
+}
+
 .gx-section__count {
   color: var(--text-muted);
   font-size: var(--fs-xs);
@@ -820,6 +824,10 @@ body.is-scrolling .gx-tile {
   font-weight: var(--fw-medium);
   font-size: var(--fs-base);
   line-height: 1.3;
+}
+
+.gx-row__label--custom {
+  color: #FF9800;
 }
 
 .gx-row__desc {
@@ -1234,6 +1242,17 @@ button.gx-chip {
 
 button.gx-chip:hover {
   background: var(--glass-bg-hover);
+}
+
+.gx-chip--custom {
+  background: rgba(255, 152, 0, 0.18);
+  border: 1px solid #FF9800;
+  color: #FF9800;
+}
+
+.gx-chip--custom-section {
+  border: 1px solid #FF9800;
+  color: #FF9800;
 }
 
 .gx-chip--advanced {
