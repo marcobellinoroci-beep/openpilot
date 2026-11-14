@@ -1342,6 +1342,14 @@ STARPILOT_EVENTS: dict[int, dict[str, Alert | AlertCallbackType]] = {
       Priority.MID, VisualAlert.none, AudibleAlert.prompt, .2),
   },
 
+  StarPilotEventName.navLaneChange: {
+    ET.WARNING: Alert(
+      "Segui percorso",
+      "",
+      AlertStatus.normal, AlertSize.small,
+      Priority.MID, VisualAlert.none, AudibleAlert.prompt, .2),
+  },
+
   StarPilotEventName.turningLeft: {
     ET.WARNING: turning_alert("Left"),
   },

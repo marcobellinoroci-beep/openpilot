@@ -222,6 +222,8 @@ class StarPilotEvents:
       self.events.add(StarPilotEventName.autoOvertake)
     elif auto_lane_change == AutoLaneChangeKind.overtakeReturn:
       self.events.add(StarPilotEventName.autoOvertakeReturn)
+    elif auto_lane_change == AutoLaneChangeKind.nav:
+      self.events.add(StarPilotEventName.navLaneChange)
 
     self.always_on_lateral_allowed_previously = sm["starpilotCarState"].alwaysOnLateralAllowed
     self.played_events.update(STARPILOT_EVENT_NAME[event] for event in self.events.names)

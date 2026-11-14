@@ -3,7 +3,7 @@ from time import monotonic
 
 from cereal import log
 
-from openpilot.selfdrive.controls.lib.desire_helper import DesireHelper, LaneChangeDirection, LaneChangeState
+from openpilot.selfdrive.controls.lib.desire_helper import AutoLaneChangeKind, DesireHelper, LaneChangeDirection, LaneChangeState
 
 
 def make_car_state(**overrides):
@@ -862,6 +862,7 @@ def test_nav_lane_change_off_ramp_right_starts_blinkerless_change():
   assert helper.auto_nav_active
   assert helper.auto_overtake_active
   assert helper.desire == log.Desire.laneChangeRight
+  assert helper.auto_lane_change_kind == AutoLaneChangeKind.NAV
   assert not helper.return_pending
 
 

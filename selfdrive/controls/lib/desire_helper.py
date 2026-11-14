@@ -135,6 +135,7 @@ class AutoLaneChangeKind:
   NONE = 0
   OVERTAKE = 1
   RETURN = 2
+  NAV = 3
 
 
 def _overtake_return_delay(value) -> float:
@@ -699,6 +700,8 @@ class DesireHelper:
     if self.lane_change_state not in (LaneChangeState.preLaneChange, LaneChangeState.laneChangeStarting,
                                       LaneChangeState.laneChangeFinishing):
       return AutoLaneChangeKind.NONE
+    if self.auto_nav_active:
+      return AutoLaneChangeKind.NAV
     if self.auto_return_active:
       return AutoLaneChangeKind.RETURN
     if self.auto_overtake_active and self.lane_change_direction == LaneChangeDirection.left:

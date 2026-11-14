@@ -131,6 +131,7 @@ struct StarPilotModelDataV2 @0x80ae746ee2596b11 {
     none @0;
     overtake @1;
     overtakeReturn @2;
+    nav @3;
   }
 }
 
@@ -198,6 +199,7 @@ struct StarPilotOnroadEvent @0xe344718567f9ce71 {
     pedalNotCalibrated @40;
     autoOvertake @41;
     autoOvertakeReturn @42;
+    navLaneChange @43;
   }
 }
 
