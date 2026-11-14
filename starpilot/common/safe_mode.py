@@ -63,6 +63,7 @@ SAFE_MODE_MANAGED_KEYS = (
   "NudgelessLaneChangeOnlyWhenEngaged",
   "AutoOvertake",
   "AutoOvertakeReturn",
+  "NavLaneChange",
   "OvertakeReturnDelay",
   "OneLaneChange",
   "NNFF",

@@ -1191,6 +1191,7 @@ class StarPilotVariables:
     toggle.nudgeless_lane_change_only_when_engaged = self.get_value("NudgelessLaneChangeOnlyWhenEngaged", condition=toggle.lane_changes and toggle.nudgeless)
     toggle.one_lane_change = self.get_value("OneLaneChange", condition=toggle.lane_changes)
     toggle.auto_overtake = self.get_value("AutoOvertake", condition=toggle.lane_changes)
+    toggle.nav_lane_change = self.get_value("NavLaneChange", condition=toggle.lane_changes)
     toggle.auto_overtake_return = self.get_value("AutoOvertakeReturn", condition=toggle.lane_changes and toggle.auto_overtake)
     toggle.overtake_return_delay = self.get_value(
       "OvertakeReturnDelay", cast=float, condition=toggle.lane_changes and toggle.auto_overtake, default=2.5, min=0.0, max=10.0,

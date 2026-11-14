@@ -192,6 +192,13 @@ class StarPilotLateralLayout(_SettingsPage):
         visible=ao_on,
       ),
       SettingRow(
+        "NavLaneChange", "toggle", tr_noop("Follow Route"),
+        subtitle=tr_noop("On the highway, automatically change lanes toward an upcoming exit or keep-left/keep-right from navigation, without a turn signal."),
+        get_state=lambda: p.get_bool("NavLaneChange"),
+        set_state=lambda s: p.put_bool("NavLaneChange", s),
+        visible=lc_on,
+      ),
+      SettingRow(
         "OvertakeReturnDelay", "value", tr_noop("Overtake Return Delay"),
         subtitle=tr_noop("Wait this long after an overtake before signaling a return to the right."),
         get_value=self._get_overtake_return_delay_display,

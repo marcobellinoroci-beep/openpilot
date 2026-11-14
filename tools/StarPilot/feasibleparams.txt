@@ -207,6 +207,7 @@ ModelVersion
 NNFF
 NNFFLite
 NavDesiresAllowed
+NavLaneChange
 NavLongitudinalAllowed
 NavigationUI
 NoLogging

@@ -409,6 +409,7 @@ def test_honda_pid_scale_controls_use_galaxy_fine_granularity():
 def test_hidden_feature_defaults_remain_enabled():
   assert _declared_default("GalaxyDeveloperMode") == "0"
   assert _declared_default("NavDesiresAllowed") == "1"
+  assert _declared_default("NavLaneChange") == "0"
   assert _declared_default("NavLanePositioningAllowed") == "0"
   assert _declared_default("NavLongitudinalAllowed") == "1"
   assert _declared_default("CEOpenRoad") == "0"
