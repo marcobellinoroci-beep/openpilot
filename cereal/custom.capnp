@@ -119,11 +119,18 @@ struct StarPilotDeviceState @0xda96579883444c35 {
 
 struct StarPilotModelDataV2 @0x80ae746ee2596b11 {
   turnDirection @0 :TurnDirection;
+  autoLaneChange @1 :AutoLaneChangeKind;
 
   enum TurnDirection {
     none @0;
     turnLeft @1;
     turnRight @2;
+  }
+
+  enum AutoLaneChangeKind {
+    none @0;
+    overtake @1;
+    overtakeReturn @2;
   }
 }
 
@@ -189,6 +196,8 @@ struct StarPilotOnroadEvent @0xe344718567f9ce71 {
     teslaCCDisengaged @38;
     teslaCCNotArmed @39;
     pedalNotCalibrated @40;
+    autoOvertake @41;
+    autoOvertakeReturn @42;
   }
 }
 

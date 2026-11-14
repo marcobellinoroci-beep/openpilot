@@ -670,6 +670,81 @@ class DesireHelper:
       self.overtake_timer = 0.0
       self.lead_dropout_timer = 0.0
 
+    # One return to the right after a left auto-overtake finishes.
+    if self.return_pending:
+      self.return_wait_timer += DT_MDL
+      if self.lane_change_state == LaneChangeState.off:
+        self.return_settle_timer += DT_MDL
+      opposite_torque = carstate.steeringPressed and carstate.steeringTorque > 0
+      if (carstate.leftBlinker or opposite_torque or
+          not self.auto_overtake or not lateral_active or
+          self.return_wait_timer >= AUTO_OVERTAKE_RETURN_TIMEOUT):
+        self.return_pending = False
+        self.return_wait_timer = 0.0
+        self.return_settle_timer = 0.0
+        self.return_blinker_held = False
+
+    return_delay_active = self.return_pending and self.return_wait_timer < self.return_delay
+    right_blinker_only = carstate.rightBlinker and not carstate.leftBlinker
+    blinker_edge = one_blinker and not self.prev_one_blinker
+    if not (self.return_pending and right_blinker_only):
+      self.return_blinker_held = False
+    elif blinker_edge and return_delay_active and self.lane_change_state == LaneChangeState.off:
+      self.return_blinker_held = True
+      blinker_edge = False
+    return_side_ok = (
+      right_lane_clear and
+      not right_lane_oncoming and
+      not carstate.rightBlindspot and
+      not right_edge_detected and
+      lateral_active and
+      not below_lane_change_speed
+    )
+    held_return_ready = (
+      self.return_blinker_held and
+      not return_delay_active and
+      return_side_ok and
+      self.lane_change_state == LaneChangeState.off
+    )
+    return_ready = (
+      self.return_pending and
+      self.return_settle_timer >= AUTO_OVERTAKE_RETURN_SETTLE and
+      not return_delay_active and
+      not slower_lead_detected and
+      right_lane_clear and
+      not right_lane_oncoming and
+      not carstate.rightBlindspot and
+      not right_edge_detected and
+      carstate.rightBlinker and
+      not carstate.leftBlinker and
+      lateral_active and
+      v_ego >= AUTO_OVERTAKE_SPEED_MIN and
+      self.auto_overtake and
+      lane_changes_allowed and
+      self.lane_change_state == LaneChangeState.off
+    )
+    auto_return_ok = (
+      self.auto_overtake_return and
+      self.return_pending and
+      self.return_settle_timer >= AUTO_OVERTAKE_RETURN_SETTLE and
+      not return_delay_active and
+      not slower_lead_detected and
+      right_lane_clear and
+      not right_lane_oncoming and
+      not carstate.rightBlindspot and
+      not right_edge_detected and
+      not carstate.rightBlinker and
+      not carstate.leftBlinker and
+      highway is True and
+      lateral_active and
+      v_ego >= AUTO_OVERTAKE_SPEED_MIN and
+      self.auto_overtake and
+      lane_changes_allowed and
+      self.lane_change_state == LaneChangeState.off
+    )
+    self.auto_return_timer = self.auto_return_timer + DT_MDL if auto_return_ok else 0.0
+    auto_return_ready = auto_return_ok and self.auto_return_timer >= AUTO_OVERTAKE_RETURN_CONFIRM
+
     if not lateral_active or self.lane_change_timer > lane_change_time_max or not lane_changes_allowed:
       self.lane_change_state = LaneChangeState.off
       self.lane_change_direction = LaneChangeDirection.none
@@ -682,11 +757,27 @@ class DesireHelper:
 
       # LaneChangeState.off
       auto_overtake_trigger = self.overtake_timer >= AUTO_OVERTAKE_DELAY or self.stopped_lead_timer >= STOPPED_LEAD_CONFIRM
-      blinker_start = (one_blinker and not self.prev_one_blinker and not below_lane_change_speed and not nav_turn_signal)
-      if self.lane_change_state == LaneChangeState.off and (blinker_start or (auto_overtake_trigger and not below_lane_change_speed)):
+      blinker_start = (blinker_edge and not below_lane_change_speed and not nav_turn_signal)
+      if (self.lane_change_state == LaneChangeState.off and
+          (blinker_start or auto_overtake_trigger or return_ready or held_return_ready or auto_return_ready) and
+          not below_lane_change_speed):
         self.lane_change_state = LaneChangeState.preLaneChange
         self.lane_change_ll_prob = 1.0
-        if auto_overtake_trigger and not blinker_start:
+        if return_ready:
+          self.lane_change_direction = LaneChangeDirection.right
+          self.auto_overtake_active = True
+          self.auto_return_active = False
+          self.return_pending = False
+          self.return_wait_timer = 0.0
+          self.return_settle_timer = 0.0
+          self.return_blinker_held = False
+        elif auto_return_ready:
+          self.lane_change_direction = LaneChangeDirection.right
+          self.auto_overtake_active = True
+          self.auto_return_active = True
+          self.return_pending = self.return_blinker_held = False
+          self.return_wait_timer = self.return_settle_timer = self.auto_return_timer = 0.0
+        elif auto_overtake_trigger and not blinker_start:
           self.lane_change_direction = LaneChangeDirection.left
           self.auto_overtake_active = True
           self.overtake_timer = 0.0
@@ -695,6 +786,17 @@ class DesireHelper:
           # Initialize lane change direction to prevent UI alert flicker
           self.lane_change_direction = self.get_lane_change_direction(carstate)
           self.auto_overtake_active = False
+          if held_return_ready:
+            self.return_pending = self.return_blinker_held = False
+            self.return_wait_timer = self.return_settle_timer = 0.0
+
+      elif self.auto_return_active and (carstate.rightBlindspot or carstate.leftBlinker or
+                                        (carstate.steeringPressed and carstate.steeringTorque > 0)):
+        self.lane_change_state = LaneChangeState.off
+        self.lane_change_direction = LaneChangeDirection.none
+        self.lane_change_timer = 0.0
+        self.auto_overtake_active = False
+        self.auto_return_active = False
 
       # LaneChangeState.preLaneChange
       elif self.lane_change_state == LaneChangeState.preLaneChange:
@@ -750,11 +852,24 @@ class DesireHelper:
         self.lane_change_ll_prob = min(self.lane_change_ll_prob + DT_MDL, 1.0)
 
         if self.lane_change_ll_prob > 0.99:
+          finished_auto_left = (
+            self.auto_overtake_active and
+            not self.auto_return_active and
+            self.lane_change_direction == LaneChangeDirection.left and
+            not one_blinker
+          )
           self.lane_change_direction = LaneChangeDirection.none
+          self.auto_overtake_active = False
+          self.auto_return_active = False
           if one_blinker:
             self.lane_change_state = LaneChangeState.preLaneChange
           else:
             self.lane_change_state = LaneChangeState.off
+            if finished_auto_left:
+              self.return_pending = True
+              self.return_wait_timer = 0.0
+              self.return_settle_timer = 0.0
+              self.return_blinker_held = False
 
     if self.lane_change_state in (LaneChangeState.off, LaneChangeState.preLaneChange):
       self.lane_change_timer = 0.0
@@ -762,6 +877,8 @@ class DesireHelper:
       self.lane_change_timer += DT_MDL
 
     self.prev_one_blinker = one_blinker
+    if self.lane_change_state == LaneChangeState.off:
+      self.auto_return_active = False
 
     if lateral_active and one_blinker and below_lane_change_speed and not carstate.standstill \
         and starpilot_toggles.use_turn_desires and not self.turn_stop_hold:

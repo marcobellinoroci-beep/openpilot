@@ -142,6 +142,8 @@ class HudRenderer(Widget):
     if self.draw_exp_button:
       self._exp_button.render(rl.Rectangle(button_x, button_y, UI_CONFIG.button_size, UI_CONFIG.button_size))
 
+    self._draw_auto_overtake_indicator(rect)
+
   def user_interacting(self) -> bool:
     return self._exp_button.is_pressed or self._navigation_card.is_pressed
 
@@ -205,3 +207,24 @@ class HudRenderer(Widget):
       compass_size = measure_text_cached(self._font_bold, compass_text, compass_font_size)
       compass_pos = rl.Vector2(rect.x + rect.width / 2 - compass_size.x / 2, 65 - compass_size.y / 2)
       draw_text_with_shadow(self._font_bold, compass_text, compass_pos, compass_font_size, rl.WHITE)
+
+  def _draw_auto_overtake_indicator(self, rect: rl.Rectangle) -> None:
+    """Small onroad AO status chip. Toggles live in StarPilot Steering settings."""
+    try:
+      ao_on = bool(ui_state.params.get_bool("AutoOvertake"))
+    except Exception:
+      return
+
+    label = "AO" if ao_on else "AO OFF"
+    font_size = 32
+    text_size = measure_text_cached(self._font_semi_bold, label, font_size)
+    pad_x, pad_y = 12, 8
+    width = text_size.x + pad_x * 2
+    height = text_size.y + pad_y * 2
+    set_speed_width = UI_CONFIG.set_speed_width_metric if ui_state.is_metric else UI_CONFIG.set_speed_width_imperial
+    x = rect.x + WIDGET_ANCHOR_OFFSET - set_speed_width / 2
+    y = rect.y + 45 + UI_CONFIG.set_speed_height + 12
+    bg = rl.Color(20, 80, 50, 180) if ao_on else rl.Color(0, 0, 0, 120)
+    fg = COLORS.ENGAGED if ao_on else COLORS.GREY
+    rl.draw_rectangle_rounded(rl.Rectangle(x, y, width, height), 0.35, 6, bg)
+    rl.draw_text_ex(self._font_semi_bold, label, rl.Vector2(x + pad_x, y + pad_y), font_size, 0, fg)

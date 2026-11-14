@@ -1326,6 +1326,22 @@ STARPILOT_EVENTS: dict[int, dict[str, Alert | AlertCallbackType]] = {
     ET.PERMANENT: NormalPermanentAlert("Arm Stock Cruise to Enable Speed Control"),
   },
 
+  StarPilotEventName.autoOvertake: {
+    ET.WARNING: Alert(
+      "Sorpasso auto" if HARDWARE.get_device_type() == "mici" else "Sorpasso automatico",
+      "",
+      AlertStatus.normal, AlertSize.small,
+      Priority.MID, VisualAlert.none, AudibleAlert.prompt, .2),
+  },
+
+  StarPilotEventName.autoOvertakeReturn: {
+    ET.WARNING: Alert(
+      "Rientro auto" if HARDWARE.get_device_type() == "mici" else "Rientro automatico",
+      "",
+      AlertStatus.normal, AlertSize.small,
+      Priority.MID, VisualAlert.none, AudibleAlert.prompt, .2),
+  },
+
   StarPilotEventName.turningLeft: {
     ET.WARNING: turning_alert("Left"),
   },

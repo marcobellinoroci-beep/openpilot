@@ -316,3 +316,133 @@ def test_nav_desires_do_not_override_an_active_overtake():
        toggles=ao_toggles(nudgeless=True))
   assert helper.desire == log.Desire.laneChangeLeft
   assert helper.lane_change_state == LaneChangeState.laneChangeStarting
+
+
+# --- return path ---
+
+from openpilot.selfdrive.controls.lib.desire_helper import (
+  AUTO_OVERTAKE_RETURN_CONFIRM,
+  AUTO_OVERTAKE_RETURN_SETTLE,
+  AUTO_OVERTAKE_RETURN_TIMEOUT,
+  AutoLaneChangeKind,
+)
+
+
+def finish_active_lane_change(helper, **kwargs):
+  kwargs.setdefault("lane_change_prob", 0.0)
+  kwargs.setdefault("slower_lead_detected", False)
+  saw_finishing = False
+  for _ in range(frames_for(2.5) + 5):
+    if helper.lane_change_state == LaneChangeState.off and saw_finishing:
+      break
+    if helper.lane_change_state == LaneChangeState.laneChangeFinishing:
+      saw_finishing = True
+    step(helper, 1, **kwargs)
+    if helper.lane_change_state == LaneChangeState.off and saw_finishing:
+      break
+  assert saw_finishing
+  assert helper.lane_change_state == LaneChangeState.off
+
+
+def complete_left_overtake(helper=None, **kwargs):
+  helper = start_overtake(helper, **kwargs)
+  finish_active_lane_change(helper, **kwargs)
+  assert helper.return_pending
+  return helper
+
+
+def test_left_overtake_arms_a_return_to_the_right():
+  helper = complete_left_overtake()
+  assert helper.return_pending
+  assert helper.lane_change_state == LaneChangeState.off
+  assert not helper.auto_overtake_active
+
+
+def test_blinker_return_starts_after_delay_and_settle():
+  helper = complete_left_overtake()
+  # Wait the settle period with no blinker; the 2.5 s delay is shorter than settle.
+  step(helper, frames_for(AUTO_OVERTAKE_RETURN_SETTLE),
+       carstate=make_car_state(vEgo=HIGHWAY_V_EGO))
+  assert helper.lane_change_state == LaneChangeState.off
+  assert helper.return_pending
+  # Rising edge of the right blinker starts the owed return without a nudge.
+  step(helper, 1, carstate=make_car_state(vEgo=HIGHWAY_V_EGO, rightBlinker=True))
+  assert helper.lane_change_state == LaneChangeState.preLaneChange
+  assert helper.lane_change_direction == LaneChangeDirection.right
+  assert helper.auto_overtake_active
+  step(helper, 1, carstate=make_car_state(vEgo=HIGHWAY_V_EGO, rightBlinker=True))
+  assert helper.lane_change_state == LaneChangeState.laneChangeStarting
+  assert helper.desire == log.Desire.laneChangeRight
+
+
+def test_early_right_blinker_is_held_until_return_delay():
+  helper = complete_left_overtake()
+  # Signal during the delay: do not start yet, then start once 2.5 s have elapsed.
+  step(helper, 1, carstate=make_car_state(vEgo=HIGHWAY_V_EGO, rightBlinker=True))
+  step(helper, frames_for(2.5) - 2, carstate=make_car_state(vEgo=HIGHWAY_V_EGO, rightBlinker=True))
+  assert helper.lane_change_state == LaneChangeState.off
+  assert helper.return_pending
+  step(helper, 4, carstate=make_car_state(vEgo=HIGHWAY_V_EGO, rightBlinker=True))
+  assert helper.lane_change_state in (LaneChangeState.preLaneChange, LaneChangeState.laneChangeStarting)
+  assert helper.lane_change_direction == LaneChangeDirection.right
+
+
+def test_auto_return_starts_without_blinker_when_enabled():
+  helper = complete_left_overtake(toggles=ao_toggles(auto_overtake_return=True))
+  step(helper, frames_for(AUTO_OVERTAKE_RETURN_SETTLE) + frames_for(AUTO_OVERTAKE_RETURN_CONFIRM),
+       toggles=ao_toggles(auto_overtake_return=True), slower_lead_detected=False, highway=True)
+  assert helper.lane_change_state in (LaneChangeState.preLaneChange, LaneChangeState.laneChangeStarting)
+  assert helper.auto_return_active or helper.auto_overtake_active
+  assert helper.lane_change_direction == LaneChangeDirection.right
+  step(helper, 1, toggles=ao_toggles(auto_overtake_return=True), highway=True)
+  assert helper.lane_change_state == LaneChangeState.laneChangeStarting
+  assert helper.auto_return_active
+  assert helper.auto_lane_change_kind == AutoLaneChangeKind.RETURN
+  assert helper.desire == log.Desire.laneChangeRight
+
+
+def test_auto_return_requires_highway():
+  helper = complete_left_overtake(toggles=ao_toggles(auto_overtake_return=True))
+  step(helper, frames_for(AUTO_OVERTAKE_RETURN_SETTLE) + frames_for(AUTO_OVERTAKE_RETURN_CONFIRM) + 5,
+       toggles=ao_toggles(auto_overtake_return=True), highway=False)
+  assert helper.lane_change_state == LaneChangeState.off
+  assert helper.return_pending
+
+
+def test_auto_return_blocked_by_right_bsm():
+  helper = complete_left_overtake(toggles=ao_toggles(auto_overtake_return=True))
+  step(helper, frames_for(AUTO_OVERTAKE_RETURN_SETTLE) + frames_for(AUTO_OVERTAKE_RETURN_CONFIRM) + 5,
+       toggles=ao_toggles(auto_overtake_return=True),
+       carstate=make_car_state(vEgo=HIGHWAY_V_EGO, rightBlindspot=True))
+  assert helper.lane_change_state == LaneChangeState.off
+  assert helper.return_pending
+
+
+def test_auto_return_blocked_when_right_lane_not_clear():
+  helper = complete_left_overtake(toggles=ao_toggles(auto_overtake_return=True))
+  step(helper, frames_for(AUTO_OVERTAKE_RETURN_SETTLE) + frames_for(AUTO_OVERTAKE_RETURN_CONFIRM) + 5,
+       toggles=ao_toggles(auto_overtake_return=True), right_lane_clear=False)
+  assert helper.lane_change_state == LaneChangeState.off
+  assert helper.return_pending
+
+
+def test_auto_return_blocked_by_right_road_edge():
+  helper = complete_left_overtake(toggles=ao_toggles(auto_overtake_return=True))
+  step(helper, frames_for(AUTO_OVERTAKE_RETURN_SETTLE) + frames_for(AUTO_OVERTAKE_RETURN_CONFIRM) + 5,
+       toggles=ao_toggles(auto_overtake_return=True), right_edge_detected=True)
+  assert helper.lane_change_state == LaneChangeState.off
+  assert helper.return_pending
+
+
+def test_return_cancelled_by_timeout_or_left_input():
+  helper = complete_left_overtake()
+  step(helper, frames_for(AUTO_OVERTAKE_RETURN_TIMEOUT) + 1)
+  assert not helper.return_pending
+
+  helper = complete_left_overtake()
+  step(helper, 2, carstate=make_car_state(vEgo=HIGHWAY_V_EGO, leftBlinker=True))
+  assert not helper.return_pending
+
+  helper = complete_left_overtake()
+  step(helper, 2, carstate=make_car_state(vEgo=HIGHWAY_V_EGO, steeringPressed=True, steeringTorque=1.0))
+  assert not helper.return_pending

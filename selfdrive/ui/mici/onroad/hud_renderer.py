@@ -307,6 +307,7 @@ class HudRenderer(Widget):
       self._draw_model_source(self._rect)
 
     self._draw_steering_wheel(self._rect)
+    self._draw_auto_overtake_indicator(self._rect)
     self._draw_speed_limit_prompt(self._rect)
 
   def user_interacting(self) -> bool:
@@ -730,3 +731,23 @@ class HudRenderer(Widget):
     unit_text_size = measure_text_cached(self._font_medium, unit_text, FONT_SIZES.speed_unit)
     unit_pos = rl.Vector2(rect.x + rect.width / 2 - unit_text_size.x / 2, 290 - unit_text_size.y / 2)
     rl.draw_text_ex(self._font_medium, unit_text, unit_pos, FONT_SIZES.speed_unit, 0, COLORS.WHITE_TRANSLUCENT)
+
+  def _draw_auto_overtake_indicator(self, rect: rl.Rectangle) -> None:
+    """Small onroad AO status chip. Toggles live in StarPilot Steering settings."""
+    try:
+      ao_on = bool(ui_state.params.get_bool("AutoOvertake"))
+    except Exception:
+      return
+
+    label = "AO" if ao_on else "AO OFF"
+    font_size = 22
+    text_size = measure_text_cached(self._font_semi_bold, label, font_size)
+    pad_x, pad_y = 8, 5
+    width = text_size.x + pad_x * 2
+    height = text_size.y + pad_y * 2
+    x = rect.x + rect.width - width - 10
+    y = rect.y + 8
+    bg = rl.Color(20, 80, 50, 180) if ao_on else rl.Color(0, 0, 0, 120)
+    fg = rl.Color(180, 255, 210, 255) if ao_on else rl.Color(200, 200, 200, 160)
+    rl.draw_rectangle_rounded(rl.Rectangle(x, y, width, height), 0.35, 6, bg)
+    rl.draw_text_ex(self._font_semi_bold, label, rl.Vector2(x + pad_x, y + pad_y), font_size, 0, fg)

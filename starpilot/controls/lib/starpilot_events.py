@@ -3,6 +3,7 @@ import random
 
 from openpilot.common.constants import ACCELERATION_DUE_TO_GRAVITY, CV
 from openpilot.common.realtime import DT_MDL
+from cereal import custom
 from openpilot.selfdrive.controls.lib.desire_helper import TurnDirection
 from openpilot.selfdrive.selfdrived.events import ET, EVENT_NAME, STARPILOT_EVENT_NAME, EventName, StarPilotEventName, Events
 
@@ -214,6 +215,13 @@ class StarPilotEvents:
       self.events.add(StarPilotEventName.turningLeft)
     elif sm["starpilotModelV2"].turnDirection == TurnDirection.turnRight:
       self.events.add(StarPilotEventName.turningRight)
+
+    AutoLaneChangeKind = custom.StarPilotModelDataV2.AutoLaneChangeKind
+    auto_lane_change = sm["starpilotModelV2"].autoLaneChange
+    if auto_lane_change == AutoLaneChangeKind.overtake:
+      self.events.add(StarPilotEventName.autoOvertake)
+    elif auto_lane_change == AutoLaneChangeKind.overtakeReturn:
+      self.events.add(StarPilotEventName.autoOvertakeReturn)
 
     self.always_on_lateral_allowed_previously = sm["starpilotCarState"].alwaysOnLateralAllowed
     self.played_events.update(STARPILOT_EVENT_NAME[event] for event in self.events.names)
