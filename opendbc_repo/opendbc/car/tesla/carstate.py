@@ -1,4 +1,5 @@
 import copy
+import math
 from cereal import custom
 from opendbc.can import CANDefine, CANParser
 from opendbc.car import Bus, create_button_events, structs
@@ -15,8 +16,46 @@ from opendbc.car.tesla.preap.pedal_feedback import PedalFeedback
 
 ButtonType = structs.CarState.ButtonEvent.Type
 
+
 TESLA_GAS_PRESS_ON = 0.8
 TESLA_GAS_PRESS_OFF = 0.4
+
+# tesla_model3_party.dbc, message DAS_status (0x39B) on the Autopilot party bus (CANBUS.autopilot_party = 2).
+# 5-bit signal, factor 5, units kph or mph from DI_state.DI_speedUnits. VAL_ raw 0 = UNKNOWN_SNA, raw 31 = NONE.
+# The CAN parser exposes the physical value (raw * 5), so NONE arrives as 155, outside the DBC [0|150] range.
+# Look up sentinels on the raw value; looking up int(physical) on CANDefine.dv misses NONE.
+DAS_FUSED_SPEED_LIMIT_FACTOR = 5.0
+DAS_FUSED_SPEED_LIMIT_NONE_RAW = 31
+DAS_FUSED_SPEED_LIMIT_UNKNOWN_RAW = 0
+
+
+def tesla_das_status_stale(parser: CANParser) -> bool:
+  """True when DAS_status has never been seen or has exceeded the parser timeout."""
+  state = next((s for s in parser.message_states.values() if s.name == "DAS_status"), None)
+  if state is None:
+    return True
+  return not state.valid(parser._last_update_nanos, parser.bus_timeout)
+
+
+def tesla_dashboard_speed_limit(fused_physical: float, speed_units: str | None, stale: bool = False) -> float:
+  """Tesla DAS_fusedSpeedLimit in m/s, or 0 if unknown, NONE, stale, or units are missing."""
+  if stale:
+    return 0.0
+  try:
+    physical = float(fused_physical)
+  except (TypeError, ValueError):
+    return 0.0
+  if not math.isfinite(physical) or physical <= 0:
+    return 0.0
+  raw = int(round(physical / DAS_FUSED_SPEED_LIMIT_FACTOR))
+  if raw in (DAS_FUSED_SPEED_LIMIT_UNKNOWN_RAW, DAS_FUSED_SPEED_LIMIT_NONE_RAW):
+    return 0.0
+  if speed_units == "KPH":
+    return physical * CV.KPH_TO_MS
+  if speed_units == "MPH":
+    return physical * CV.MPH_TO_MS
+  return 0.0
+
 
 
 class TeslaScreenCANParser(CANParser):
@@ -220,6 +259,13 @@ class CarState(CarStateBase):
     fp_ret = custom.StarPilotCarState.new_message()
     if self.CP.flags & TeslaFlags.AOL_SCREEN_BUTTON:
       fp_ret.cancelPressed = self.screen_cancel_pressed
+    # Existing StarPilotCarState field, already published in m/s for Honda/Ford/Hyundai/Toyota
+    # dashboard limits and consumed as the "Dashboard" SLC source.
+    fp_ret.dashboardSpeedLimit = tesla_dashboard_speed_limit(
+      cp_ap_party.vl["DAS_status"]["DAS_fusedSpeedLimit"],
+      speed_units,
+      tesla_das_status_stale(cp_ap_party),
+    )
 
     return ret, fp_ret
 
