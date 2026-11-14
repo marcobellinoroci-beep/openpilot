@@ -35,6 +35,7 @@ def make_toggles(**overrides):
     "lane_changes_require_cruise": False,
     "nav_desires_allowed": True,
     "nav_lane_positioning_allowed": True,
+    "nav_lane_change": False,
   }
   defaults.update(overrides)
   return SimpleNamespace(**defaults)
@@ -786,3 +787,202 @@ def test_nav_lane_positioning_requires_driver_confirmation():
   )
 
   assert helper.desire == log.Desire.none
+
+
+from openpilot.common.realtime import DT_MDL
+from openpilot.selfdrive.controls.lib.desire_helper import NAV_LANE_CHANGE_DELAY, NAV_LANE_CHANGE_MIN_DISTANCE
+
+
+def _frames_for(seconds):
+  return int(round(seconds / DT_MDL))
+
+
+def make_nav_instruction(**overrides):
+  state = {
+    "valid": True,
+    "updatedAtMonotonic": monotonic(),
+    "maneuverType": "off ramp",
+    "maneuverModifier": "right",
+    "maneuverDistance": 300.0,
+    "activeLaneDirection": "slightRight",
+    "maneuverPrimaryText": "Exit 12",
+  }
+  state.update(overrides)
+  return state
+
+
+def arm_nav(helper, **overrides):
+  helper._update_nav_params = lambda: None
+  helper._nav_instruction_state = make_nav_instruction(**overrides)
+  return helper
+
+
+def nav_toggles(**overrides):
+  return make_toggles(nav_lane_change=True, **overrides)
+
+
+def step_nav(helper, frames=1, *, carstate=None, plan=None, toggles=None, lateral_active=True,
+             lane_change_prob=1.0, **kwargs):
+  carstate = carstate or make_car_state(vEgo=30.0)
+  plan = plan or make_plan()
+  toggles = toggles or nav_toggles()
+  kwargs.setdefault("slower_lead_detected", False)
+  kwargs.setdefault("left_lane_clear", True)
+  kwargs.setdefault("right_lane_clear", True)
+  kwargs.setdefault("left_edge_detected", False)
+  kwargs.setdefault("right_edge_detected", False)
+  kwargs.setdefault("right_lane_oncoming", False)
+  kwargs.setdefault("highway", True)
+  for _ in range(frames):
+    helper.update(carstate, lateral_active, lane_change_prob, plan, toggles, True, **kwargs)
+  return helper
+
+
+def start_nav_lane_change(helper=None, **kwargs):
+  helper = helper or DesireHelper()
+  nav = kwargs.pop("nav", {})
+  arm_nav(helper, **nav)
+  step_nav(helper, _frames_for(NAV_LANE_CHANGE_DELAY), **kwargs)
+  # One more frame in preLaneChange to commit to starting
+  step_nav(helper, 1, **kwargs)
+  return helper
+
+
+def test_nav_lane_change_off_does_not_trigger():
+  helper = arm_nav(DesireHelper())
+  step_nav(helper, _frames_for(NAV_LANE_CHANGE_DELAY) + 5, toggles=make_toggles(nav_lane_change=False))
+  assert helper.lane_change_state == LaneChangeState.off
+  assert not helper.auto_nav_active
+
+
+def test_nav_lane_change_off_ramp_right_starts_blinkerless_change():
+  helper = start_nav_lane_change()
+  assert helper.lane_change_state == LaneChangeState.laneChangeStarting
+  assert helper.lane_change_direction == LaneChangeDirection.right
+  assert helper.auto_nav_active
+  assert helper.auto_overtake_active
+  assert helper.desire == log.Desire.laneChangeRight
+  assert not helper.return_pending
+
+
+def test_nav_lane_change_waits_for_confirm_delay():
+  helper = arm_nav(DesireHelper())
+  step_nav(helper, _frames_for(NAV_LANE_CHANGE_DELAY) - 1)
+  assert helper.lane_change_state == LaneChangeState.off
+  step_nav(helper, 1)
+  assert helper.lane_change_state == LaneChangeState.preLaneChange
+  assert helper.auto_nav_active
+
+
+def test_nav_lane_change_continue_keep_left():
+  helper = start_nav_lane_change(nav={
+    "maneuverType": "continue",
+    "maneuverModifier": "slightLeft",
+    "activeLaneDirection": "",
+    "maneuverPrimaryText": "Keep left to stay on A1",
+  })
+  assert helper.lane_change_direction == LaneChangeDirection.left
+  assert helper.desire == log.Desire.laneChangeLeft
+  assert helper.auto_nav_active
+
+
+def test_nav_lane_change_notification_keep_right():
+  helper = start_nav_lane_change(nav={
+    "maneuverType": "notification",
+    "maneuverModifier": "right",
+    "activeLaneDirection": "",
+    "maneuverPrimaryText": "Keep right",
+  })
+  assert helper.lane_change_direction == LaneChangeDirection.right
+  assert helper.desire == log.Desire.laneChangeRight
+  assert helper.auto_nav_active
+
+
+def test_nav_lane_change_fork_left_with_lane_guidance():
+  helper = start_nav_lane_change(nav={
+    "maneuverType": "fork",
+    "maneuverModifier": "left",
+    "activeLaneDirection": "slightLeft",
+    "maneuverDistance": 280.0,
+  })
+  assert helper.lane_change_direction == LaneChangeDirection.left
+  assert helper.auto_nav_active
+
+
+def test_nav_lane_change_ignores_city_turn_and_roundabout():
+  for maneuver_type, modifier in (("turn", "right"), ("roundabout", "left"), ("rotary", "right"), ("exit roundabout", "left")):
+    helper = arm_nav(DesireHelper(), maneuverType=maneuver_type, maneuverModifier=modifier, activeLaneDirection="")
+    step_nav(helper, _frames_for(NAV_LANE_CHANGE_DELAY) + 5)
+    assert helper.lane_change_state == LaneChangeState.off, maneuver_type
+    assert not helper.auto_nav_active
+
+
+def test_nav_lane_change_ignores_too_close_and_too_far():
+  helper = arm_nav(DesireHelper(), maneuverDistance=NAV_LANE_CHANGE_MIN_DISTANCE - 1.0)
+  step_nav(helper, _frames_for(NAV_LANE_CHANGE_DELAY) + 5)
+  assert helper.lane_change_state == LaneChangeState.off
+
+  helper = arm_nav(DesireHelper(), maneuverDistance=500.0)
+  step_nav(helper, _frames_for(NAV_LANE_CHANGE_DELAY) + 5, carstate=make_car_state(vEgo=30.0))
+  assert helper.lane_change_state == LaneChangeState.off
+
+
+def test_nav_lane_change_requires_highway_and_min_speed():
+  helper = arm_nav(DesireHelper())
+  step_nav(helper, _frames_for(NAV_LANE_CHANGE_DELAY) + 5, highway=False)
+  assert helper.lane_change_state == LaneChangeState.off
+
+  helper = arm_nav(DesireHelper())
+  step_nav(helper, _frames_for(NAV_LANE_CHANGE_DELAY) + 5, carstate=make_car_state(vEgo=15.0))
+  assert helper.lane_change_state == LaneChangeState.off
+
+
+def test_nav_lane_change_blocked_by_bsm_edge_and_occupied_lane():
+  helper = arm_nav(DesireHelper())
+  step_nav(helper, _frames_for(NAV_LANE_CHANGE_DELAY) + 5, carstate=make_car_state(vEgo=30.0, rightBlindspot=True))
+  assert helper.lane_change_state == LaneChangeState.off
+
+  helper = arm_nav(DesireHelper())
+  step_nav(helper, _frames_for(NAV_LANE_CHANGE_DELAY) + 5, right_edge_detected=True)
+  assert helper.lane_change_state == LaneChangeState.off
+
+  helper = arm_nav(DesireHelper())
+  step_nav(helper, _frames_for(NAV_LANE_CHANGE_DELAY) + 5, right_lane_clear=False)
+  assert helper.lane_change_state == LaneChangeState.off
+
+
+def test_nav_lane_change_blocked_by_blinker_or_stale_instruction():
+  helper = arm_nav(DesireHelper())
+  step_nav(helper, _frames_for(NAV_LANE_CHANGE_DELAY) + 5, carstate=make_car_state(vEgo=30.0, leftBlinker=True))
+  assert helper.lane_change_state == LaneChangeState.off or not helper.auto_nav_active
+
+  helper = arm_nav(DesireHelper(), updatedAtMonotonic=monotonic() - 10.0)
+  step_nav(helper, _frames_for(NAV_LANE_CHANGE_DELAY) + 5)
+  assert helper.lane_change_state == LaneChangeState.off
+  assert not helper.auto_nav_active
+
+
+def test_nav_lane_change_straight_active_lane_does_not_trigger():
+  helper = arm_nav(DesireHelper(), maneuverType="fork", maneuverModifier="left", activeLaneDirection="straight")
+  step_nav(helper, _frames_for(NAV_LANE_CHANGE_DELAY) + 5)
+  assert helper.lane_change_state == LaneChangeState.off
+
+
+def test_finished_left_nav_lane_change_does_not_arm_overtake_return():
+  helper = start_nav_lane_change(nav={
+    "maneuverType": "continue",
+    "maneuverModifier": "slightLeft",
+    "activeLaneDirection": "",
+  })
+  assert helper.lane_change_state == LaneChangeState.laneChangeStarting
+  saw_finishing = False
+  for _ in range(_frames_for(2.5) + 5):
+    if helper.lane_change_state == LaneChangeState.laneChangeFinishing:
+      saw_finishing = True
+    step_nav(helper, 1, lane_change_prob=0.0)
+    if helper.lane_change_state == LaneChangeState.off and saw_finishing:
+      break
+  assert saw_finishing
+  assert helper.lane_change_state == LaneChangeState.off
+  assert not helper.return_pending
+  assert not helper.auto_nav_active

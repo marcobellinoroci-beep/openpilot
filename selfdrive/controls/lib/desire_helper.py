@@ -30,6 +30,16 @@ NAV_KEEP_DISTANCE_BREAKPOINTS = [25.0, 90.0, 160.0]
 NAV_KEEP_AMBIGUOUS_SPLIT_DISTANCE_SCALE = 0.6
 NAV_KEEP_SMALL_SPLIT_MAX_OTHER_LANES = 2
 
+# Blinkerless nav-following lane change (NavLaneChange). Highway exits, forks,
+# and keep-left/keep-right only. City turns and roundabouts are excluded.
+NAV_LANE_CHANGE_TYPES = frozenset({"off ramp", "fork", "continue", "notification"})
+NAV_LANE_CHANGE_LEFT_MODIFIERS = frozenset({"left", "sharpLeft", "slightLeft"})
+NAV_LANE_CHANGE_RIGHT_MODIFIERS = frozenset({"right", "sharpRight", "slightRight"})
+NAV_LANE_CHANGE_DELAY = 2.0
+NAV_LANE_CHANGE_MIN_DISTANCE = 40.0
+NAV_LANE_CHANGE_SPEED_BREAKPOINTS = [0.0, 15.0, 30.0]
+NAV_LANE_CHANGE_DISTANCE_BREAKPOINTS = [200.0, 325.0, 450.0]
+
 DESIRES = {
   LaneChangeDirection.none: {
     LaneChangeState.off: log.Desire.none,
@@ -371,6 +381,8 @@ class DesireHelper:
     self.auto_overtake_return = False
     self.auto_return_timer = 0.0
     self.auto_return_active = False
+    self.auto_nav_active = False
+    self.nav_lane_change_timer = 0.0
 
     self.nav_desires_allowed = False
     self.nav_lane_positioning_allowed = False
@@ -541,6 +553,97 @@ class DesireHelper:
 
     return modifier
 
+  @staticmethod
+  def _nav_lane_change_is_imminent(carstate, maneuver_distance, maneuver_type="", same_side_lane_count=0, lane_count=0):
+    try:
+      distance = float(maneuver_distance)
+    except (TypeError, ValueError):
+      return False
+    if distance < NAV_LANE_CHANGE_MIN_DISTANCE:
+      return False
+
+    threshold = float(np.interp(carstate.vEgo, NAV_LANE_CHANGE_SPEED_BREAKPOINTS, NAV_LANE_CHANGE_DISTANCE_BREAKPOINTS))
+    if DesireHelper._nav_should_delay_ambiguous_split(maneuver_type, same_side_lane_count, lane_count):
+      threshold *= NAV_KEEP_AMBIGUOUS_SPLIT_DISTANCE_SCALE
+    return distance <= threshold
+
+  def _nav_lane_change_side(self, carstate):
+    """Return a highway nav lane-change direction, or none if this maneuver is out of scope."""
+    state = self._nav_instruction_state
+    if not bool(state.get("valid", False)):
+      return LaneChangeDirection.none
+
+    maneuver_type = str(state.get("maneuverType", "")).strip().lower()
+    if maneuver_type not in NAV_LANE_CHANGE_TYPES:
+      return LaneChangeDirection.none
+
+    try:
+      distance = float(state.get("maneuverDistance", 0.0))
+    except (TypeError, ValueError):
+      return LaneChangeDirection.none
+
+    same_side_lane_count = int(state.get("sameSideLaneCount", 0) or 0)
+    lane_count = int(state.get("laneCount", 0) or 0)
+    if not DesireHelper._nav_lane_change_is_imminent(carstate, distance, maneuver_type, same_side_lane_count, lane_count):
+      return LaneChangeDirection.none
+
+    if DesireHelper._nav_should_suppress_edge_lane_keep(state):
+      return LaneChangeDirection.none
+
+    modifier = str(state.get("maneuverModifier", "")).strip()
+    if maneuver_type in ("off ramp", "fork"):
+      active_lane_direction = str(state.get("activeLaneDirection", "")).strip()
+      if active_lane_direction in NAV_LANE_CHANGE_LEFT_MODIFIERS:
+        modifier = "slightLeft"
+      elif active_lane_direction in NAV_LANE_CHANGE_RIGHT_MODIFIERS:
+        modifier = "slightRight"
+      elif active_lane_direction:
+        # Lane guidance says the recommended lane is not a side change (e.g. straight).
+        return LaneChangeDirection.none
+
+    if modifier in NAV_LANE_CHANGE_LEFT_MODIFIERS:
+      return LaneChangeDirection.left
+    if modifier in NAV_LANE_CHANGE_RIGHT_MODIFIERS:
+      return LaneChangeDirection.right
+    return LaneChangeDirection.none
+
+  def _nav_lane_change_request(self, carstate, lateral_active, starpilotPlan, starpilot_toggles,
+                               left_lane_clear, right_lane_clear, left_edge_detected, right_edge_detected,
+                               right_lane_oncoming, highway, lane_changes_allowed, below_lane_change_speed):
+    if not bool(getattr(starpilot_toggles, "nav_lane_change", False)):
+      return LaneChangeDirection.none
+    if not lane_changes_allowed or not lateral_active or highway is not True:
+      return LaneChangeDirection.none
+    if below_lane_change_speed or carstate.vEgo < AUTO_OVERTAKE_SPEED_MIN:
+      return LaneChangeDirection.none
+    if carstate.leftBlinker or carstate.rightBlinker:
+      return LaneChangeDirection.none
+    if self.lane_change_state != LaneChangeState.off:
+      return LaneChangeDirection.none
+    if not self._nav_instruction_is_fresh():
+      return LaneChangeDirection.none
+
+    direction = self._nav_lane_change_side(carstate)
+    if direction == LaneChangeDirection.none:
+      return LaneChangeDirection.none
+
+    if direction == LaneChangeDirection.left:
+      if carstate.leftBlindspot or left_edge_detected or not left_lane_clear:
+        return LaneChangeDirection.none
+      width = starpilotPlan.laneWidthLeft
+    else:
+      if carstate.rightBlindspot or right_edge_detected or not right_lane_clear or right_lane_oncoming:
+        return LaneChangeDirection.none
+      width = starpilotPlan.laneWidthRight
+
+    try:
+      width = float(width)
+    except (TypeError, ValueError):
+      return LaneChangeDirection.none
+    if width < starpilot_toggles.lane_detection_width:
+      return LaneChangeDirection.none
+    return direction
+
   def _navigation_desire(self, carstate, lateral_active, starpilotPlan, starpilot_toggles):
     self._update_nav_params()
     self.nav_desires_allowed = bool(getattr(starpilot_toggles, "nav_desires_allowed", self.nav_desires_allowed))
@@ -638,6 +741,17 @@ class DesireHelper:
     self.auto_overtake_return = bool(getattr(starpilot_toggles, "auto_overtake_return", False))
     self.return_delay = _overtake_return_delay(getattr(starpilot_toggles, "overtake_return_delay", OVERTAKE_RETURN_DELAY_DEFAULT))
 
+    nav_lc_direction = self._nav_lane_change_request(
+      carstate, lateral_active, starpilotPlan, starpilot_toggles,
+      left_lane_clear, right_lane_clear, left_edge_detected, right_edge_detected,
+      right_lane_oncoming, highway, lane_changes_allowed, below_lane_change_speed,
+    )
+    nav_blocks_overtake = nav_lc_direction != LaneChangeDirection.none or self.auto_nav_active
+    # A right (or any) nav maneuver suppresses a left auto-overtake. Same-side
+    # requests also yield to nav so the two paths cannot start together.
+    nav_blocks_left = nav_blocks_overtake
+    nav_blocks_right_return = nav_lc_direction == LaneChangeDirection.left or self.auto_nav_active
+
     # Auto Overtake (left only, no blinker required). Count only while off.
     overtake_ready = (
       self.auto_overtake and
@@ -652,7 +766,8 @@ class DesireHelper:
       left_lane_clear and
       highway is True and
       not self.return_pending and
-      self.lane_change_state == LaneChangeState.off
+      self.lane_change_state == LaneChangeState.off and
+      not nav_blocks_left
     )
     if stopped_lead != StoppedLead.NONE:
       slower_lead_detected = False
@@ -740,16 +855,24 @@ class DesireHelper:
       v_ego >= AUTO_OVERTAKE_SPEED_MIN and
       self.auto_overtake and
       lane_changes_allowed and
-      self.lane_change_state == LaneChangeState.off
+      self.lane_change_state == LaneChangeState.off and
+      not nav_blocks_right_return
     )
     self.auto_return_timer = self.auto_return_timer + DT_MDL if auto_return_ok else 0.0
     auto_return_ready = auto_return_ok and self.auto_return_timer >= AUTO_OVERTAKE_RETURN_CONFIRM
+
+    self.nav_lane_change_timer = self.nav_lane_change_timer + DT_MDL if nav_lc_direction != LaneChangeDirection.none else 0.0
+    nav_lane_change_ready = (
+      nav_lc_direction != LaneChangeDirection.none and
+      self.nav_lane_change_timer >= NAV_LANE_CHANGE_DELAY
+    )
 
     if not lateral_active or self.lane_change_timer > lane_change_time_max or not lane_changes_allowed:
       self.lane_change_state = LaneChangeState.off
       self.lane_change_direction = LaneChangeDirection.none
       self.auto_overtake_active = False
       self.auto_return_active = False
+      self.auto_nav_active = False
     else:
       if nav_turn_signal and self.lane_change_state == LaneChangeState.preLaneChange:
         self.lane_change_state = LaneChangeState.off
@@ -759,7 +882,7 @@ class DesireHelper:
       auto_overtake_trigger = self.overtake_timer >= AUTO_OVERTAKE_DELAY or self.stopped_lead_timer >= STOPPED_LEAD_CONFIRM
       blinker_start = (blinker_edge and not below_lane_change_speed and not nav_turn_signal)
       if (self.lane_change_state == LaneChangeState.off and
-          (blinker_start or auto_overtake_trigger or return_ready or held_return_ready or auto_return_ready) and
+          (blinker_start or auto_overtake_trigger or return_ready or held_return_ready or auto_return_ready or nav_lane_change_ready) and
           not below_lane_change_speed):
         self.lane_change_state = LaneChangeState.preLaneChange
         self.lane_change_ll_prob = 1.0
@@ -767,6 +890,7 @@ class DesireHelper:
           self.lane_change_direction = LaneChangeDirection.right
           self.auto_overtake_active = True
           self.auto_return_active = False
+          self.auto_nav_active = False
           self.return_pending = False
           self.return_wait_timer = 0.0
           self.return_settle_timer = 0.0
@@ -775,17 +899,30 @@ class DesireHelper:
           self.lane_change_direction = LaneChangeDirection.right
           self.auto_overtake_active = True
           self.auto_return_active = True
+          self.auto_nav_active = False
           self.return_pending = self.return_blinker_held = False
           self.return_wait_timer = self.return_settle_timer = self.auto_return_timer = 0.0
+        elif nav_lane_change_ready and not blinker_start:
+          self.lane_change_direction = nav_lc_direction
+          self.auto_overtake_active = True
+          self.auto_nav_active = True
+          self.auto_return_active = False
+          self.nav_lane_change_timer = 0.0
+          self.return_pending = False
+          self.return_wait_timer = 0.0
+          self.return_settle_timer = 0.0
+          self.return_blinker_held = False
         elif auto_overtake_trigger and not blinker_start:
           self.lane_change_direction = LaneChangeDirection.left
           self.auto_overtake_active = True
+          self.auto_nav_active = False
           self.overtake_timer = 0.0
           self.stopped_lead_timer = 0.0
         else:
           # Initialize lane change direction to prevent UI alert flicker
           self.lane_change_direction = self.get_lane_change_direction(carstate)
           self.auto_overtake_active = False
+          self.auto_nav_active = False
           if held_return_ready:
             self.return_pending = self.return_blinker_held = False
             self.return_wait_timer = self.return_settle_timer = 0.0
@@ -797,6 +934,7 @@ class DesireHelper:
         self.lane_change_timer = 0.0
         self.auto_overtake_active = False
         self.auto_return_active = False
+        self.auto_nav_active = False
 
       # LaneChangeState.preLaneChange
       elif self.lane_change_state == LaneChangeState.preLaneChange:
@@ -827,6 +965,7 @@ class DesireHelper:
           self.lane_change_state = LaneChangeState.off
           self.lane_change_direction = LaneChangeDirection.none
           self.auto_overtake_active = False
+          self.auto_nav_active = False
         elif (torque_applied or self.auto_overtake_active) and not blindspot_detected and not edge_detected:
           self.lane_change_state = LaneChangeState.laneChangeStarting
 
@@ -855,12 +994,14 @@ class DesireHelper:
           finished_auto_left = (
             self.auto_overtake_active and
             not self.auto_return_active and
+            not self.auto_nav_active and
             self.lane_change_direction == LaneChangeDirection.left and
             not one_blinker
           )
           self.lane_change_direction = LaneChangeDirection.none
           self.auto_overtake_active = False
           self.auto_return_active = False
+          self.auto_nav_active = False
           if one_blinker:
             self.lane_change_state = LaneChangeState.preLaneChange
           else:

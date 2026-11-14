@@ -20,7 +20,7 @@ from openpilot.selfdrive.controls.lib.desire_helper import (
   road_is_highway,
   stopped_lead_status,
 )
-from openpilot.selfdrive.controls.tests.test_navigation_desires import make_car_state, make_plan, make_toggles
+from openpilot.selfdrive.controls.tests.test_navigation_desires import arm_nav, make_car_state, make_plan, make_toggles, nav_toggles
 
 
 HIGHWAY_V_EGO = 30.0  # m/s, well above 60 km/h
@@ -446,3 +446,39 @@ def test_return_cancelled_by_timeout_or_left_input():
   helper = complete_left_overtake()
   step(helper, 2, carstate=make_car_state(vEgo=HIGHWAY_V_EGO, steeringPressed=True, steeringTorque=1.0))
   assert not helper.return_pending
+
+
+def test_nav_right_maneuver_suppresses_left_auto_overtake():
+  helper = DesireHelper()
+  arm_nav(helper, maneuverType="off ramp", maneuverModifier="right", activeLaneDirection="slightRight", maneuverDistance=300.0)
+  toggles = ao_toggles(auto_overtake=True, nav_lane_change=True)
+  step(helper, frames_for(AUTO_OVERTAKE_DELAY) + 2, slower_lead_detected=True, toggles=toggles,
+       carstate=make_car_state(vEgo=HIGHWAY_V_EGO))
+  # AutoOvertake would have started a left pass by now; nav needs the opposite side.
+  assert helper.lane_change_direction != LaneChangeDirection.left or helper.auto_nav_active
+  assert not (helper.auto_overtake_active and not helper.auto_nav_active)
+  # After the nav confirm delay, a right nav change starts instead.
+  step(helper, frames_for(2.0) + 2, slower_lead_detected=True, toggles=toggles,
+       carstate=make_car_state(vEgo=HIGHWAY_V_EGO))
+  assert helper.auto_nav_active
+  assert helper.lane_change_direction == LaneChangeDirection.right
+  assert helper.desire == log.Desire.laneChangeRight
+
+
+def test_nav_keep_desires_still_work_when_nav_lane_change_is_off():
+  helper = DesireHelper()
+  helper.nav_desires_allowed = True
+  helper._update_nav_params = lambda: None
+  helper._nav_instruction_state = {"valid": True, "maneuverModifier": "slightLeft", "updatedAtMonotonic": monotonic()}
+  toggles = ao_toggles(auto_overtake=True, nav_lane_change=False, nudgeless=True)
+  helper.update(
+    make_car_state(vEgo=20.0, steeringPressed=True, steeringTorque=1.0),
+    True,
+    0.0,
+    make_plan(laneWidthLeft=4.2),
+    toggles,
+    slower_lead_detected=False,
+    highway=False,
+  )
+  assert helper.desire == log.Desire.keepLeft
+  assert helper.lane_change_state == LaneChangeState.off
