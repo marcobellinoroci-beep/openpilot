@@ -6,6 +6,7 @@ export const LANGUAGE_OPTIONS = [
   { value: "en", label: "English" },
   { value: "es", label: "Spanish" },
   { value: "fr", label: "French" },
+  { value: "it", label: "Italian" },
   { value: "ko", label: "Korean" },
   { value: "zh-CHS", label: "Chinese" },
 ]
@@ -16,7 +17,7 @@ const SUPPORTED_CODES = new Set(LANGUAGE_OPTIONS.map((option) => option.value))
 // labels ship safely before they have been added to every translation below.
 const TRANSLATIONS = {
   es: {
-    English: "Inglés", Spanish: "Español", French: "Francés", Korean: "Coreano", Chinese: "Chino",
+    English: "Inglés", Spanish: "Español", French: "Francés", Italian: "Italiano", Korean: "Coreano", Chinese: "Chino",
     Home: "Inicio", Toggles: "Interruptores", Tools: "Herramientas", Recordings: "Grabaciones",
     Bluetooth: "Bluetooth", "Cameras & Monitoring": "Cámaras y monitoreo", Galaxy: "Galaxy",
     "Logs & Diagnostics": "Registros y diagnósticos", "Model Manager": "Administrador de modelos",
@@ -38,7 +39,7 @@ const TRANSLATIONS = {
     "Working...": "Procesando...", Run: "Ejecutar", Manage: "Administrar", Close: "Cerrar", Stock: "Original",
   },
   fr: {
-    English: "Anglais", Spanish: "Espagnol", French: "Français", Korean: "Coréen", Chinese: "Chinois",
+    English: "Anglais", Spanish: "Espagnol", French: "Français", Italian: "Italien", Korean: "Coréen", Chinese: "Chinois",
     Home: "Accueil", Toggles: "Options", Tools: "Outils", Recordings: "Enregistrements",
     Bluetooth: "Bluetooth", "Cameras & Monitoring": "Caméras et surveillance", Galaxy: "Galaxy",
     "Logs & Diagnostics": "Journaux et diagnostics", "Model Manager": "Gestionnaire de modèles",
@@ -59,8 +60,30 @@ const TRANSLATIONS = {
     Default: "Par défaut", "Loading...": "Chargement...", "No options available": "Aucune option disponible",
     "Working...": "En cours...", Run: "Exécuter", Manage: "Gérer", Close: "Fermer", Stock: "Origine",
   },
+  it: {
+    English: "Inglese", Spanish: "Spagnolo", French: "Francese", Italian: "Italiano", Korean: "Coreano", Chinese: "Cinese",
+    Home: "Home", Toggles: "Opzioni", Tools: "Strumenti", Recordings: "Registrazioni",
+    Bluetooth: "Bluetooth", "Cameras & Monitoring": "Fotocamere e monitoraggio", Galaxy: "Galaxy",
+    "Logs & Diagnostics": "Log e diagnostica", "Model Manager": "Gestione modelli",
+    "Navigation & Maps": "Navigazione e mappe", "System Tools": "Strumenti di sistema",
+    "Model Laboratory": "Laboratorio modelli", Plots: "Grafici", "Testing Ground": "Area di prova",
+    "Theme Maker": "Creatore di temi", "Tuning, Plots & Testing": "Messa a punto, grafici e prove",
+    "Vehicle Controls": "Controlli del veicolo", Main: "Principale", Offline: "Offline", Parked: "In sosta",
+    Back: "Indietro", Menu: "Menu", "Galaxy home": "Home di Galaxy", "Search toggles...": "Cerca opzioni...",
+    "Search toggles": "Cerca opzioni", "Clear search": "Cancella ricerca", "Dark mode": "Modalità scura",
+    "Light mode": "Modalità chiara", "Switch to dark mode": "Passa alla modalità scura", "Switch to light mode": "Passa alla modalità chiara",
+    Settings: "Impostazioni", Language: "Lingua", "Select language": "Seleziona la lingua", Advanced: "Avanzate",
+    "result(s)": "risultato/i",
+    "Galaxy uses English when no language is selected.": "Galaxy usa l'inglese se non è selezionata una lingua.",
+    "Language updated.": "Lingua aggiornata.", "Unable to save language.": "Impossibile salvare la lingua.",
+    "Loading configuration...": "Caricamento configurazione...", "No settings available.": "Nessuna impostazione disponibile.",
+    "No settings in this section.": "Nessuna impostazione in questa sezione.", "Locked:": "Bloccato:", "Step:": "Passo:",
+    "This setting can only be changed while parked.": "Questa impostazione si può modificare solo a veicolo fermo.",
+    Default: "Predefinito", "Loading...": "Caricamento...", "No options available": "Nessuna opzione disponibile",
+    "Working...": "In corso...", Run: "Esegui", Manage: "Gestisci", Close: "Chiudi", Stock: "Di serie",
+  },
   ko: {
-    English: "영어", Spanish: "스페인어", French: "프랑스어", Korean: "한국어", Chinese: "중국어",
+    English: "영어", Spanish: "스페인어", French: "프랑스어", Italian: "이탈리아어", Korean: "한국어", Chinese: "중국어",
     Home: "홈", Toggles: "토글", Tools: "도구", Recordings: "녹화",
     Bluetooth: "블루투스", "Cameras & Monitoring": "카메라 및 모니터링", Galaxy: "Galaxy",
     "Logs & Diagnostics": "로그 및 진단", "Model Manager": "모델 관리자",
@@ -82,7 +105,7 @@ const TRANSLATIONS = {
     "Working...": "처리 중...", Run: "실행", Manage: "관리", Close: "닫기", Stock: "기본",
   },
   "zh-CHS": {
-    English: "英语", Spanish: "西班牙语", French: "法语", Korean: "韩语", Chinese: "中文",
+    English: "英语", Spanish: "西班牙语", French: "法语", Italian: "意大利语", Korean: "韩语", Chinese: "中文",
     Home: "主页", Toggles: "开关", Tools: "工具", Recordings: "录制内容",
     Bluetooth: "蓝牙", "Cameras & Monitoring": "摄像头和监控", Galaxy: "Galaxy",
     "Logs & Diagnostics": "日志和诊断", "Model Manager": "模型管理器",
@@ -137,6 +160,20 @@ const MORE_TRANSLATIONS = {
     "Enable V-ASM": "Activer V-ASM",
     Routes: "Itinéraires", Route: "Itinéraire", Selected: "Sélectionné", Recommended: "Recommandé", Alternative: "Alternative", Select: "Sélectionner", "Choose a route": "Choisir un itinéraire",
   },
+  it: {
+    Favorites: "Preferiti", "Lateral (Steering)": "Laterale (Sterzo)",
+    "Longitudinal (Speed & Following)": "Longitudinale (Velocità e inseguimento)",
+    "Vision Speed Limits": "Limiti di velocità visivi", "Visual (Display & UI)": "Visuale (Schermo e interfaccia)",
+    "Sounds & Alerts": "Suoni e avvisi", Vehicle: "Veicolo", "Wheel Controls": "Controlli al volante",
+    "Device & Data": "Dispositivo e dati", Developer: "Sviluppatore", "Advanced Lateral Tuning": "Messa a punto laterale avanzata",
+    "Advanced steering control changes to fine-tune how openpilot drives.": "Modifiche avanzate al controllo dello sterzo per regolare il modo in cui guida openpilot.",
+    "Always On Lateral": "Sterzo sempre attivo", "openpilot's steering remains active even when the accelerator or brake pedals are pressed.": "Lo sterzo di openpilot resta attivo anche quando si premono acceleratore o freno.",
+    "Lane Changes": "Cambi di corsia", "Allow openpilot to change lanes.": "Permetti a openpilot di cambiare corsia.",
+    "Lateral Tuning": "Messa a punto laterale", "Miscellaneous steering control changes to fine-tune how openpilot drives.": "Varie modifiche al controllo dello sterzo per regolare il modo in cui guida openpilot.",
+    "Quality of Life": "Comfort", "Steering control changes to fine-tune how openpilot drives.": "Modifiche al controllo dello sterzo per regolare il modo in cui guida openpilot.",
+    "Enable V-ASM": "Attiva V-ASM", Marco: "Marco",
+    Routes: "Percorsi", Route: "Percorso", Selected: "Selezionato", Recommended: "Consigliato", Alternative: "Alternativo", Select: "Seleziona", "Choose a route": "Scegli un percorso",
+  },
   ko: {
     Favorites: "즐겨찾기", "Lateral (Steering)": "횡방향 (조향)",
     "Longitudinal (Speed & Following)": "종방향 (속도 및 추종)",
@@ -178,6 +215,9 @@ const TERM_TRANSLATIONS = {
   fr: {
     "Advanced": "Avancé", "Always On": "Toujours actif", "Lateral": "Latéral", "Steering": "Direction", "Longitudinal": "Longitudinal", "Speed": "Vitesse", "Following": "Suivi", "Vision": "Vision", "Limits": "Limites", "Visual": "Visuel", "Display": "Affichage", "Sounds": "Sons", "Alerts": "Alertes", "Vehicle": "Véhicule", "Wheel": "Volant", "Controls": "Commandes", "Device": "Appareil", "Data": "Données", "Developer": "Développeur", "Favorites": "Favoris", "Main": "Principal", "Tools": "Outils", "Recordings": "Enregistrements", "Cameras": "Caméras", "Monitoring": "surveillance", "Logs": "Journaux", "Diagnostics": "diagnostics", "Model": "Modèle", "Manager": "gestionnaire", "Navigation": "Navigation", "Maps": "cartes", "System": "Système", "Laboratory": "Laboratoire", "Plots": "Graphiques", "Testing": "Tests", "Ground": "Zone", "Theme": "Thème", "Maker": "créateur", "Home": "Accueil", "Toggles": "Options", "Install": "Installer", "Update": "Mettre à jour", "Available": "disponible", "Loading": "Chargement", "Error": "Erreur", "Retry": "Réessayer", "Save": "Enregistrer", "Cancel": "Annuler", "Close": "Fermer", "Delete": "Supprimer", "All": "tout", "Search": "Rechercher", "Clear": "Effacer", "Manage": "Gérer", "Connected": "Connecté", "Disconnect": "Déconnecter", "Connect": "Connecter", "Pair": "Associer", "Refresh": "Actualiser", "Status": "État", "Samples": "Échantillons", "Duration": "Durée", "Distance": "Distance", "drives": "trajets", "hours": "heures", "engaged": "activé", "Onroad": "En route", "Offroad": "Hors route", "Enabled": "Activé", "Disabled": "Désactivé", "Default": "Par défaut", "Working": "En cours", "Run": "Exécuter", "Reset": "Réinitialiser", "Download": "Télécharger", "Network": "Réseau", "Current": "Actuel", "Change": "Modifier", "Changes": "Modifications", "Allow": "Autoriser", "Use": "Utiliser", "Show": "Afficher", "Hide": "Masquer", "Enable": "Activer", "Disable": "Désactiver", "Automatic": "Automatique", "Settings": "Paramètres", "Language": "Langue", "Routes": "Itinéraires", "Selected": "Sélectionné", "Recommended": "Recommandé", "Alternative": "Alternative",
   },
+  it: {
+    "Advanced": "Avanzate", "Always On": "Sempre attivo", "Lateral": "Laterale", "Steering": "Sterzo", "Longitudinal": "Longitudinale", "Speed": "Velocità", "Following": "Inseguimento", "Vision": "Visione", "Limits": "Limiti", "Visual": "Visuale", "Display": "Schermo", "Sounds": "Suoni", "Alerts": "Avvisi", "Vehicle": "Veicolo", "Wheel": "Volante", "Controls": "Controlli", "Device": "Dispositivo", "Data": "Dati", "Developer": "Sviluppatore", "Favorites": "Preferiti", "Main": "Principale", "Tools": "Strumenti", "Recordings": "Registrazioni", "Cameras": "Fotocamere", "Monitoring": "monitoraggio", "Logs": "Log", "Diagnostics": "diagnostica", "Model": "Modello", "Manager": "gestione", "Navigation": "Navigazione", "Maps": "mappe", "System": "Sistema", "Laboratory": "Laboratorio", "Plots": "Grafici", "Testing": "Prove", "Ground": "Area", "Theme": "Tema", "Maker": "creatore", "Home": "Home", "Toggles": "Opzioni", "Install": "Installa", "Update": "Aggiorna", "Available": "disponibile", "Loading": "Caricamento", "Error": "Errore", "Retry": "Riprova", "Save": "Salva", "Cancel": "Annulla", "Close": "Chiudi", "Delete": "Elimina", "All": "tutto", "Search": "Cerca", "Clear": "Cancella", "Manage": "Gestisci", "Connected": "Connesso", "Disconnect": "Disconnetti", "Connect": "Connetti", "Pair": "Associa", "Refresh": "Aggiorna", "Status": "Stato", "Samples": "Campioni", "Duration": "Durata", "Distance": "Distanza", "drives": "viaggi", "hours": "ore", "engaged": "inserito", "Onroad": "In guida", "Offroad": "Offroad", "Enabled": "Attivato", "Disabled": "Disattivato", "Default": "Predefinito", "Working": "In corso", "Run": "Esegui", "Reset": "Reimposta", "Download": "Scarica", "Network": "Rete", "Current": "Attuale", "Change": "Cambia", "Changes": "Modifiche", "Allow": "Permetti", "Use": "Usa", "Show": "Mostra", "Hide": "Nascondi", "Enable": "Attiva", "Disable": "Disattiva", "Automatic": "Automatico", "Settings": "Impostazioni", "Language": "Lingua", "Routes": "Percorsi", "Selected": "Selezionato", "Recommended": "Consigliato", "Alternative": "Alternativo",
+  },
   ko: {
     "Advanced": "고급", "Always On": "항상 활성화", "Lateral": "횡방향", "Steering": "조향", "Longitudinal": "종방향", "Speed": "속도", "Following": "추종", "Vision": "비전", "Limits": "제한", "Visual": "시각", "Display": "디스플레이", "Sounds": "소리", "Alerts": "경고", "Vehicle": "차량", "Wheel": "휠", "Controls": "제어", "Device": "장치", "Data": "데이터", "Developer": "개발자", "Favorites": "즐겨찾기", "Main": "메인", "Tools": "도구", "Recordings": "녹화", "Cameras": "카메라", "Monitoring": "모니터링", "Logs": "로그", "Diagnostics": "진단", "Model": "모델", "Manager": "관리자", "Navigation": "내비게이션", "Maps": "지도", "System": "시스템", "Laboratory": "연구소", "Plots": "플롯", "Testing": "테스트", "Ground": "공간", "Theme": "테마", "Maker": "제작", "Home": "홈", "Toggles": "토글", "Install": "설치", "Update": "업데이트", "Available": "사용 가능", "Loading": "로드 중", "Error": "오류", "Retry": "재시도", "Save": "저장", "Cancel": "취소", "Close": "닫기", "Delete": "삭제", "All": "모두", "Search": "검색", "Clear": "지우기", "Manage": "관리", "Connected": "연결됨", "Disconnect": "연결 해제", "Connect": "연결", "Pair": "페어링", "Refresh": "새로 고침", "Status": "상태", "Samples": "샘플", "Duration": "시간", "Distance": "거리", "drives": "주행", "hours": "시간", "engaged": "활성화", "Onroad": "주행 중", "Offroad": "오프로드", "Enabled": "활성화", "Disabled": "비활성화", "Default": "기본값", "Working": "처리 중", "Run": "실행", "Reset": "초기화", "Download": "다운로드", "Network": "네트워크", "Current": "현재", "Change": "변경", "Changes": "변경 사항", "Allow": "허용", "Use": "사용", "Show": "표시", "Hide": "숨기기", "Enable": "활성화", "Disable": "비활성화", "Automatic": "자동", "Settings": "설정", "Language": "언어", "Routes": "경로", "Selected": "선택됨", "Recommended": "추천", "Alternative": "대안",
   },
@@ -188,6 +228,7 @@ const TERM_TRANSLATIONS = {
 
 Object.assign(TERM_TRANSLATIONS.es, { Route: "Ruta", Select: "Seleccionar" })
 Object.assign(TERM_TRANSLATIONS.fr, { Route: "Itinéraire", Select: "Sélectionner" })
+Object.assign(TERM_TRANSLATIONS.it, { Route: "Percorso", Select: "Seleziona" })
 Object.assign(TERM_TRANSLATIONS.ko, { Route: "경로", Select: "선택" })
 Object.assign(TERM_TRANSLATIONS["zh-CHS"], { Route: "路线", Select: "选择" })
 

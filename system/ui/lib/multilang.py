@@ -30,6 +30,7 @@ PLURAL_SELECTORS = {
   'fr': lambda n: 0 if n <= 1 else 1,
   'pt-BR': lambda n: 0 if n <= 1 else 1,
   'es': lambda n: 0 if n == 1 else 1,
+  'it': lambda n: 0 if n == 1 else 1,
   'tr': lambda n: 0 if n == 1 else 1,
   'uk': lambda n: 0 if n % 10 == 1 and n % 100 != 11 else (1 if 2 <= n % 10 <= 4 and not 12 <= n % 100 <= 14 else 2),
   'th': lambda n: 0,

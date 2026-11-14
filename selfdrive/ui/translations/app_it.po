@@ -1,0 +1,3336 @@
+# Italian translations for openpilot / StarPilot.
+# Copyright (C) comma.ai
+# This file is distributed under the same license as the openpilot package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: openpilot\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-23 00:51-0700\n"
+"PO-Revision-Date: 2026-11-15 00:00+0100\n"
+"Last-Translator: Marco\n"
+"Language-Team: Italian\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+
+#: system/ui/widgets/html_render.py:263 system/ui/widgets/confirm_dialog.py:93
+#: selfdrive/ui/layouts/sidebar.py:127
+#, python-format
+msgid "OK"
+msgstr "OK"
+
+#: system/ui/widgets/confirm_dialog.py:23 system/ui/widgets/option_dialog.py:35
+#: system/ui/widgets/keyboard.py:81 system/ui/widgets/network.py:318
+#, python-format
+msgid "Cancel"
+msgstr "Annulla"
+
+#: system/ui/widgets/option_dialog.py:36
+#, python-format
+msgid "Select"
+msgstr "Seleziona"
+
+#: system/ui/widgets/network.py:74 system/ui/widgets/network.py:95
+#, python-format
+msgid "Advanced"
+msgstr "Avanzate"
+
+#: system/ui/widgets/network.py:99 selfdrive/ui/layouts/onboarding.py:147
+#, python-format
+msgid "Back"
+msgstr "Indietro"
+
+#: system/ui/widgets/network.py:120
+#, python-format
+msgid "Enable Tethering"
+msgstr "Attiva tethering"
+
+#: system/ui/widgets/network.py:123 system/ui/widgets/network.py:139
+#, python-format
+msgid "EDIT"
+msgstr "MODIFICA"
+
+#: system/ui/widgets/network.py:124
+#, python-format
+msgid "Tethering Password"
+msgstr "Password tethering"
+
+#: system/ui/widgets/network.py:129
+#, python-format
+msgid "Enable Roaming"
+msgstr "Attiva roaming"
+
+#: system/ui/widgets/network.py:134
+#, python-format
+msgid "Cellular Metered"
+msgstr "Cellulare a consumo"
+
+#: system/ui/widgets/network.py:135
+#, python-format
+msgid "Prevent large data uploads when on a metered cellular connection"
+msgstr "Impedisce i caricamenti di dati di grandi dimensioni su una connessione cellulare a consumo"
+
+#: system/ui/widgets/network.py:139
+#, python-format
+msgid "APN Setting"
+msgstr "Impostazione APN"
+
+#: system/ui/widgets/network.py:142
+#, python-format
+msgid "default"
+msgstr "predefinito"
+
+#: system/ui/widgets/network.py:142
+#, python-format
+msgid "metered"
+msgstr "a consumo"
+
+#: system/ui/widgets/network.py:142
+#, python-format
+msgid "unmetered"
+msgstr "senza limiti"
+
+#: system/ui/widgets/network.py:144
+#, python-format
+msgid "Wi-Fi Network Metered"
+msgstr "Rete Wi-Fi a consumo"
+
+#: system/ui/widgets/network.py:144
+#, python-format
+msgid "Prevent large data uploads when on a metered Wi-Fi connection"
+msgstr "Impedisce i caricamenti di dati di grandi dimensioni su una rete Wi-Fi a consumo"
+
+#: system/ui/widgets/network.py:150
+#, python-format
+msgid "IP Address"
+msgstr "Indirizzo IP"
+
+#: system/ui/widgets/network.py:155
+#, python-format
+msgid "Hidden Network"
+msgstr "Rete nascosta"
+
+#: system/ui/widgets/network.py:155 selfdrive/ui/layouts/sidebar.py:73
+#: selfdrive/ui/layouts/sidebar.py:134 selfdrive/ui/layouts/sidebar.py:136
+#: selfdrive/ui/layouts/sidebar.py:138
+#, python-format
+msgid "CONNECT"
+msgstr "CONNETTI"
+
+#: system/ui/widgets/network.py:204
+#, python-format
+msgid "Enter APN"
+msgstr "Inserisci APN"
+
+#: system/ui/widgets/network.py:204
+#, python-format
+msgid "leave blank for automatic configuration"
+msgstr "lascia vuoto per la configurazione automatica"
+
+#: system/ui/widgets/network.py:237 system/ui/widgets/network.py:314
+#, python-format
+msgid "Enter password"
+msgstr "Inserisci la password"
+
+#: system/ui/widgets/network.py:237 system/ui/widgets/network.py:314
+#, python-format
+msgid "for \"{}\""
+msgstr "per \"{}\""
+
+#: system/ui/widgets/network.py:241
+#, python-format
+msgid "Enter SSID"
+msgstr "Inserisci SSID"
+
+#: system/ui/widgets/network.py:254
+#, python-format
+msgid "Enter new tethering password"
+msgstr "Inserisci la nuova password tethering"
+
+#: system/ui/widgets/network.py:310
+#, python-format
+msgid "Scanning Wi-Fi networks..."
+msgstr "Ricerca delle reti Wi-Fi..."
+
+#: system/ui/widgets/network.py:314
+#, python-format
+msgid "Wrong password"
+msgstr "Password errata"
+
+#: system/ui/widgets/network.py:318 system/ui/widgets/network.py:451
+#, python-format
+msgid "Forget"
+msgstr "Dimentica"
+
+#: system/ui/widgets/network.py:319
+#, python-format
+msgid "Forget Wi-Fi Network \"{}\"?"
+msgstr "Dimenticare la rete Wi-Fi \"{}\"?"
+
+#: system/ui/widgets/network.py:369
+#, python-format
+msgid "CONNECTING..."
+msgstr "CONNESSIONE..."
+
+#: system/ui/widgets/network.py:373
+#, python-format
+msgid "FORGETTING..."
+msgstr "ELIMINAZIONE..."
+
+#: system/ui/widgets/list_view.py:123 system/ui/widgets/list_view.py:160
+#, python-format
+msgid "Error"
+msgstr "Errore"
+
+#: selfdrive/ui/widgets/pairing_dialog.py:103
+#, python-format
+msgid "Pair your device to your comma account"
+msgstr "Associa il dispositivo al tuo account comma"
+
+#: selfdrive/ui/widgets/pairing_dialog.py:128
+#, python-format
+msgid "Go to https://connect.comma.ai on your phone"
+msgstr "Apri https://connect.comma.ai sul telefono"
+
+#: selfdrive/ui/widgets/pairing_dialog.py:129
+#, python-format
+msgid "Click \"add new device\" and scan the QR code on the right"
+msgstr "Tocca \"add new device\" e inquadra il codice QR a destra"
+
+#: selfdrive/ui/widgets/pairing_dialog.py:130
+#, python-format
+msgid "Bookmark connect.comma.ai to your home screen to use it like an app"
+msgstr "Aggiungi connect.comma.ai alla schermata Home per usarlo come un'app"
+
+#: selfdrive/ui/widgets/pairing_dialog.py:161
+#, python-format
+msgid "QR Code Error"
+msgstr "Errore del codice QR"
+
+#: selfdrive/ui/widgets/ssh_key.py:29
+msgid "LOADING"
+msgstr "CARICAMENTO"
+
+#: selfdrive/ui/widgets/ssh_key.py:30
+msgid "ADD"
+msgstr "AGGIUNGI"
+
+#: selfdrive/ui/widgets/ssh_key.py:31
+msgid "REMOVE"
+msgstr "RIMUOVI"
+
+#: selfdrive/ui/widgets/ssh_key.py:89
+#, python-format
+msgid "Enter your GitHub username"
+msgstr "Inserisci il tuo nome utente GitHub"
+
+#: selfdrive/ui/widgets/ssh_key.py:114
+#, python-format
+msgid "No SSH keys found"
+msgstr "Nessuna chiave SSH trovata"
+
+#: selfdrive/ui/widgets/ssh_key.py:123
+#, python-format
+msgid "Request timed out"
+msgstr "Richiesta scaduta"
+
+#: selfdrive/ui/widgets/ssh_key.py:126
+#, python-format
+msgid "No SSH keys found for user '{}'"
+msgstr "Nessuna chiave SSH trovata per l'utente '{}'"
+
+#: selfdrive/ui/widgets/prime.py:33
+#, python-format
+msgid "Upgrade Now"
+msgstr "Passa a Prime"
+
+#: selfdrive/ui/widgets/prime.py:38
+#, python-format
+msgid "Become a comma prime member at connect.comma.ai"
+msgstr "Diventa membro comma prime su connect.comma.ai"
+
+#: selfdrive/ui/widgets/prime.py:44
+#, python-format
+msgid "PRIME FEATURES:"
+msgstr "FUNZIONI PRIME:"
+
+#: selfdrive/ui/widgets/prime.py:47
+#, python-format
+msgid "Remote access"
+msgstr "Accesso remoto"
+
+#: selfdrive/ui/widgets/prime.py:47
+#, python-format
+msgid "24/7 LTE connectivity"
+msgstr "Connettività LTE 24/7"
+
+#: selfdrive/ui/widgets/prime.py:47
+#, python-format
+msgid "1 year of drive storage"
+msgstr "1 anno di archiviazione dei viaggi"
+
+#: selfdrive/ui/widgets/prime.py:47
+#, python-format
+msgid "Remote snapshots"
+msgstr "Istantanee remote"
+
+#: selfdrive/ui/widgets/prime.py:62
+#, python-format
+msgid "✓ SUBSCRIBED"
+msgstr "✓ ABBONATO"
+
+#: selfdrive/ui/widgets/prime.py:63
+#, python-format
+msgid "comma prime"
+msgstr "comma prime"
+
+#: selfdrive/ui/widgets/exp_mode_button.py:50
+#, python-format
+msgid "EXPERIMENTAL MODE ON"
+msgstr "MODALITÀ SPERIMENTALE ATTIVA"
+
+#: selfdrive/ui/widgets/exp_mode_button.py:50
+#, python-format
+msgid "CHILL MODE ON"
+msgstr "MODALITÀ TRANQUILLA ATTIVA"
+
+#: selfdrive/ui/widgets/offroad_alerts.py:104
+#, python-format
+msgid "Close"
+msgstr "Chiudi"
+
+#: selfdrive/ui/widgets/offroad_alerts.py:106
+#, python-format
+msgid "Snooze Update"
+msgstr "Rimanda aggiornamento"
+
+#: selfdrive/ui/widgets/offroad_alerts.py:109
+#, python-format
+msgid "Acknowledge Excessive Actuation"
+msgstr "Conferma attuazione eccessiva"
+
+#: selfdrive/ui/widgets/offroad_alerts.py:112
+#, python-format
+msgid "Reboot and Update"
+msgstr "Riavvia e aggiorna"
+
+#: selfdrive/ui/widgets/offroad_alerts.py:320
+#, python-format
+msgid "No release notes available."
+msgstr "Nessuna nota di rilascio disponibile."
+
+#: selfdrive/ui/widgets/setup.py:19
+#, python-format
+msgid "Pair device"
+msgstr "Associa dispositivo"
+
+#: selfdrive/ui/widgets/setup.py:20
+#, python-format
+msgid "Open"
+msgstr "Apri"
+
+#: selfdrive/ui/widgets/setup.py:22
+#, python-format
+msgid "🔥 Firehose Mode 🔥"
+msgstr "🔥 Modalità Firehose 🔥"
+
+#: selfdrive/ui/widgets/setup.py:44
+#, python-format
+msgid "Finish Setup"
+msgstr "Completa configurazione"
+
+#: selfdrive/ui/widgets/setup.py:48 selfdrive/ui/layouts/settings/device.py:24
+#, python-format
+msgid "Pair your device with comma connect (connect.comma.ai) and claim your comma prime offer."
+msgstr "Associa il dispositivo a comma connect (connect.comma.ai) e richiedi l'offerta comma prime."
+
+#: selfdrive/ui/widgets/setup.py:75
+#, python-format
+msgid "Maximize your training data uploads to improve openpilot's driving models."
+msgstr "Massimizza i caricamenti dei dati di addestramento per migliorare i modelli di guida di openpilot."
+
+#: selfdrive/ui/widgets/setup.py:91
+#, python-format
+msgid "Please connect to Wi-Fi to complete initial pairing"
+msgstr "Connettiti al Wi-Fi per completare l'associazione iniziale"
+
+#: selfdrive/ui/layouts/home.py:155
+#, python-format
+msgid "UPDATE"
+msgstr "AGGIORNA"
+
+#: selfdrive/ui/layouts/home.py:169
+#, python-format
+msgid "{} ALERT"
+msgid_plural "{} ALERTS"
+msgstr[0] "{} AVVISO"
+msgstr[1] "{} AVVISI"
+
+#: selfdrive/ui/layouts/sidebar.py:43
+msgid "--"
+msgstr "--"
+
+#: selfdrive/ui/layouts/sidebar.py:44
+msgid "Wi-Fi"
+msgstr "Wi-Fi"
+
+#: selfdrive/ui/layouts/sidebar.py:45
+msgid "ETH"
+msgstr "ETH"
+
+#: selfdrive/ui/layouts/sidebar.py:46
+msgid "2G"
+msgstr "2G"
+
+#: selfdrive/ui/layouts/sidebar.py:47
+msgid "3G"
+msgstr "3G"
+
+#: selfdrive/ui/layouts/sidebar.py:48
+msgid "LTE"
+msgstr "LTE"
+
+#: selfdrive/ui/layouts/sidebar.py:49
+msgid "5G"
+msgstr "5G"
+
+#: selfdrive/ui/layouts/sidebar.py:71 selfdrive/ui/layouts/sidebar.py:125
+#: selfdrive/ui/layouts/sidebar.py:127 selfdrive/ui/layouts/sidebar.py:129
+msgid "TEMP"
+msgstr "TEMP"
+
+#: selfdrive/ui/layouts/sidebar.py:71 selfdrive/ui/layouts/sidebar.py:125
+msgid "GOOD"
+msgstr "BUONO"
+
+#: selfdrive/ui/layouts/sidebar.py:72 selfdrive/ui/layouts/sidebar.py:144
+msgid "VEHICLE"
+msgstr "VEICOLO"
+
+#: selfdrive/ui/layouts/sidebar.py:72 selfdrive/ui/layouts/sidebar.py:136
+#: selfdrive/ui/layouts/sidebar.py:144
+msgid "ONLINE"
+msgstr "ONLINE"
+
+#: selfdrive/ui/layouts/sidebar.py:73 selfdrive/ui/layouts/sidebar.py:134
+msgid "OFFLINE"
+msgstr "OFFLINE"
+
+#: selfdrive/ui/layouts/sidebar.py:117
+msgid "Unknown"
+msgstr "Sconosciuto"
+
+#: selfdrive/ui/layouts/sidebar.py:129
+msgid "HIGH"
+msgstr "ALTA"
+
+#: selfdrive/ui/layouts/sidebar.py:138
+msgid "ERROR"
+msgstr "ERRORE"
+
+#: selfdrive/ui/layouts/sidebar.py:142
+msgid "NO"
+msgstr "NO"
+
+#: selfdrive/ui/layouts/sidebar.py:142
+msgid "PANDA"
+msgstr "PANDA"
+
+#: selfdrive/ui/layouts/onboarding.py:111
+#, python-format
+msgid "Welcome to openpilot"
+msgstr "Benvenuto in openpilot"
+
+#: selfdrive/ui/layouts/onboarding.py:112
+#, python-format
+msgid "You must accept the Terms and Conditions to use openpilot. Read the latest terms at https://comma.ai/terms before continuing."
+msgstr "Devi accettare i Termini e le condizioni per usare openpilot. Leggi i termini aggiornati su https://comma.ai/terms prima di continuare."
+
+#: selfdrive/ui/layouts/onboarding.py:115
+#, python-format
+msgid "Decline"
+msgstr "Rifiuta"
+
+#: selfdrive/ui/layouts/onboarding.py:116
+#, python-format
+msgid "Agree"
+msgstr "Accetto"
+
+#: selfdrive/ui/layouts/onboarding.py:145
+#, python-format
+msgid "You must accept the Terms and Conditions in order to use openpilot."
+msgstr "Devi accettare i Termini e le condizioni per usare openpilot."
+
+#: selfdrive/ui/layouts/onboarding.py:148
+#, python-format
+msgid "Decline, uninstall openpilot"
+msgstr "Rifiuta e disinstalla openpilot"
+
+#: selfdrive/ui/layouts/settings/firehose.py:18
+msgid "Firehose Mode"
+msgstr "Modalità Firehose"
+
+#: selfdrive/ui/layouts/settings/firehose.py:20
+msgid ""
+"openpilot learns to drive by watching humans, like you, drive.\n"
+"\n"
+"Firehose Mode allows you to maximize your training data uploads to improve openpilot's driving models. More data means bigger models, which means better Experimental Mode."
+msgstr ""
+"openpilot impara a guidare osservando persone come te.\n"
+"\n"
+"La modalità Firehose ti permette di massimizzare i caricamenti dei dati di addestramento per migliorare i modelli di guida di openpilot. Più dati significano modelli più grandi e quindi una Modalità sperimentale migliore."
+
+#: selfdrive/ui/layouts/settings/firehose.py:25
+msgid ""
+"For maximum effectiveness, bring your device inside and connect to a good USB-C adapter and Wi-Fi weekly.\n"
+"\n"
+"Firehose Mode can also work while you're driving if connected to a hotspot or unlimited SIM card.\n"
+"\n"
+"\n"
+"Frequently Asked Questions\n"
+"\n"
+"Does it matter how or where I drive? Nope, just drive as you normally would.\n"
+"\n"
+"Do all of my segments get pulled in Firehose Mode? No, we selectively pull a subset of your segments.\n"
+"\n"
+"What's a good USB-C adapter? Any fast phone or laptop charger should be fine.\n"
+"\n"
+"Does it matter which software I run? Yes, only upstream openpilot (and particular forks) are able to be used for training."
+msgstr ""
+"Per la massima efficacia, porta il dispositivo in casa e collegalo ogni settimana a un buon alimentatore USB-C e al Wi-Fi.\n"
+"\n"
+"La modalità Firehose può funzionare anche durante la guida se sei collegato a un hotspot o a una SIM senza limiti.\n"
+"\n"
+"\n"
+"Domande frequenti\n"
+"\n"
+"Importa come o dove guido? No, guida normalmente come fai sempre.\n"
+"\n"
+"Tutti i miei segmenti vengono scaricati in modalità Firehose? No, selezioniamo solo un sottoinsieme dei tuoi segmenti.\n"
+"\n"
+"Qual è un buon alimentatore USB-C? Qualsiasi caricabatterie veloce per telefono o computer va bene.\n"
+"\n"
+"Importa quale software uso? Sì, per l'addestramento si può usare solo openpilot ufficiale (e alcuni fork specifici)."
+
+#: selfdrive/ui/layouts/settings/firehose.py:111
+#, python-format
+msgid "{} segment of your driving is in the training dataset so far."
+msgid_plural "{} segments of your driving is in the training dataset so far."
+msgstr[0] "Finora {} segmento delle tue guide è nel dataset di addestramento."
+msgstr[1] "Finora {} segmenti delle tue guide sono nel dataset di addestramento."
+
+#: selfdrive/ui/layouts/settings/firehose.py:138
+#, python-format
+msgid "ACTIVE"
+msgstr "ATTIVA"
+
+#: selfdrive/ui/layouts/settings/firehose.py:140
+#, python-format
+msgid "INACTIVE: connect to an unmetered network"
+msgstr "INATTIVA: connettiti a una rete senza limiti"
+
+#: selfdrive/ui/layouts/settings/developer.py:15
+msgid "ADB (Android Debug Bridge) allows connecting to your device over USB or over the network. See https://docs.comma.ai/how-to/connect-to-comma for more info."
+msgstr "ADB (Android Debug Bridge) permette di collegarti al dispositivo tramite USB o rete. Per maggiori informazioni vedi https://docs.comma.ai/how-to/connect-to-comma."
+
+#: selfdrive/ui/layouts/settings/developer.py:19
+msgid "Warning: This grants SSH access to all public keys in your GitHub settings. Never enter a GitHub username other than your own. A comma employee will NEVER ask you to add their GitHub username."
+msgstr "Attenzione: questo concede l'accesso SSH a tutte le chiavi pubbliche nelle impostazioni GitHub. Non inserire mai un nome utente GitHub diverso dal tuo. Un dipendente comma NON ti chiederà MAI di aggiungere il suo nome utente GitHub."
+
+#: selfdrive/ui/layouts/settings/developer.py:23
+msgid "<b>WARNING: openpilot longitudinal control is in alpha for this car and will disable Automatic Emergency Braking (AEB).</b><br><br>On this car, openpilot defaults to the car's built-in ACC instead of openpilot's longitudinal control. Enable this to switch to openpilot longitudinal control. Enabling Experimental mode is recommended when enabling openpilot longitudinal control alpha. Changing this setting will restart openpilot if the car is powered on."
+msgstr "<b>ATTENZIONE: il controllo longitudinale di openpilot è in versione alpha per questa auto e disattiverà la frenata automatica di emergenza (AEB).</b><br><br>Su questa auto, openpilot usa di default l'ACC di serie invece del controllo longitudinale di openpilot. Attiva questa opzione per passare al controllo longitudinale di openpilot. Si consiglia di attivare anche la Modalità sperimentale. La modifica di questa impostazione riavvierà openpilot se l'auto è accesa."
+
+#: selfdrive/ui/layouts/settings/developer.py:39
+#, python-format
+msgid "Enable ADB"
+msgstr "Attiva ADB"
+
+#: selfdrive/ui/layouts/settings/developer.py:48
+#, python-format
+msgid "Enable SSH"
+msgstr "Attiva SSH"
+
+#: selfdrive/ui/layouts/settings/developer.py:53
+#, python-format
+msgid "SSH Keys"
+msgstr "Chiavi SSH"
+
+#: selfdrive/ui/layouts/settings/developer.py:56
+#, python-format
+msgid "Joystick Debug Mode"
+msgstr "Modalità debug joystick"
+
+#: selfdrive/ui/layouts/settings/developer.py:64
+#, python-format
+msgid "Longitudinal Maneuver Mode"
+msgstr "Modalità manovre longitudinali"
+
+#: selfdrive/ui/layouts/settings/developer.py:71
+#, python-format
+msgid "openpilot Longitudinal Control (Alpha)"
+msgstr "Controllo longitudinale openpilot (Alpha)"
+
+#: selfdrive/ui/layouts/settings/developer.py:166
+#: selfdrive/ui/layouts/settings/toggles.py:228
+#, python-format
+msgid "Enable"
+msgstr "Attiva"
+
+#: selfdrive/ui/layouts/settings/software.py:20
+#, python-format
+msgid "never"
+msgstr "mai"
+
+#: selfdrive/ui/layouts/settings/software.py:31
+#, python-format
+msgid "now"
+msgstr "ora"
+
+#: selfdrive/ui/layouts/settings/software.py:34
+#, python-format
+msgid "{} minute ago"
+msgid_plural "{} minutes ago"
+msgstr[0] "{} minuto fa"
+msgstr[1] "{} minuti fa"
+
+#: selfdrive/ui/layouts/settings/software.py:37
+#, python-format
+msgid "{} hour ago"
+msgid_plural "{} hours ago"
+msgstr[0] "{} ora fa"
+msgstr[1] "{} ore fa"
+
+#: selfdrive/ui/layouts/settings/software.py:40
+#, python-format
+msgid "{} day ago"
+msgid_plural "{} days ago"
+msgstr[0] "{} giorno fa"
+msgstr[1] "{} giorni fa"
+
+#: selfdrive/ui/layouts/settings/software.py:48
+#, python-format
+msgid "Updates are only downloaded while the car is off."
+msgstr "Gli aggiornamenti vengono scaricati solo a auto spenta."
+
+#: selfdrive/ui/layouts/settings/software.py:49
+#, python-format
+msgid "Current Version"
+msgstr "Versione attuale"
+
+#: selfdrive/ui/layouts/settings/software.py:50
+#, python-format
+msgid "Download"
+msgstr "Scarica"
+
+#: selfdrive/ui/layouts/settings/software.py:50
+#: selfdrive/ui/layouts/settings/software.py:107
+#: selfdrive/ui/layouts/settings/software.py:118
+#: selfdrive/ui/layouts/settings/software.py:147
+#, python-format
+msgid "CHECK"
+msgstr "CONTROLLA"
+
+#: selfdrive/ui/layouts/settings/software.py:53
+#, python-format
+msgid "Install Update"
+msgstr "Installa aggiornamento"
+
+#: selfdrive/ui/layouts/settings/software.py:53
+#: selfdrive/ui/layouts/settings/software.py:136
+#, python-format
+msgid "INSTALL"
+msgstr "INSTALLA"
+
+#: selfdrive/ui/layouts/settings/software.py:61
+#, python-format
+msgid "Target Branch"
+msgstr "Branch di destinazione"
+
+#: selfdrive/ui/layouts/settings/software.py:61
+#, python-format
+msgid "SELECT"
+msgstr "SELEZIONA"
+
+#: selfdrive/ui/layouts/settings/software.py:72
+#: selfdrive/ui/layouts/settings/software.py:163
+#, python-format
+msgid "Uninstall"
+msgstr "Disinstalla"
+
+#: selfdrive/ui/layouts/settings/software.py:72
+#, python-format
+msgid "UNINSTALL"
+msgstr "DISINSTALLA"
+
+#: selfdrive/ui/layouts/settings/software.py:106
+#, python-format
+msgid "failed to check for update"
+msgstr "controllo aggiornamenti non riuscito"
+
+#: selfdrive/ui/layouts/settings/software.py:109
+#, python-format
+msgid "update available"
+msgstr "aggiornamento disponibile"
+
+#: selfdrive/ui/layouts/settings/software.py:110
+#, python-format
+msgid "DOWNLOAD"
+msgstr "SCARICA"
+
+#: selfdrive/ui/layouts/settings/software.py:115
+#, python-format
+msgid "up to date, last checked {}"
+msgstr "già aggiornato, ultimo controllo {}"
+
+#: selfdrive/ui/layouts/settings/software.py:117
+#, python-format
+msgid "up to date, last checked never"
+msgstr "già aggiornato, mai controllato"
+
+#: selfdrive/ui/layouts/settings/software.py:163
+#, python-format
+msgid "Are you sure you want to uninstall?"
+msgstr "Vuoi davvero disinstallare?"
+
+#: selfdrive/ui/layouts/settings/software.py:183
+#, python-format
+msgid "Select a branch"
+msgstr "Seleziona un branch"
+
+#: selfdrive/ui/layouts/settings/device.py:25
+msgid "Preview the driver facing camera to ensure that driver monitoring has good visibility. (vehicle must be off)"
+msgstr "Anteprima della fotocamera rivolta al guidatore, per verificare che il monitoraggio abbia una buona visibilità. (l'auto deve essere spenta)"
+
+#: selfdrive/ui/layouts/settings/device.py:26
+msgid "openpilot requires the device to be mounted within 4° left or right and within 5° up or 9° down."
+msgstr "openpilot richiede che il dispositivo sia montato entro 4° a sinistra o a destra e entro 5° verso l'alto o 9° verso il basso."
+
+#: selfdrive/ui/layouts/settings/device.py:27
+msgid "Review the rules, features, and limitations of openpilot"
+msgstr "Rivedi le regole, le funzioni e i limiti di openpilot"
+
+#: selfdrive/ui/layouts/settings/device.py:48
+#, python-format
+msgid "Pair Device"
+msgstr "Associa dispositivo"
+
+#: selfdrive/ui/layouts/settings/device.py:48
+#, python-format
+msgid "PAIR"
+msgstr "ASSOCIA"
+
+#: selfdrive/ui/layouts/settings/device.py:51
+#, python-format
+msgid "Reset Calibration"
+msgstr "Reimposta calibrazione"
+
+#: selfdrive/ui/layouts/settings/device.py:51
+#, python-format
+msgid "RESET"
+msgstr "REIMPOSTA"
+
+#: selfdrive/ui/layouts/settings/device.py:55
+#: selfdrive/ui/layouts/settings/device.py:175
+#, python-format
+msgid "Reboot"
+msgstr "Riavvia"
+
+#: selfdrive/ui/layouts/settings/device.py:55
+#: selfdrive/ui/layouts/settings/device.py:187
+#, python-format
+msgid "Power Off"
+msgstr "Spegni"
+
+#: selfdrive/ui/layouts/settings/device.py:59
+#, python-format
+msgid "Dongle ID"
+msgstr "Dongle ID"
+
+#: selfdrive/ui/layouts/settings/device.py:59
+#: selfdrive/ui/layouts/settings/device.py:60
+#, python-format
+msgid "N/A"
+msgstr "N/D"
+
+#: selfdrive/ui/layouts/settings/device.py:60
+#, python-format
+msgid "Serial"
+msgstr "Seriale"
+
+#: selfdrive/ui/layouts/settings/device.py:62
+#, python-format
+msgid "Driver Camera"
+msgstr "Fotocamera guidatore"
+
+#: selfdrive/ui/layouts/settings/device.py:62
+#, python-format
+msgid "PREVIEW"
+msgstr "ANTEPRIMA"
+
+#: selfdrive/ui/layouts/settings/device.py:65
+#, python-format
+msgid "Review Training Guide"
+msgstr "Rivedi la guida di addestramento"
+
+#: selfdrive/ui/layouts/settings/device.py:65
+#, python-format
+msgid "REVIEW"
+msgstr "RIVEDI"
+
+#: selfdrive/ui/layouts/settings/device.py:67
+#, python-format
+msgid "Regulatory"
+msgstr "Informazioni normative"
+
+#: selfdrive/ui/layouts/settings/device.py:67
+#, python-format
+msgid "VIEW"
+msgstr "VISUALIZZA"
+
+#: selfdrive/ui/layouts/settings/device.py:68
+#, python-format
+msgid "Change Language"
+msgstr "Cambia lingua"
+
+#: selfdrive/ui/layouts/settings/device.py:68
+#, python-format
+msgid "CHANGE"
+msgstr "CAMBIA"
+
+#: selfdrive/ui/layouts/settings/device.py:91
+#, python-format
+msgid "Select a language"
+msgstr "Seleziona una lingua"
+
+#: selfdrive/ui/layouts/settings/device.py:103
+#, python-format
+msgid "Disengage to Reset Calibration"
+msgstr "Disinserisci per reimpostare la calibrazione"
+
+#: selfdrive/ui/layouts/settings/device.py:119
+#, python-format
+msgid "Are you sure you want to reset calibration?"
+msgstr "Vuoi davvero reimpostare la calibrazione?"
+
+#: selfdrive/ui/layouts/settings/device.py:119
+#, python-format
+msgid "Reset"
+msgstr "Reimposta"
+
+#: selfdrive/ui/layouts/settings/device.py:133
+#, python-format
+msgid " Your device is pointed {:.1f}° {} and {:.1f}° {}."
+msgstr " Il dispositivo è orientato di {:.1f}° {} e {:.1f}° {}."
+
+#: selfdrive/ui/layouts/settings/device.py:133
+#, python-format
+msgid "down"
+msgstr "verso il basso"
+
+#: selfdrive/ui/layouts/settings/device.py:133
+#, python-format
+msgid "up"
+msgstr "verso l'alto"
+
+#: selfdrive/ui/layouts/settings/device.py:134
+#, python-format
+msgid "left"
+msgstr "a sinistra"
+
+#: selfdrive/ui/layouts/settings/device.py:134
+#, python-format
+msgid "right"
+msgstr "a destra"
+
+#: selfdrive/ui/layouts/settings/device.py:146
+#, python-format
+msgid "<br><br>Steering lag calibration is {}% complete."
+msgstr "<br><br>Calibrazione del ritardo dello sterzo completata al {}%."
+
+#: selfdrive/ui/layouts/settings/device.py:148
+#, python-format
+msgid "<br><br>Steering lag calibration is complete."
+msgstr "<br><br>Calibrazione del ritardo dello sterzo completata."
+
+#: selfdrive/ui/layouts/settings/device.py:158
+#, python-format
+msgid " Steering torque response calibration is {}% complete."
+msgstr " Calibrazione della risposta in coppia dello sterzo completata al {}%."
+
+#: selfdrive/ui/layouts/settings/device.py:160
+#, python-format
+msgid " Steering torque response calibration is complete."
+msgstr " Calibrazione della risposta in coppia dello sterzo completata."
+
+#: selfdrive/ui/layouts/settings/device.py:165
+#, python-format
+msgid "openpilot is continuously calibrating, resetting is rarely required. Resetting calibration will restart openpilot if the car is powered on."
+msgstr "openpilot si calibra in modo continuo e reimpostare è raramente necessario. Reimpostare la calibrazione riavvierà openpilot se l'auto è accesa."
+
+#: selfdrive/ui/layouts/settings/device.py:172
+#, python-format
+msgid "Disengage to Reboot"
+msgstr "Disinserisci per riavviare"
+
+#: selfdrive/ui/layouts/settings/device.py:175
+#, python-format
+msgid "Are you sure you want to reboot?"
+msgstr "Vuoi davvero riavviare?"
+
+#: selfdrive/ui/layouts/settings/device.py:184
+#, python-format
+msgid "Disengage to Power Off"
+msgstr "Disinserisci per spegnere"
+
+#: selfdrive/ui/layouts/settings/device.py:187
+#, python-format
+msgid "Are you sure you want to power off?"
+msgstr "Vuoi davvero spegnere?"
+
+#: selfdrive/ui/layouts/settings/settings.py:62
+msgid "Device"
+msgstr "Dispositivo"
+
+#: selfdrive/ui/layouts/settings/settings.py:63
+msgid "Network"
+msgstr "Rete"
+
+#: selfdrive/ui/layouts/settings/settings.py:64
+msgid "Toggles"
+msgstr "Opzioni"
+
+#: selfdrive/ui/layouts/settings/settings.py:65
+msgid "Software"
+msgstr "Software"
+
+#: selfdrive/ui/layouts/settings/settings.py:66
+msgid "Firehose"
+msgstr "Firehose"
+
+#: selfdrive/ui/layouts/settings/settings.py:67
+msgid "Developer"
+msgstr "Sviluppatore"
+
+#: selfdrive/ui/layouts/settings/toggles.py:17
+msgid "Use the openpilot system for adaptive cruise control and lane keep driver assistance. Your attention is required at all times to use this feature."
+msgstr "Usa il sistema openpilot per il cruise control adattivo e il mantenimento di corsia. La tua attenzione è sempre necessaria per usare questa funzione."
+
+#: selfdrive/ui/layouts/settings/toggles.py:20
+msgid "When enabled, pressing the accelerator pedal will disengage openpilot."
+msgstr "Se attiva, premere l'acceleratore disinserisce openpilot."
+
+#: selfdrive/ui/layouts/settings/toggles.py:22
+msgid "Standard is recommended. In aggressive mode, openpilot will follow lead cars closer and be more aggressive with the gas and brake. In relaxed mode openpilot will stay further away from lead cars. On supported cars, you can cycle through these personalities with your steering wheel distance button."
+msgstr "Si consiglia Standard. In modalità aggressiva, openpilot segue più da vicino l'auto davanti e usa acceleratore e freno in modo più deciso. In modalità rilassata resta più distante. Sulle auto supportate puoi ciclare queste personalità con il tasto della distanza sul volante."
+
+#: selfdrive/ui/layouts/settings/toggles.py:27
+msgid "Receive alerts to steer back into the lane when your vehicle drifts over a detected lane line without a turn signal activated while driving over 31 mph (50 km/h)."
+msgstr "Ricevi avvisi per tornare in corsia se il veicolo supera una linea rilevata senza indicatore di direzione, sopra i 31 mph (50 km/h)."
+
+#: selfdrive/ui/layouts/settings/toggles.py:30
+msgid "Enable driver monitoring even when openpilot is not engaged."
+msgstr "Attiva il monitoraggio del guidatore anche quando openpilot non è inserito."
+
+#: selfdrive/ui/layouts/settings/toggles.py:31
+msgid "Upload data from the driver facing camera and help improve the driver monitoring algorithm."
+msgstr "Carica i dati della fotocamera rivolta al guidatore e aiuta a migliorare l'algoritmo di monitoraggio."
+
+#: selfdrive/ui/layouts/settings/toggles.py:32
+msgid "Display speed in km/h instead of mph."
+msgstr "Mostra la velocità in km/h invece che in mph."
+
+#: selfdrive/ui/layouts/settings/toggles.py:33
+msgid "Record and store microphone audio while driving. The audio will be included in the dashcam video in comma connect."
+msgstr "Registra e salva l'audio del microfono durante la guida. L'audio sarà incluso nel video della dashcam su comma connect."
+
+#: selfdrive/ui/layouts/settings/toggles.py:46
+#, python-format
+msgid "Enable openpilot"
+msgstr "Attiva openpilot"
+
+#: selfdrive/ui/layouts/settings/toggles.py:52
+#, python-format
+msgid "Experimental Mode"
+msgstr "Modalità sperimentale"
+
+#: selfdrive/ui/layouts/settings/toggles.py:58
+#, python-format
+msgid "Disengage on Accelerator Pedal"
+msgstr "Disinserisci con l'acceleratore"
+
+#: selfdrive/ui/layouts/settings/toggles.py:64
+#, python-format
+msgid "Enable Lane Departure Warnings"
+msgstr "Attiva avvisi di uscita di corsia"
+
+#: selfdrive/ui/layouts/settings/toggles.py:70
+#, python-format
+msgid "Always-On Driver Monitoring"
+msgstr "Monitoraggio guidatore sempre attivo"
+
+#: selfdrive/ui/layouts/settings/toggles.py:76
+#, python-format
+msgid "Record and Upload Driver Camera"
+msgstr "Registra e carica la fotocamera guidatore"
+
+#: selfdrive/ui/layouts/settings/toggles.py:82
+#, python-format
+msgid "Record and Upload Microphone Audio"
+msgstr "Registra e carica l'audio del microfono"
+
+#: selfdrive/ui/layouts/settings/toggles.py:88
+#, python-format
+msgid "Use Metric System"
+msgstr "Usa il sistema metrico"
+
+#: selfdrive/ui/layouts/settings/toggles.py:96
+#, python-format
+msgid "Driving Personality"
+msgstr "Personalità di guida"
+
+#: selfdrive/ui/layouts/settings/toggles.py:98
+#, python-format
+msgid "Aggressive"
+msgstr "Aggressiva"
+
+#: selfdrive/ui/layouts/settings/toggles.py:98
+#, python-format
+msgid "Standard"
+msgstr "Standard"
+
+#: selfdrive/ui/layouts/settings/toggles.py:98
+#, python-format
+msgid "Relaxed"
+msgstr "Rilassata"
+
+#: selfdrive/ui/layouts/settings/toggles.py:125
+#, python-format
+msgid "Changing this setting will restart openpilot if the car is powered on."
+msgstr "La modifica di questa impostazione riavvierà openpilot se l'auto è accesa."
+
+#: selfdrive/ui/layouts/settings/toggles.py:158
+#, python-format
+msgid "openpilot defaults to driving in chill mode. Experimental mode enables alpha-level features that aren't ready for chill mode. Experimental features are listed below:<br><h4>End-to-End Longitudinal Control</h4><br>Let the driving model control the gas and brakes. openpilot will drive as it thinks a human would, including stopping for red lights and stop signs. Since the driving model decides the speed to drive, the set speed will only act as an upper bound. This is an alpha quality feature; mistakes should be expected.<br><h4>New Driving Visualization</h4><br>The driving visualization will transition to the road-facing wide-angle camera at low speeds to better show some turns. The Experimental mode logo will also be shown in the top right corner."
+msgstr "openpilot guida di default in modalità tranquilla. La Modalità sperimentale attiva funzioni di livello alpha non ancora pronte per la modalità tranquilla. Le funzioni sperimentali sono elencate qui sotto:<br><h4>Controllo longitudinale end-to-end</h4><br>Lascia che il modello di guida controlli acceleratore e freni. openpilot guiderà come penserebbe di fare una persona, fermandosi anche ai semafori rossi e agli stop. Poiché è il modello a decidere la velocità, il limite impostato funge solo da massimo. È una funzione di qualità alpha: sono da aspettarsi degli errori.<br><h4>Nuova visualizzazione di guida</h4><br>A bassa velocità la visualizzazione passa alla fotocamera grandangolare rivolta alla strada, per mostrare meglio alcune curve. In alto a destra viene anche mostrato il logo della Modalità sperimentale."
+
+#: selfdrive/ui/layouts/settings/toggles.py:181
+#, python-format
+msgid "Experimental mode is currently unavailable on this car since the car's stock ACC is used for longitudinal control."
+msgstr "La Modalità sperimentale non è al momento disponibile su questa auto perché viene usato l'ACC di serie per il controllo longitudinale."
+
+#: selfdrive/ui/layouts/settings/toggles.py:183
+#, python-format
+msgid "openpilot longitudinal control may come in a future update."
+msgstr "Il controllo longitudinale di openpilot potrebbe arrivare in un aggiornamento futuro."
+
+#: selfdrive/ui/layouts/settings/toggles.py:186
+#, python-format
+msgid "An alpha version of openpilot longitudinal control can be tested, along with Experimental mode, on non-release branches."
+msgstr "Una versione alpha del controllo longitudinale di openpilot, insieme alla Modalità sperimentale, può essere provata sui branch non di rilascio."
+
+#: selfdrive/ui/layouts/settings/toggles.py:189
+#, python-format
+msgid "Enable the openpilot longitudinal control (alpha) toggle to allow Experimental mode."
+msgstr "Attiva l'opzione del controllo longitudinale openpilot (alpha) per usare la Modalità sperimentale."
+
+#: selfdrive/ui/onroad/hud_renderer.py:148
+#, python-format
+msgid "MAX"
+msgstr "MAX"
+
+#: selfdrive/ui/onroad/hud_renderer.py:177
+#, python-format
+msgid "km/h"
+msgstr "km/h"
+
+#: selfdrive/ui/onroad/hud_renderer.py:177
+#, python-format
+msgid "mph"
+msgstr "mph"
+
+#: selfdrive/ui/onroad/driver_camera_dialog.py:34
+#, python-format
+msgid "camera starting"
+msgstr "avvio fotocamera"
+
+#: selfdrive/ui/onroad/alert_renderer.py:51
+#, python-format
+msgid "openpilot Unavailable"
+msgstr "openpilot non disponibile"
+
+#: selfdrive/ui/onroad/alert_renderer.py:52
+#, python-format
+msgid "Waiting to start"
+msgstr "In attesa dell'avvio"
+
+#: selfdrive/ui/onroad/alert_renderer.py:58
+#, python-format
+msgid "TAKE CONTROL IMMEDIATELY"
+msgstr "PRENDI SUBITO IL CONTROLLO"
+
+#: selfdrive/ui/onroad/alert_renderer.py:59
+#: selfdrive/ui/onroad/alert_renderer.py:65
+#, python-format
+msgid "System Unresponsive"
+msgstr "Sistema non risponde"
+
+#: selfdrive/ui/onroad/alert_renderer.py:66
+#, python-format
+msgid "Reboot Device"
+msgstr "Riavvia il dispositivo"
+
+#: selfdrive/ui/layouts/settings/starpilot/maps.py
+msgid "Auto: Off"
+msgstr "Auto: disattivato"
+
+#: selfdrive/ui/layouts/settings/starpilot/maps.py
+msgid "Auto: Weekly"
+msgstr "Auto: settimanale"
+
+#: selfdrive/ui/layouts/settings/starpilot/maps.py
+msgid "Auto: Monthly"
+msgstr "Auto: mensile"
+
+#: selfdrive/ui/onroad/starpilot/navigation_card.py
+msgid "Then"
+msgstr "Poi"
+
+# StarPilot and other UI strings wrapped in tr()/tr_noop but missing from app.pot.
+
+msgid "1 min"
+msgstr "1 min"
+
+msgid "A backup with this name already exists."
+msgstr "Esiste già un backup con questo nome."
+
+msgid "A model download is already in progress."
+msgstr "È già in corso il download di un modello."
+
+msgid "A toggle backup with this name already exists."
+msgstr "Esiste già un backup delle opzioni con questo nome."
+
+msgid "AK, AZ, CA, CO, HI, ID, MT, NV, NM, OR, UT, WA, WY"
+msgstr "AK, AZ, CA, CO, HI, ID, MT, NV, NM, OR, UT, WA, WY"
+
+msgid "AL, AR, DE, DC, FL, GA, KY, LA, MD, MS, NC, OK, SC, TN, TX, VA, WV"
+msgstr "AL, AR, DE, DC, FL, GA, KY, LA, MD, MS, NC, OK, SC, TN, TX, VA, WV"
+
+msgid "AS, GU, MP, PR, VI"
+msgstr "AS, GU, MP, PR, VI"
+
+msgid "Abbreviated Sources"
+msgstr "Fonti abbreviate"
+
+msgid "Above Speed"
+msgstr "Sopra la velocità"
+
+msgid "Accel Smoothness"
+msgstr "Fluidità accelerazione"
+
+msgid "Acceleration Path"
+msgstr "Percorso di accelerazione"
+
+msgid "Acceleration Profile"
+msgstr "Profilo di accelerazione"
+
+msgid "Acceleration and braking control changes to fine-tune how openpilot drives."
+msgstr "Modifiche al controllo di accelerazione e frenata per regolare il modo in cui guida openpilot."
+
+msgid "Acceleration feels harsh or jerky"
+msgstr "L'accelerazione è secca o a scatti"
+
+msgid "Acceleration tuning for EV and direct-drive vehicles."
+msgstr "Regolazione dell'accelerazione per veicoli elettrici e a trasmissione diretta."
+
+msgid "Active"
+msgstr "Attivo"
+
+msgid "Active Sources Only"
+msgstr "Solo fonti attive"
+
+msgid "Actuator Delay"
+msgstr "Ritardo attuatore"
+
+msgid "Adaptive Speed Controls"
+msgstr "Controlli di velocità adattivi"
+
+msgid "Add"
+msgstr "Aggiungi"
+
+msgid "Add to Blacklist"
+msgstr "Aggiungi alla blacklist"
+
+msgid "Adjacent Lane Metrics"
+msgstr "Metriche corsie adiacenti"
+
+msgid "Adjacent Lanes"
+msgstr "Corsie adiacenti"
+
+msgid "Adjust actuator delay, EV/Truck tuning, and launch/stop speeds/rates."
+msgstr "Regola il ritardo dell'attuatore, la messa a punto EV/autocarro e le velocità/rate di partenza e arresto."
+
+msgid "Adjust actuator delay, steer ratio, Kp, friction, and neural network feedforward controllers."
+msgstr "Regola ritardo attuatore, steer ratio, Kp, attrito e i controllori feedforward della rete neurale."
+
+msgid "Adjust driving parameters for this weather condition."
+msgstr "Regola i parametri di guida per questa condizione meteo."
+
+msgid "Adjust parameters for fog, mist, and poor visibility conditions."
+msgstr "Regola i parametri per nebbia, foschia e scarsa visibilità."
+
+msgid "Adjust parameters for heavy rain and storms."
+msgstr "Regola i parametri per pioggia intensa e temporali."
+
+msgid "Adjust parameters for light to moderate rain."
+msgstr "Regola i parametri per pioggia da leggera a moderata."
+
+msgid "Adjust parameters for snowy and icy conditions."
+msgstr "Regola i parametri per neve e ghiaccio."
+
+msgid "Adjust radar plots, lead vehicle info, and stop sign metrics."
+msgstr "Regola i grafici radar, le info sul veicolo davanti e le metriche degli stop."
+
+msgid "Adopt Current Speed Limit"
+msgstr "Adotta il limite attuale"
+
+msgid "Advanced Actuators"
+msgstr "Attuatori avanzati"
+
+msgid "Advanced Lateral Tuning"
+msgstr "Messa a punto laterale avanzata"
+
+msgid "Advanced Longitudinal Tuning"
+msgstr "Messa a punto longitudinale avanzata"
+
+msgid "Advanced Metrics"
+msgstr "Metriche avanzate"
+
+msgid "Advanced UI Controls"
+msgstr "Controlli interfaccia avanzati"
+
+msgid "Advanced acceleration and braking changes for refining launch, stopping, and actuator response."
+msgstr "Modifiche avanzate di accelerazione e frenata per affinare partenza, arresto e risposta dell'attuatore."
+
+msgid "Alerts"
+msgstr "Avvisi"
+
+msgid "All Available"
+msgstr "Tutti disponibili"
+
+msgid "All Models On Device"
+msgstr "Tutti i modelli sul dispositivo"
+
+msgid "All options in this panel are hidden or unavailable."
+msgstr "Tutte le opzioni di questo pannello sono nascoste o non disponibili."
+
+msgid "Allow navigation to request lane keep and turns."
+msgstr "Permetti alla navigazione di richiedere il mantenimento di corsia e le svolte."
+
+msgid "Allow openpilot to change lanes."
+msgstr "Permetti a openpilot di cambiare corsia."
+
+msgid "Almost done"
+msgstr "Quasi fatto"
+
+msgid "Always On Lateral"
+msgstr "Sterzo sempre attivo"
+
+msgid "An alert was unclear and I'm not sure what it meant"
+msgstr "Un avviso non era chiaro e non ho capito cosa volesse dire"
+
+msgid "Appearance"
+msgstr "Aspetto"
+
+msgid "Auto"
+msgstr "Auto"
+
+msgid "Auto Lane Changes"
+msgstr "Cambi di corsia automatici"
+
+msgid "Auto Lock Doors"
+msgstr "Chiusura automatica porte"
+
+msgid "Auto Match Speed Limits"
+msgstr "Allinea automaticamente ai limiti"
+
+msgid "Auto Overtake"
+msgstr "Sorpasso automatico"
+
+msgid "Auto Return After Overtake"
+msgstr "Rientro automatico dopo il sorpasso"
+
+msgid "Auto Unlock Doors"
+msgstr "Apertura automatica porte"
+
+msgid "Auto Update Schedule"
+msgstr "Programma aggiornamenti automatici"
+
+msgid "Automatically adjust driving behavior based on real-time weather."
+msgstr "Adatta automaticamente il comportamento di guida al meteo in tempo reale."
+
+msgid "Available for Download"
+msgstr "Disponibili al download"
+
+msgid "Available to Download"
+msgstr "Disponibili al download"
+
+msgid "Backup creation started."
+msgstr "Creazione del backup avviata."
+
+msgid "Backup deleted."
+msgstr "Backup eliminato."
+
+#, python-format
+msgid "Backups: {}  •  Snapshots: {}"
+msgstr "Backup: {}  •  Istantanee: {}"
+
+msgid "Below Speed"
+msgstr "Sotto la velocità"
+
+msgid "Blacklist"
+msgstr "Blacklist"
+
+msgid "Blind Spot Borders"
+msgstr "Bordi dell'angolo cieco"
+
+msgid "Blind Spot Path"
+msgstr "Percorso angolo cieco"
+
+msgid "Blinkerless left pass of a slower lead on the highway."
+msgstr "Sorpasso a sinistra senza indicatore di un veicolo più lento in autostrada."
+
+msgid "Blinkerless return to the right lane after an automatic overtake."
+msgstr "Rientro a destra senza indicatore dopo un sorpasso automatico."
+
+msgid "Boot Logo"
+msgstr "Logo di avvio"
+
+msgid "Border Width"
+msgstr "Spessore bordo"
+
+msgid "Brake Smoothness"
+msgstr "Fluidità frenata"
+
+msgid "Brake force to hold the vehicle at a complete stop."
+msgstr "Forza frenante per tenere fermo il veicolo da fermo."
+
+msgid "Braking is too sudden or uncomfortable"
+msgstr "La frenata è troppo improvvisa o scomoda"
+
+msgid "Built-in"
+msgstr "Integrato"
+
+msgid "CAN Ignition Only"
+msgstr "Solo accensione CAN"
+
+msgid "CAN Ignition Only requires a Panda firmware update."
+msgstr "Solo accensione CAN richiede un aggiornamento del firmware Panda."
+
+msgid "CANCEL"
+msgstr "ANNULLA"
+
+msgid "CC Main Button"
+msgstr "Tasto CC Main"
+
+msgid "CPU Metrics"
+msgstr "Metriche CPU"
+
+msgid "CSC Status Widget"
+msgstr "Widget stato CSC"
+
+msgid "CT, ME, MA, NH, NJ, NY, PA, RI, VT"
+msgstr "CT, ME, MA, NH, NJ, NY, PA, RI, VT"
+
+msgid "Calculating..."
+msgstr "Calcolo in corso..."
+
+msgid "Calibrated Lateral Accel"
+msgstr "Accel. laterale calibrata"
+
+msgid "Calibration Progress"
+msgstr "Avanzamento calibrazione"
+
+msgid "Camera & System Startup"
+msgstr "Avvio fotocamera e sistema"
+
+msgid "Camera View"
+msgstr "Vista fotocamera"
+
+msgid "Cancel Button"
+msgstr "Tasto Cancel"
+
+msgid "Cancel Download"
+msgstr "Annulla download"
+
+msgid "Cancel the current map download?"
+msgstr "Annullare il download della mappa in corso?"
+
+msgid "Cancelling Download"
+msgstr "Annullamento download"
+
+msgid "Cancelling..."
+msgstr "Annullamento..."
+
+msgid "Cannot delete model files while a download is in progress."
+msgstr "Impossibile eliminare i file del modello durante un download."
+
+msgid "Cannot delete model files while driving."
+msgstr "Impossibile eliminare i file del modello durante la guida."
+
+msgid "Cannot download models while driving."
+msgstr "Impossibile scaricare modelli durante la guida."
+
+msgid "Cannot refresh the model catalog during an active download."
+msgstr "Impossibile aggiornare il catalogo modelli durante un download."
+
+msgid "Cannot refresh the model catalog while driving."
+msgstr "Impossibile aggiornare il catalogo modelli durante la guida."
+
+msgid "Car Make"
+msgstr "Marca"
+
+msgid "Car Model"
+msgstr "Modello auto"
+
+msgid "Change Personality"
+msgstr "Cambia personalità"
+
+msgid "Checking Offline Maps"
+msgstr "Controllo mappe offline"
+
+msgid "Chill"
+msgstr "Tranquilla"
+
+msgid "Choose a short name"
+msgstr "Scegli un nome breve"
+
+msgid "Choose how firmly openpilot slows the car down."
+msgstr "Scegli con quanta decisione openpilot rallenta l'auto."
+
+msgid "Choose how quickly openpilot speeds up."
+msgstr "Scegli quanto rapidamente openpilot accelera."
+
+msgid "Clear Driving Data"
+msgstr "Cancella dati di guida"
+
+msgid "Clear Error Logs"
+msgstr "Cancella i log degli errori"
+
+msgid "Clear Route When Offroad"
+msgstr "Cancella il percorso da fermo"
+
+msgid "Clear the active navigation destination when the device goes offroad."
+msgstr "Cancella la destinazione di navigazione attiva quando il dispositivo va offroad."
+
+msgid "Close Gap On Lane Change"
+msgstr "Riduci distanza nel cambio corsia"
+
+msgid "Comma"
+msgstr "Comma"
+
+msgid "Community Picks"
+msgstr "Scelte della community"
+
+msgid "Compact display only; the unified card always shows nonzero offsets."
+msgstr "Solo visualizzazione compatta; la scheda unificata mostra sempre gli offset diversi da zero."
+
+msgid "Compass"
+msgstr "Bussola"
+
+msgid "Compensates for steering friction around center."
+msgstr "Compensa l'attrito dello sterzo intorno al centro."
+
+msgid "Conditional Chill"
+msgstr "Tranquilla condizionale"
+
+msgid "Conditional Drive Mode"
+msgstr "Modalità di guida condizionale"
+
+msgid "Conditional Experimental"
+msgstr "Sperimentale condizionale"
+
+msgid "Configure"
+msgstr "Configura"
+
+msgid "Configure Always On Lateral (AOL), pause speed thresholds, and turn signal behaviors."
+msgstr "Configura lo sterzo sempre attivo (AOL), le soglie di pausa e il comportamento degli indicatori di direzione."
+
+msgid "Configure Curve Speed Controller and Conditional Experimental Mode triggers."
+msgstr "Configura il controllore di velocità in curva e gli attivatori della Modalità sperimentale condizionale."
+
+msgid "Configure acceleration profiles, lane changes, and route speed control."
+msgstr "Configura i profili di accelerazione, i cambi di corsia e il controllo della velocità sul percorso."
+
+msgid "Configure automated switching between Experimental and Chill Modes based on set conditions."
+msgstr "Configura il passaggio automatico tra modalità Sperimentale e Tranquilla in base alle condizioni impostate."
+
+msgid "Configure automatic lane changes, speed/width thresholds, and smoothing parameters."
+msgstr "Configura i cambi di corsia automatici, le soglie di velocità/larghezza e i parametri di smorzamento."
+
+msgid "Configure compass, dynamic pedals, signals, and screen borders."
+msgstr "Configura bussola, pedali dinamici, indicatori e bordi dello schermo."
+
+msgid "Configure cruise intervals, standstill behaviors, gear mapping, and weather presets."
+msgstr "Configura gli intervalli del cruise, il comportamento da fermo, la mappatura delle marce e i preset meteo."
+
+msgid "Configure follow distance, smoothness, and response for aggressive driving."
+msgstr "Configura distanza di sicurezza, fluidità e risposta per la guida aggressiva."
+
+msgid "Configure follow distance, smoothness, and response for everyday driving."
+msgstr "Configura distanza di sicurezza, fluidità e risposta per la guida di tutti i giorni."
+
+msgid "Configure follow distance, smoothness, and response for relaxed driving."
+msgstr "Configura distanza di sicurezza, fluidità e risposta per la guida rilassata."
+
+msgid "Configure follow distance, smoothness, and response for traffic conditions."
+msgstr "Configura distanza di sicurezza, fluidità e risposta per il traffico."
+
+msgid "Configure road names, Vienna signs, and offroad routes."
+msgstr "Configura nomi delle strade, segnali Vienna e percorsi offroad."
+
+msgid "Configure speed control on curves and reset collected calibration data."
+msgstr "Configura il controllo della velocità in curva e reimposta i dati di calibrazione raccolti."
+
+msgid "Configure steering behavior and lane changes."
+msgstr "Configura il comportamento dello sterzo e i cambi di corsia."
+
+msgid "Confirm"
+msgstr "Conferma"
+
+msgid "Confirm Higher"
+msgstr "Conferma superiori"
+
+msgid "Confirm Lower"
+msgstr "Conferma inferiori"
+
+msgid "Confirm New Limits"
+msgstr "Conferma i nuovi limiti"
+
+msgid "Connect to the internet"
+msgstr "Connettiti a Internet"
+
+msgid "Control how aggressively openpilot detects and reacts to vehicles ahead."
+msgstr "Controlla con quanta prontezza openpilot rileva e reagisce ai veicoli davanti."
+
+msgid "Convenience features for everyday driving."
+msgstr "Funzioni di comfort per la guida di tutti i giorni."
+
+msgid "Could not determine that location. Try another result."
+msgstr "Impossibile determinare quella posizione. Prova un altro risultato."
+
+msgid "Create Backup"
+msgstr "Crea backup"
+
+msgid "Create Bookmark"
+msgstr "Crea segnalibro"
+
+msgid "Cruise Interval"
+msgstr "Intervallo cruise"
+
+msgid "Cruise Long"
+msgstr "Cruise longitudinale"
+
+msgid "Current"
+msgstr "Attuale"
+
+msgid "Curve Speed Controller"
+msgstr "Controllore velocità in curva"
+
+msgid "Curves"
+msgstr "Curve"
+
+msgid "Curves w/ Lead"
+msgstr "Curve con veicolo davanti"
+
+msgid "Custom Series"
+msgstr "Serie personalizzate"
+
+msgid "Customize dynamic lane paths, road edges, and colors."
+msgstr "Personalizza i percorsi di corsia dinamici, i bordi strada e i colori."
+
+msgid "Customize follow distance and jerk/response metrics for each personality profile."
+msgstr "Personalizza distanza di sicurezza e metriche di scatto/risposta per ogni profilo di personalità."
+
+msgid "Customize follow distance and smoothness for this driving personality."
+msgstr "Personalizza distanza di sicurezza e fluidità per questa personalità di guida."
+
+msgid "Customize your display, driving widgets, model visualization, and themes."
+msgstr "Personalizza schermo, widget di guida, visualizzazione del modello e temi."
+
+msgid "DELETE"
+msgstr "ELIMINA"
+
+msgid "Daily QOL & Weather"
+msgstr "Comfort quotidiano e meteo"
+
+msgid "Date (Newest)"
+msgstr "Data (più recente)"
+
+msgid "Date (Oldest)"
+msgstr "Data (più vecchia)"
+
+msgid "Debug Mode"
+msgstr "Modalità debug"
+
+msgid "Deceleration Profile"
+msgstr "Profilo di decelerazione"
+
+msgid "Default"
+msgstr "Predefinito"
+
+msgid "Delay before lateral resumes after signal off. 0 = Off."
+msgstr "Ritardo prima che lo sterzo riprenda dopo lo spegnimento dell'indicatore. 0 = Disattivato."
+
+msgid "Delay before the start of an automatic lane change. 0 = Instant."
+msgstr "Ritardo prima dell'inizio di un cambio di corsia automatico. 0 = Immediato."
+
+msgid "Delete"
+msgstr "Elimina"
+
+#, python-format
+msgid "Delete \"{name}\"?"
+msgstr "Eliminare \"{name}\"?"
+
+msgid "Delete Backup"
+msgstr "Elimina backup"
+
+msgid "Delete Named Snapshot"
+msgstr "Elimina istantanea con nome"
+
+msgid "Delete Toggle Backup"
+msgstr "Elimina backup opzioni"
+
+msgid "Delete all downloaded offline map data?"
+msgstr "Eliminare tutti i dati delle mappe offline scaricate?"
+
+msgid "Delete all driving data and footage?"
+msgstr "Eliminare tutti i dati e i video di guida?"
+
+msgid "Delete all error logs?"
+msgstr "Eliminare tutti i log degli errori?"
+
+#, python-format
+msgid "Delete backup '{}'?"
+msgstr "Eliminare il backup '{}'?"
+
+#, python-format
+msgid "Delete toggle backup '{}'?"
+msgstr "Eliminare il backup delle opzioni '{}'?"
+
+msgid "Destination"
+msgstr "Destinazione"
+
+msgid "Detect and display speed-limit signs without enabling Speed Limit Controller."
+msgstr "Rileva e mostra i segnali di limite senza attivare il controllore dei limiti di velocità."
+
+msgid "Detect and display speed-limit signs without enabling the Speed Limit Controller."
+msgstr "Rileva e mostra i segnali di limite senza attivare il controllore dei limiti di velocità."
+
+msgid "Developer Metrics"
+msgstr "Metriche sviluppatore"
+
+msgid "Developer Sidebar"
+msgstr "Barra laterale sviluppatore"
+
+msgid "Developer Sidebar Metrics"
+msgstr "Metriche barra laterale sviluppatore"
+
+msgid "Developer-only: coast this far below the current cruise target before accelerating back up."
+msgstr "Solo per sviluppatori: lascia che l'auto scenda di tanto sotto il target del cruise prima di riaccelerare."
+
+msgid "Disable"
+msgstr "Disattiva"
+
+msgid "Disable Fingerprinting"
+msgstr "Disattiva fingerprinting"
+
+msgid "Disable Logging"
+msgstr "Disattiva registrazione log"
+
+msgid "Disable Onroad Uploads"
+msgstr "Disattiva caricamenti in guida"
+
+msgid "Disable Uploads"
+msgstr "Disattiva i caricamenti"
+
+msgid "Disable openpilot Long"
+msgstr "Disattiva long. openpilot"
+
+msgid "Disable openpilot longitudinal control?"
+msgstr "Disattivare il controllo longitudinale di openpilot?"
+
+msgid "Disabled"
+msgstr "Disattivato"
+
+msgid "Disabled while auto-learned delay is enabled."
+msgstr "Disattivato mentre è attivo il ritardo appreso automaticamente."
+
+msgid "Discord Username"
+msgstr "Nome utente Discord"
+
+msgid "Disengage AOL on Brake"
+msgstr "Disinserisci AOL al freno"
+
+msgid "Disengagement Alert"
+msgstr "Avviso di disinserimento"
+
+msgid "Display"
+msgstr "Schermo"
+
+msgid "Display camera-detected speed-limit signs; optionally use them with Speed Limit Controller."
+msgstr "Mostra i limiti rilevati dalla fotocamera; facoltativamente usali con il controllore dei limiti di velocità."
+
+msgid "Display the driving model path, lanes, and road edges."
+msgstr "Mostra il percorso del modello di guida, le corsie e i bordi strada."
+
+msgid "Distance Button"
+msgstr "Tasto distanza"
+
+msgid "Distracted Driver"
+msgstr "Guidatore distratto"
+
+msgid "Don't trigger on turn signal if lines are clear."
+msgstr "Non attivare con l'indicatore se le linee sono libere."
+
+msgid "Download Offline Maps"
+msgstr "Scarica mappe offline"
+
+msgid "Download Readiness"
+msgstr "Prontezza al download"
+
+msgid "Download in progress"
+msgstr "Download in corso"
+
+#, python-format
+msgid "Download {name}s to see them here."
+msgstr "Scarica {name} per vederli qui."
+
+msgid "Downloaded"
+msgstr "Scaricato"
+
+msgid "Downloaded on device"
+msgstr "Scaricato sul dispositivo"
+
+msgid "Downloading"
+msgstr "Download in corso"
+
+msgid "Downloading Maps"
+msgstr "Download mappe"
+
+msgid "Downloading model files..."
+msgstr "Download dei file del modello..."
+
+msgid "Downloads Pause Onroad"
+msgstr "I download si mettono in pausa in guida"
+
+msgid "Downloads and removals pause while driving."
+msgstr "Download e rimozioni si mettono in pausa durante la guida."
+
+msgid "Drive-cycle requested for immediate apply."
+msgstr "Richiesto un ciclo di guida per l'applicazione immediata."
+
+msgid "Driving Controls"
+msgstr "Controlli di guida"
+
+msgid "Driving Model"
+msgstr "Modello di guida"
+
+msgid "Driving Personalities"
+msgstr "Personalità di guida"
+
+msgid "Driving Screen Widgets"
+msgstr "Widget della schermata di guida"
+
+msgid "Driving Widgets & HUD"
+msgstr "Widget di guida e HUD"
+
+msgid "Driving data deletion started."
+msgstr "Eliminazione dei dati di guida avviata."
+
+msgid "Driving metrics panel on the right"
+msgstr "Pannello metriche di guida a destra"
+
+msgid "Dynamic Path"
+msgstr "Percorso dinamico"
+
+msgid "Dynamic Pedals"
+msgstr "Pedali dinamici"
+
+msgid "EV Active"
+msgstr "EV attivo"
+
+msgid "EV Remote Climate"
+msgstr "Climatizzazione remota EV"
+
+msgid "EV Remote Climate requires a Panda firmware update."
+msgstr "La climatizzazione remota EV richiede un aggiornamento del firmware Panda."
+
+msgid "EV Tuning"
+msgstr "Messa a punto EV"
+
+msgid "Enable Lane Changes in Steering first."
+msgstr "Prima attiva i cambi di corsia in Sterzo."
+
+#, python-format
+msgid "Enable {} to configure settings."
+msgstr "Attiva {} per configurare le impostazioni."
+
+msgid "Enabled"
+msgstr "Attivato"
+
+msgid "Engagement Chime"
+msgstr "Suono di inserimento"
+
+msgid "Engagement Refused"
+msgstr "Inserimento rifiutato"
+
+msgid "Enter a place or address"
+msgstr "Inserisci un luogo o un indirizzo"
+
+msgid "Enter at least 3 characters to search."
+msgstr "Inserisci almeno 3 caratteri per cercare."
+
+msgid "Enter or remove your weather data API key."
+msgstr "Inserisci o rimuovi la chiave API dei dati meteo."
+
+msgid "Error logs deleted."
+msgstr "Log degli errori eliminati."
+
+msgid "Exact full delay between steering command and vehicle response."
+msgstr "Ritardo completo esatto tra comando dello sterzo e risposta del veicolo."
+
+msgid "Experimental"
+msgstr "Sperimentale"
+
+msgid "Extra acceleration when moving away from a stop."
+msgstr "Accelerazione extra in ripartenza da fermo."
+
+msgid "FPS Display"
+msgstr "Visualizzazione FPS"
+
+msgid "Fallback Speed"
+msgstr "Velocità di riserva"
+
+msgid "Favorite"
+msgstr "Preferito"
+
+msgid "Favorite #1"
+msgstr "Preferito #1"
+
+msgid "Favorite #2"
+msgstr "Preferito #2"
+
+msgid "Favorite #3"
+msgstr "Preferito #3"
+
+msgid "Favorite destination"
+msgstr "Destinazione preferita"
+
+msgid "Favorite destinations"
+msgstr "Destinazioni preferite"
+
+msgid "Favorites"
+msgstr "Preferiti"
+
+msgid "Features"
+msgstr "Funzioni"
+
+msgid "Fine-tune acceleration, braking, and driving behavior."
+msgstr "Regola accelerazione, frenata e comportamento di guida."
+
+msgid "Fine-tune steering response and auto-tuning."
+msgstr "Regola la risposta dello sterzo e l'auto-taratura."
+
+msgid "Fine-tune which elements appear on screen."
+msgstr "Regola quali elementi appaiono sullo schermo."
+
+msgid "Flash"
+msgstr "Flash"
+
+msgid "Flash Panda"
+msgstr "Flash Panda"
+
+msgid "Flash Panda firmware?"
+msgstr "Eseguire il flash del firmware Panda?"
+
+msgid "Follow Distance"
+msgstr "Distanza di sicurezza"
+
+msgid "Follow High"
+msgstr "Distanza alta"
+
+msgid "Follow Route"
+msgstr "Segui percorso"
+
+msgid "Follow turn intent below min lane change speed."
+msgstr "Segui l'intenzione di svolta sotto la velocità minima di cambio corsia."
+
+msgid "Following Distance"
+msgstr "Distanza di inseguimento"
+
+msgid "For"
+msgstr "Per"
+
+msgid "Force Auto-Tune Off"
+msgstr "Forza auto-taratura disattivata"
+
+msgid "Force Auto-Tune On"
+msgstr "Forza auto-taratura attivata"
+
+msgid "Force Coast"
+msgstr "Forza veleggio"
+
+msgid "Force Standstill"
+msgstr "Forza sosta"
+
+msgid "Force Stop Offset"
+msgstr "Offset arresto forzato"
+
+msgid "Force Stops"
+msgstr "Arresti forzati"
+
+msgid "Force Torque Ctrl"
+msgstr "Forza controllo in coppia"
+
+msgid "Force Turn Desires"
+msgstr "Forza intenzioni di svolta"
+
+msgid "Force-disable learned lateral values and use your set values."
+msgstr "Disattiva forzatamente i valori laterali appresi e usa quelli impostati."
+
+msgid "Force-enable live auto-tuning for friction and lateral accel."
+msgstr "Attiva forzatamente l'auto-taratura in tempo reale per attrito e accelerazione laterale."
+
+msgid "Fork settings for automatic overtakes and following the navigation route."
+msgstr "Impostazioni del fork per i sorpassi automatici e per seguire il percorso di navigazione."
+
+msgid "Friction"
+msgstr "Attrito"
+
+msgid "GPU Metrics"
+msgstr "Metriche GPU"
+
+msgid "GPU required"
+msgstr "GPU richiesta"
+
+msgid "Gap to use during lane changes, only when shorter than your normal gap."
+msgstr "Distanza da usare nei cambi di corsia, solo se più corta di quella normale."
+
+msgid "Gas / Brake"
+msgstr "Acceleratore / Freno"
+
+msgid "Gas/Brake"
+msgstr "Acceleratore/Freno"
+
+msgid "General Prompt"
+msgstr "Richiesta generale"
+
+msgid "Green Light"
+msgstr "Semaforo verde"
+
+msgid "Hide Alerts"
+msgstr "Nascondi avvisi"
+
+msgid "Hide Changing Lanes Banner"
+msgstr "Nascondi il banner cambio corsia"
+
+msgid "Hide Distance Profile Banner"
+msgstr "Nascondi il banner del profilo distanza"
+
+msgid "Hide Driver Monitoring Icon"
+msgstr "Nascondi l'icona di monitoraggio guidatore"
+
+msgid "Hide Lead Marker"
+msgstr "Nascondi il marker del veicolo davanti"
+
+msgid "Hide Max Speed"
+msgstr "Nascondi velocità massima"
+
+msgid "Hide Speed"
+msgstr "Nascondi velocità"
+
+msgid "Hide Steering Wheel"
+msgstr "Nascondi il volante"
+
+msgid "Hide Turning Banner"
+msgstr "Nascondi il banner di svolta"
+
+msgid "Hide source rows that have no current speed limit reading."
+msgstr "Nascondi le righe delle fonti senza un limite di velocità attuale."
+
+msgid "High Bitrate Recording"
+msgstr "Registrazione ad alto bitrate"
+
+msgid "Higher Lookahead"
+msgstr "Lookahead più alto"
+
+msgid "Hold after ACC times out at a stop and resume when traffic moves."
+msgstr "Mantieni la sosta dopo il timeout dell'ACC e riparti quando il traffico si muove."
+
+msgid "Home"
+msgstr "Home"
+
+msgid "How much curve data has been collected. Normal for the value to stay low."
+msgstr "Quanti dati di curva sono stati raccolti. È normale che il valore resti basso."
+
+msgid "How quickly braking ramps up to bring the car to a stop."
+msgstr "Quanto rapidamente aumenta la frenata per fermare l'auto."
+
+msgid "How strongly openpilot corrects lateral position."
+msgstr "Con quanta forza openpilot corregge la posizione laterale."
+
+msgid "Human-Like Lane Changes"
+msgstr "Cambi di corsia più naturali"
+
+msgid "I'm not sure if this is normal or a bug:"
+msgstr "Non so se è normale o un problema:"
+
+msgid "IL, IN, IA, KS, MI, MN, MO, NE, ND, OH, SD, WI"
+msgstr "IL, IN, IA, KS, MI, MN, MO, NE, ND, OH, SD, WI"
+
+msgid "Immediate Warning"
+msgstr "Avviso immediato"
+
+msgid "In Pool"
+msgstr "Nel pool"
+
+msgid "Incomplete"
+msgstr "Incompleto"
+
+msgid "Instant"
+msgstr "Immediato"
+
+msgid "Issue reported. Thank you!"
+msgstr "Segnalazione inviata. Grazie!"
+
+msgid "Jeep Brake Hold"
+msgstr "Freno di stazionamento Jeep"
+
+msgid "Keep manual Chill override through reboots."
+msgstr "Mantieni l'override manuale Tranquilla dopo i riavvii."
+
+msgid "Keep manual Experimental override through reboots."
+msgstr "Mantieni l'override manuale Sperimentale dopo i riavvii."
+
+msgid "Keep steering off after pressing the brake until openpilot is engaged again."
+msgstr "Tieni lo sterzo disinserito dopo aver premuto il freno finché openpilot non viene reinserito."
+
+msgid "Konik"
+msgstr "Konik"
+
+msgid "Kp Factor"
+msgstr "Fattore Kp"
+
+msgid "LKAS Button"
+msgstr "Tasto LKAS"
+
+msgid "LOCKED"
+msgstr "BLOCCATO"
+
+msgid "Lane Change Delay"
+msgstr "Ritardo cambio corsia"
+
+msgid "Lane Change Smoothing"
+msgstr "Smorzamento cambio corsia"
+
+msgid "Lane Changes"
+msgstr "Cambi di corsia"
+
+msgid "Lane Line Color"
+msgstr "Colore linee di corsia"
+
+msgid "Lane Line Width"
+msgstr "Spessore linee di corsia"
+
+msgid "Last Updated"
+msgstr "Ultimo aggiornamento"
+
+msgid "Lateral Acceleration"
+msgstr "Accelerazione laterale"
+
+msgid "Launch Assist"
+msgstr "Assistenza alla partenza"
+
+msgid "Lead Ahead"
+msgstr "Veicolo davanti"
+
+msgid "Lead Departure"
+msgstr "Partenza del veicolo davanti"
+
+msgid "Lead Detection Sensitivity"
+msgstr "Sensibilità rilevamento veicolo davanti"
+
+msgid "Lead Detection Threshold"
+msgstr "Soglia rilevamento veicolo davanti"
+
+msgid "Lead Vehicle Metrics"
+msgstr "Metriche veicolo davanti"
+
+msgid "Learn the full steering delay automatically. The manual value below is ignored while enabled."
+msgstr "Apprende automaticamente il ritardo completo dello sterzo. Il valore manuale sotto viene ignorato se attivo."
+
+msgid "Lightweight NNFF when full model is off."
+msgstr "NNFF leggero quando il modello completo è disattivato."
+
+msgid "Limit the car's maximum speed to the current speed limit."
+msgstr "Limita la velocità massima dell'auto al limite di velocità attuale."
+
+msgid "Load"
+msgstr "Carica"
+
+msgid "Load Saved Settings"
+msgstr "Carica impostazioni salvate"
+
+#, python-format
+msgid "Load {} and overwrite your current settings?"
+msgstr "Caricare {} e sovrascrivere le impostazioni attuali?"
+
+msgid "Loaded trailer weight for tow-aware gas, brake, and conservative lateral assist."
+msgstr "Peso del rimorchio caricato per accelerazione, frenata e assistenza laterale più conservative in traino."
+
+#, python-format
+msgid "Loaded {} settings from {}."
+msgstr "Caricate {} impostazioni da {}."
+
+msgid "Lock Doors Timer"
+msgstr "Timer chiusura porte"
+
+msgid "Long Press"
+msgstr "Pressione prolungata"
+
+msgid "Longitudinal Tuning"
+msgstr "Messa a punto longitudinale"
+
+msgid "Looking up destinations"
+msgstr "Ricerca destinazioni"
+
+msgid "Loud Blindspot"
+msgstr "Angolo cieco ad alto volume"
+
+msgid "Loud While Paused"
+msgstr "Volume alto in pausa"
+
+msgid "Low Speed Alert"
+msgstr "Avviso a bassa velocità"
+
+msgid "Low Visibility"
+msgstr "Bassa visibilità"
+
+msgid "Low Voltage Shutdown"
+msgstr "Spegnimento per bassa tensione"
+
+msgid "Lower Lookahead"
+msgstr "Lookahead più basso"
+
+msgid "Lowest speed at which openpilot will change lanes."
+msgstr "Velocità minima a cui openpilot cambia corsia."
+
+msgid "Maintenance"
+msgstr "Manutenzione"
+
+msgid "Manage"
+msgstr "Gestisci"
+
+msgid "Manage Blacklist"
+msgstr "Gestisci blacklist"
+
+msgid "Manage auto speed matching, confirmation, offsets, and source priority."
+msgstr "Gestisci allineamento automatico della velocità, conferme, offset e priorità delle fonti."
+
+msgid "Manage driver monitoring cameras, boot logos, and startup sounds."
+msgstr "Gestisci le fotocamere di monitoraggio, i logo di avvio e i suoni di accensione."
+
+msgid "Manual Parking Brake SNG"
+msgstr "Freno di stazionamento manuale SNG"
+
+msgid "Manually select vehicle instead of auto-detecting."
+msgstr "Seleziona il veicolo manualmente invece di rilevarlo in automatico."
+
+msgid "Map Acceleration"
+msgstr "Accelerazione mappa"
+
+msgid "Map Data"
+msgstr "Dati mappa"
+
+msgid "Map Deceleration"
+msgstr "Decelerazione mappa"
+
+msgid "Map Gears"
+msgstr "Mappa le marce"
+
+msgid "Map Packages & Regions"
+msgstr "Pacchetti mappa e regioni"
+
+msgid "Mapbox Fallback"
+msgstr "Fallback Mapbox"
+
+msgid "Mapbox search is not configured on this device."
+msgstr "La ricerca Mapbox non è configurata su questo dispositivo."
+
+msgid "Maps steering torque to turning response."
+msgstr "Mappa la coppia dello sterzo sulla risposta in curva."
+
+msgid "Marco"
+msgstr "Marco"
+
+msgid "Master Package - Full country map data"
+msgstr "Pacchetto principale - Dati mappa dell'intero paese"
+
+msgid "Maximum Acceleration"
+msgstr "Accelerazione massima"
+
+msgid "Min Lane Change Speed"
+msgstr "Velocità min. cambio corsia"
+
+msgid "Min Lane Width"
+msgstr "Larghezza min. corsia"
+
+msgid "Mode Button"
+msgstr "Tasto modalità"
+
+msgid "Model & Path Visualization"
+msgstr "Visualizzazione modello e percorso"
+
+msgid "Model Randomizer"
+msgstr "Selezione casuale del modello"
+
+msgid "Model Randomizer Active"
+msgstr "Selezione casuale del modello attiva"
+
+msgid "Model Randomizer will change your driving model each drive."
+msgstr "La selezione casuale del modello cambierà il modello di guida a ogni viaggio."
+
+msgid "Model UI"
+msgstr "Interfaccia del modello"
+
+msgid "Model is already on this device."
+msgstr "Il modello è già su questo dispositivo."
+
+msgid "Model is not available on this device."
+msgstr "Il modello non è disponibile su questo dispositivo."
+
+msgid "Models are selected automatically each drive. Disable Randomizer to choose manually."
+msgstr "I modelli vengono scelti automaticamente a ogni viaggio. Disattiva la selezione casuale per sceglierli a mano."
+
+msgid "Muted"
+msgstr "Disattivato"
+
+msgid "My steering wheel buttons aren't working"
+msgstr "I tasti del volante non funzionano"
+
+msgid "NNFF"
+msgstr "NNFF"
+
+msgid "NNFF Lite"
+msgstr "NNFF Lite"
+
+msgid "Name your backup"
+msgstr "Dai un nome al backup"
+
+msgid "Name your toggle backup"
+msgstr "Dai un nome al backup delle opzioni"
+
+msgid "Navigation"
+msgstr "Navigazione"
+
+msgid "Navigation & Mapping"
+msgstr "Navigazione e mappe"
+
+msgid "Navigation & Maps"
+msgstr "Navigazione e mappe"
+
+msgid "Navigation Widgets"
+msgstr "Widget di navigazione"
+
+msgid "Navigation active"
+msgstr "Navigazione attiva"
+
+msgid "Needs BSM"
+msgstr "Richiede BSM"
+
+msgid "Needs Speed Limits"
+msgstr "Richiede i limiti di velocità"
+
+msgid "Needs Turn Signal speed > 0"
+msgstr "Richiede velocità indicatore di direzione > 0"
+
+msgid "Neural net feedforward steering controller."
+msgstr "Controllore feedforward dello sterzo a rete neurale."
+
+msgid "Never"
+msgstr "Mai"
+
+msgid "No Action"
+msgstr "Nessuna azione"
+
+msgid "No backups found."
+msgstr "Nessun backup trovato."
+
+msgid "No destinations yet"
+msgstr "Ancora nessuna destinazione"
+
+msgid "No fingerprint list available."
+msgstr "Nessun elenco fingerprint disponibile."
+
+msgid "No full-system backups saved yet."
+msgstr "Nessun backup completo del sistema salvato."
+
+msgid "No matching destinations"
+msgstr "Nessuna destinazione corrispondente"
+
+msgid "No model ratings found."
+msgstr "Nessuna valutazione dei modelli trovata."
+
+msgid "No models available"
+msgstr "Nessun modello disponibile"
+
+msgid "No models available for this make."
+msgstr "Nessun modello disponibile per questa marca."
+
+msgid "No options available."
+msgstr "Nessuna opzione disponibile."
+
+msgid "No regions available"
+msgstr "Nessuna regione disponibile"
+
+msgid "No regions selected"
+msgstr "Nessuna regione selezionata"
+
+msgid "No regions selected yet"
+msgstr "Ancora nessuna regione selezionata"
+
+msgid "No regions selected yet. Tap 'Whole U.S.' or pick specific states below to get started."
+msgstr "Ancora nessuna regione selezionata. Tocca «Tutti gli USA» o scegli gli stati qui sotto per iniziare."
+
+msgid "No settings to display"
+msgstr "Nessuna impostazione da mostrare"
+
+msgid "No toggle backups found."
+msgstr "Nessun backup delle opzioni trovato."
+
+msgid "No toggle snapshots saved yet."
+msgstr "Nessuna istantanea delle opzioni salvata."
+
+#, python-format
+msgid "No {name}s"
+msgstr "Nessun {name}"
+
+#, python-format
+msgid "No {name}s are currently downloaded."
+msgstr "Al momento non è scaricato nessun {name}."
+
+msgid "None"
+msgstr "Nessuno"
+
+msgid "Nostalgia Mode"
+msgstr "Modalità nostalgia"
+
+msgid "Not Available"
+msgstr "Non disponibile"
+
+msgid "Nothing to Delete"
+msgstr "Niente da eliminare"
+
+msgid "OFF"
+msgstr "OFF"
+
+msgid "Off"
+msgstr "Off"
+
+msgid "Offline Maps"
+msgstr "Mappe offline"
+
+msgid "Offroad"
+msgstr "Offroad"
+
+msgid "Offroad Brightness"
+msgstr "Luminosità offroad"
+
+msgid "Offroad Screen Timeout"
+msgstr "Timeout schermo offroad"
+
+msgid "Offsets on Dash Spoof"
+msgstr "Offset sul spoof del cruscotto"
+
+msgid "On Device"
+msgstr "Sul dispositivo"
+
+msgid "On the highway, automatically change lanes toward an upcoming exit or keep-left/keep-right from navigation, without a turn signal."
+msgstr "In autostrada, cambia automaticamente corsia verso un'uscita o un keep-left/keep-right della navigazione, senza indicatore di direzione."
+
+msgid "One Per Signal"
+msgstr "Uno per indicatore"
+
+msgid "One lane change per signal activation."
+msgstr "Un cambio di corsia per ogni attivazione dell'indicatore."
+
+msgid "Only pause steering when turn signal is active."
+msgstr "Metti in pausa lo sterzo solo quando l'indicatore di direzione è attivo."
+
+msgid "Onroad"
+msgstr "In guida"
+
+msgid "Onroad Brightness"
+msgstr "Luminosità in guida"
+
+msgid "Onroad Screen Timeout"
+msgstr "Timeout schermo in guida"
+
+msgid "Options"
+msgstr "Opzioni"
+
+msgid "Other Countries"
+msgstr "Altri Paesi"
+
+msgid "Overtake Return Delay"
+msgstr "Ritardo rientro dopo sorpasso"
+
+msgid "Overwrite"
+msgstr "Sovrascrivi"
+
+#, python-format
+msgid "Overwrite {} with your current settings?"
+msgstr "Sovrascrivere {} con le impostazioni attuali?"
+
+msgid "Panda flashing started. Device will reboot when finished."
+msgstr "Flash del Panda avviato. Il dispositivo si riavvierà al termine."
+
+msgid "Park the vehicle to download"
+msgstr "Parcheggia il veicolo per scaricare"
+
+msgid "Park to remove downloaded maps."
+msgstr "Parcheggia per rimuovere le mappe scaricate."
+
+msgid "Path Color"
+msgstr "Colore del percorso"
+
+msgid "Path Edge Color"
+msgstr "Colore bordo del percorso"
+
+msgid "Path Edge Width"
+msgstr "Spessore bordo del percorso"
+
+msgid "Path Width"
+msgstr "Larghezza del percorso"
+
+msgid "Pause AOL On Brake"
+msgstr "Metti in pausa AOL al freno"
+
+msgid "Pause AOL below this speed while brake is pressed."
+msgstr "Metti in pausa AOL sotto questa velocità mentre il freno è premuto."
+
+msgid "Pause Accel/Brake"
+msgstr "Metti in pausa accel./freno"
+
+msgid "Pause Lateral Below"
+msgstr "Metti in pausa lo sterzo sotto"
+
+msgid "Pause Steering"
+msgstr "Metti in pausa lo sterzo"
+
+msgid "Pause steering below the set speed."
+msgstr "Metti in pausa lo sterzo sotto la velocità impostata."
+
+msgid "Pedal Indicators"
+msgstr "Indicatori pedali"
+
+msgid "Pedal for Long"
+msgstr "Pedale per il longitudinale"
+
+msgid "Per-limit speed adjustments for the Speed Limit Controller."
+msgstr "Regolazioni di velocità per ciascun limite del controllore dei limiti."
+
+msgid "Performance data, sensor readings, and system metrics."
+msgstr "Dati di prestazione, letture dei sensori e metriche di sistema."
+
+msgid "Persist Chill State"
+msgstr "Mantieni stato Tranquilla"
+
+msgid "Persist Exp State"
+msgstr "Mantieni stato Sperimentale"
+
+msgid "Personality Button"
+msgstr "Tasto personalità"
+
+msgid "Pick which metrics appear in the developer sidebar on the driving screen."
+msgstr "Scegli quali metriche appaiono nella barra laterale sviluppatore sulla schermata di guida."
+
+msgid "Please select 'Whole U.S.' or pick individual states from the list below."
+msgstr "Seleziona «Tutti gli USA» o scegli i singoli stati dall'elenco sotto."
+
+msgid "Please select a Car Make first!"
+msgstr "Seleziona prima una marca!"
+
+msgid "Popular"
+msgstr "Popolari"
+
+msgid "Power"
+msgstr "Alimentazione"
+
+msgid "Predicted Stop In"
+msgstr "Arresto previsto tra"
+
+msgid "Preparing the selected regions for download."
+msgstr "Preparazione delle regioni selezionate per il download."
+
+msgid "Press"
+msgstr "Pressione"
+
+msgid "Press + above a limit for a persistent override; hold the gas pedal for a temporary override."
+msgstr "Premi + sopra un limite per un override persistente; tieni premuto l'acceleratore per un override temporaneo."
+
+msgid "Prevent lane changes into narrower lanes."
+msgstr "Impedisce i cambi di corsia verso corsie più strette."
+
+msgid "Profile Slot A"
+msgstr "Profilo A"
+
+msgid "Profile Slot B"
+msgstr "Profilo B"
+
+msgid "Profiles & Snapshots"
+msgstr "Profili e istantanee"
+
+msgid "Protected"
+msgstr "Protetto"
+
+msgid "Pulse and Glide"
+msgstr "Pulse and Glide"
+
+msgid "Pulse and Glide Delta"
+msgstr "Delta Pulse and Glide"
+
+msgid "Quality of Life"
+msgstr "Comfort"
+
+msgid "RAM Metrics"
+msgstr "Metriche RAM"
+
+msgid "Radar Point Display"
+msgstr "Visualizzazione punti radar"
+
+msgid "Radar for Takeoffs"
+msgstr "Radar per le ripartenze"
+
+msgid "Radar-informed behavior during lane changes."
+msgstr "Comportamento guidato dal radar durante i cambi di corsia."
+
+msgid "Rain"
+msgstr "Pioggia"
+
+msgid "Rainbow Path"
+msgstr "Percorso arcobaleno"
+
+msgid "Rainstorms"
+msgstr "Temporali"
+
+msgid "Ratings"
+msgstr "Valutazioni"
+
+#, python-format
+msgid "Ready to download {}."
+msgstr "Pronto a scaricare {}."
+
+msgid "Ready to navigate"
+msgstr "Pronto per navigare"
+
+msgid "Reboot required. Reboot now?"
+msgstr "Riavvio necessario. Riavviare ora?"
+
+msgid "Recent destination"
+msgstr "Destinazione recente"
+
+msgid "Recent destinations"
+msgstr "Destinazioni recenti"
+
+msgid "Reduce Accel"
+msgstr "Riduci accelerazione"
+
+msgid "Reduce Curve Speed"
+msgstr "Riduci velocità in curva"
+
+msgid "Refresh Catalog"
+msgstr "Aggiorna catalogo"
+
+msgid "Refreshing model catalog"
+msgstr "Aggiornamento catalogo modelli"
+
+msgid "Refreshing the driving model catalog in the background."
+msgstr "Aggiornamento del catalogo dei modelli di guida in background."
+
+msgid "Refreshing..."
+msgstr "Aggiornamento..."
+
+msgid "Relationship between steering wheel and road-wheel angle."
+msgstr "Rapporto tra angolo del volante e angolo delle ruote."
+
+msgid "Remap Cancel Button"
+msgstr "Riassegna il tasto Cancel"
+
+msgid "Remote Start Panda"
+msgstr "Avvio remoto Panda"
+
+msgid "Remote Start requires a Panda firmware update."
+msgstr "L'avvio remoto richiede un aggiornamento del firmware Panda."
+
+msgid "Remove"
+msgstr "Rimuovi"
+
+msgid "Remove API Key?"
+msgstr "Rimuovere la chiave API?"
+
+msgid "Remove Maps"
+msgstr "Rimuovi mappe"
+
+msgid "Remove from Blacklist"
+msgstr "Rimuovi dalla blacklist"
+
+#, python-format
+msgid "Remove {} from favorites?"
+msgstr "Rimuovere {} dai preferiti?"
+
+msgid "Removing offline maps..."
+msgstr "Rimozione delle mappe offline..."
+
+msgid "Rename"
+msgstr "Rinomina"
+
+msgid "Rename favorite"
+msgstr "Rinomina preferito"
+
+msgid "Render speed-limit sources as compact text labels (e.g. Dash-45)."
+msgstr "Mostra le fonti dei limiti come etichette di testo compatte (es. Dash-45)."
+
+msgid "Report Issue"
+msgstr "Segnala un problema"
+
+msgid "Reset All"
+msgstr "Reimposta tutto"
+
+msgid "Reset Curve Data"
+msgstr "Reimposta dati di curva"
+
+msgid "Reset Curve Data?"
+msgstr "Reimpostare i dati di curva?"
+
+msgid "Reset To Stock"
+msgstr "Ripristina impostazioni di serie"
+
+msgid "Reset Toggles"
+msgstr "Reimposta opzioni"
+
+msgid "Reset all sound volumes, cooldown, and custom alerts to their defaults?"
+msgstr "Reimpostare tutti i volumi, il tempo di attesa e gli avvisi personalizzati ai valori predefiniti?"
+
+msgid "Reset all toggles to defaults?"
+msgstr "Reimpostare tutte le opzioni ai valori predefiniti?"
+
+msgid "Reset all toggles to stock openpilot?"
+msgstr "Reimpostare tutte le opzioni ai valori di serie di openpilot?"
+
+msgid "Reset collected user data for Curve Speed Controller."
+msgstr "Reimposta i dati utente raccolti per il controllore di velocità in curva."
+
+msgid "Reset to Defaults"
+msgstr "Ripristina predefiniti"
+
+msgid "Reset to Defaults?"
+msgstr "Ripristinare i predefiniti?"
+
+msgid "Restore"
+msgstr "Ripristina"
+
+msgid "Restore Backup"
+msgstr "Ripristina backup"
+
+msgid "Restore Named Snapshot"
+msgstr "Ripristina istantanea con nome"
+
+msgid "Restoring... device will reboot."
+msgstr "Ripristino in corso... il dispositivo si riavvierà."
+
+msgid "Resume Delay"
+msgstr "Ritardo di ripresa"
+
+msgid "Reverse Cruise Increase"
+msgstr "Inverti incremento cruise"
+
+msgid "Revert to stock longitudinal control."
+msgstr "Torna al controllo longitudinale di serie."
+
+msgid "Road Edge Width"
+msgstr "Spessore bordo strada"
+
+msgid "Road Name"
+msgstr "Nome della strada"
+
+msgid "Rotating Wheel"
+msgstr "Volante rotante"
+
+msgid "SLC Offsets"
+msgstr "Offset SLC"
+
+msgid "SLC Primary Priority"
+msgstr "Priorità primaria SLC"
+
+msgid "SLC Secondary Priority"
+msgstr "Priorità secondaria SLC"
+
+msgid "Safety Gap Bias"
+msgstr "Scarto di sicurezza"
+
+msgid "Save Current Settings"
+msgstr "Salva impostazioni attuali"
+
+msgid "Save Named Snapshot"
+msgstr "Salva istantanea con nome"
+
+#, python-format
+msgid "Saved current settings to {}."
+msgstr "Impostazioni attuali salvate in {}."
+
+msgid "Screen Declutter & Visibility"
+msgstr "Pulizia schermo e visibilità"
+
+msgid "Search"
+msgstr "Cerca"
+
+msgid "Search destination"
+msgstr "Cerca destinazione"
+
+msgid "Search for a destination"
+msgstr "Cerca una destinazione"
+
+msgid "Search for a place or address to begin."
+msgstr "Cerca un luogo o un indirizzo per iniziare."
+
+msgid "Search is unavailable. Check your connection and try again."
+msgstr "Ricerca non disponibile. Controlla la connessione e riprova."
+
+msgid "Search results"
+msgstr "Risultati della ricerca"
+
+msgid "Search unavailable"
+msgstr "Ricerca non disponibile"
+
+msgid "Searching…"
+msgstr "Ricerca…"
+
+msgid "Select Backup"
+msgstr "Seleziona backup"
+
+msgid "Select Issue"
+msgstr "Seleziona problema"
+
+msgid "Select Make"
+msgstr "Seleziona marca"
+
+msgid "Select Map Data"
+msgstr "Seleziona dati mappa"
+
+msgid "Select Model"
+msgstr "Seleziona modello"
+
+msgid "Select Regions Below"
+msgstr "Seleziona le regioni sotto"
+
+msgid "Select Toggle Backup"
+msgstr "Seleziona backup opzioni"
+
+msgid "Selected"
+msgstr "Selezionato"
+
+msgid "Selected for download"
+msgstr "Selezionato per il download"
+
+msgid "Set Key"
+msgstr "Imposta chiave"
+
+msgid "Set Speed Margin"
+msgstr "Margine velocità impostata"
+
+msgid "Set Speed Offset"
+msgstr "Offset velocità impostata"
+
+msgid "Set Weather Key"
+msgstr "Imposta chiave meteo"
+
+msgid "Settings Profiles & Snapshots"
+msgstr "Profili e istantanee delle impostazioni"
+
+msgid "Settings profiles can only be loaded while parked."
+msgstr "I profili delle impostazioni si possono caricare solo da fermo."
+
+msgid "Settings profiles can only be saved while parked."
+msgstr "I profili delle impostazioni si possono salvare solo da fermo."
+
+msgid "Show FPS"
+msgstr "Mostra FPS"
+
+msgid "Show SLC Offset"
+msgstr "Mostra offset SLC"
+
+msgid "Show Sources"
+msgstr "Mostra fonti"
+
+msgid "Show Speed Limits"
+msgstr "Mostra limiti di velocità"
+
+msgid "Show Stop Sign"
+msgstr "Mostra segnale di stop"
+
+msgid "Show a curved torque-utilization indicator at the bottom of the driving screen."
+msgstr "Mostra in basso sulla schermata di guida un indicatore curvo di utilizzo della coppia."
+
+msgid "Show condition trigger on the drive screen."
+msgstr "Mostra l'attivatore della condizione sulla schermata di guida."
+
+msgid "Show interactive indicators on the driving screen."
+msgstr "Mostra indicatori interattivi sulla schermata di guida."
+
+msgid "Show navigation info on the driving screen."
+msgstr "Mostra le info di navigazione sulla schermata di guida."
+
+msgid "Show the Curve Speed Controller target speed and ambient border glow."
+msgstr "Mostra la velocità obiettivo del controllore di curva e il bagliore del bordo."
+
+msgid "Shutdown Delay"
+msgstr "Ritardo di spegnimento"
+
+msgid "Signal Lane Detect"
+msgstr "Rilevamento corsia con indicatore"
+
+msgid "Signal triggers automatic lane change."
+msgstr "L'indicatore avvia il cambio di corsia automatico."
+
+msgid "Slowdown Response"
+msgstr "Risposta in rallentamento"
+
+msgid "Slower Lead"
+msgstr "Veicolo più lento davanti"
+
+msgid "Smoothness of lane change commit. 10 = Stock, 1 = Smoothest."
+msgstr "Fluidità dell'esecuzione del cambio di corsia. 10 = Di serie, 1 = Più fluida."
+
+msgid "Snow"
+msgstr "Neve"
+
+msgid "Soft Warning"
+msgstr "Avviso leggero"
+
+msgid "Something else (please describe)"
+msgstr "Altro (descrivi)"
+
+msgid "Sounds"
+msgstr "Suoni"
+
+msgid "Sounds & Alerts"
+msgstr "Suoni e avvisi"
+
+msgid "Source Priority"
+msgstr "Priorità delle fonti"
+
+msgid "Speed Limit"
+msgstr "Limite di velocità"
+
+msgid "Speed Limit Controller"
+msgstr "Controllore limiti di velocità"
+
+msgid "Speed w/ Lead"
+msgstr "Velocità con veicolo davanti"
+
+msgid "Speed where openpilot considers the vehicle fully stopped."
+msgstr "Velocità sotto la quale openpilot considera il veicolo completamente fermo."
+
+msgid "Speed where openpilot exits the stopped state."
+msgstr "Velocità a cui openpilot esce dallo stato di fermo."
+
+msgid "Speed-Up Response"
+msgstr "Risposta in accelerazione"
+
+msgid "Stable Lead Ahead"
+msgstr "Veicolo stabile davanti"
+
+msgid "Standby Mode"
+msgstr "Modalità standby"
+
+msgid "Star Button"
+msgstr "Tasto stella"
+
+msgid "StarPilot"
+msgstr "StarPilot"
+
+msgid "StarPilot is pulling the latest driving model list. This panel will populate automatically when the refresh completes."
+msgstr "StarPilot sta scaricando l'elenco aggiornato dei modelli di guida. Questo pannello si compilerà automaticamente al termine dell'aggiornamento."
+
+msgid "Start"
+msgstr "Avvio"
+
+msgid "Start Acceleration"
+msgstr "Accelerazione di partenza"
+
+msgid "Start Speed"
+msgstr "Velocità di partenza"
+
+msgid "Start downloading offline maps for the selected regions?"
+msgstr "Avviare il download delle mappe offline per le regioni selezionate?"
+
+msgid "Starting Download"
+msgstr "Avvio download"
+
+msgid "Startup Alert"
+msgstr "Avviso di avvio"
+
+msgid "Static Pedals"
+msgstr "Pedali statici"
+
+msgid "Status Widget"
+msgstr "Widget di stato"
+
+msgid "Steer Ratio"
+msgstr "Steer ratio"
+
+msgid "Steering"
+msgstr "Sterzo"
+
+msgid "Steering Behavior"
+msgstr "Comportamento dello sterzo"
+
+msgid "Steering Controls"
+msgstr "Controlli dello sterzo"
+
+msgid "Steering Torque Indicator"
+msgstr "Indicatore coppia sterzo"
+
+msgid "Steering stays active when ACC is off."
+msgstr "Lo sterzo resta attivo quando l'ACC è spento."
+
+msgid "Stock"
+msgstr "Di serie"
+
+msgid "Stop Acceleration"
+msgstr "Accelerazione di arresto"
+
+msgid "Stop Distance"
+msgstr "Distanza di arresto"
+
+msgid "Stop Lights/Signs"
+msgstr "Semafori/stop"
+
+msgid "Stop Speed"
+msgstr "Velocità di arresto"
+
+msgid "Stop and Go"
+msgstr "Stop and Go"
+
+msgid "Stop request sent. The current transfer will wind down safely."
+msgstr "Richiesta di interruzione inviata. Il trasferimento in corso verrà interrotto in sicurezza."
+
+msgid "Stop-and-Go Hack"
+msgstr "Hack Stop-and-Go"
+
+msgid "Stopped Distance"
+msgstr "Distanza da fermo"
+
+msgid "Stopped Lead"
+msgstr "Veicolo fermo davanti"
+
+msgid "Stopped Timer"
+msgstr "Timer da fermo"
+
+msgid "Stopping Rate"
+msgstr "Rateo di arresto"
+
+msgid "Storage"
+msgstr "Archiviazione"
+
+#, python-format
+msgid "Storage: {}"
+msgstr "Archiviazione: {}"
+
+msgid "Stronger launch and acceleration for heavier vehicles."
+msgstr "Partenza e accelerazione più decise per i veicoli più pesanti."
+
+msgid "Strongest acceleration openpilot is allowed to command."
+msgstr "Massima accelerazione che openpilot può comandare."
+
+msgid "Swap Toyota/Lexus steps: short press changes dash set speed by 5; hold changes it by 1."
+msgstr "Inverti i passi Toyota/Lexus: pressione breve cambia la velocità del cruscotto di 5; pressione prolungata di 1."
+
+msgid "Switch"
+msgstr "Passa"
+
+#, python-format
+msgid "Switch Connect endpoint to {}?"
+msgstr "Passare l'endpoint di Connect a {}?"
+
+msgid "Switch on curves even when following a lead."
+msgstr "Passa in curva anche quando segui un veicolo davanti."
+
+msgid "Switch sources to keep browsing maps."
+msgstr "Cambia fonte per continuare a sfogliare le mappe."
+
+msgid "Switch specifically for slower leads."
+msgstr "Passa in modo specifico per i veicoli più lenti davanti."
+
+msgid "Switch specifically for stopped leads."
+msgstr "Passa in modo specifico per i veicoli fermi davanti."
+
+msgid "Switch to Chill Mode"
+msgstr "Passa alla modalità Tranquilla"
+
+msgid "Switch to Chill Mode when following a steady lead."
+msgstr "Passa alla modalità Tranquilla quando segui un veicolo stabile."
+
+msgid "Switch to Experimental Mode"
+msgstr "Passa alla Modalità sperimentale"
+
+msgid "Switch to Experimental Mode on open-road curves."
+msgstr "Passa alla Modalità sperimentale sulle curve a strada aperta."
+
+msgid "Switch when a slower/stopped vehicle is ahead."
+msgstr "Passa quando davanti c'è un veicolo più lento o fermo."
+
+msgid "Switch when openpilot detects a stop."
+msgstr "Passa quando openpilot rileva un arresto."
+
+msgid "Switchback Cooldown"
+msgstr "Pausa tra i cambi di modalità"
+
+msgid "System"
+msgstr "Sistema"
+
+msgid "System Backups"
+msgstr "Backup di sistema"
+
+msgid "System Settings"
+msgstr "Impostazioni di sistema"
+
+msgid "System Status"
+msgstr "Stato del sistema"
+
+msgid "Tap a downloaded model to set it as active."
+msgstr "Tocca un modello scaricato per impostarlo come attivo."
+
+msgid "Tap to select state"
+msgstr "Tocca per selezionare lo stato"
+
+msgid "Temperature Metrics"
+msgstr "Metriche temperatura"
+
+msgid "Temporarily shorten the following gap and allow acceleration while changing lanes."
+msgstr "Riduce temporaneamente la distanza e permette di accelerare durante il cambio di corsia."
+
+msgid "Temporarily switch to Chill from a stop."
+msgstr "Passa temporaneamente a Tranquilla da fermo."
+
+msgid "Temporary Follow Distance"
+msgstr "Distanza di sicurezza temporanea"
+
+msgid "That destination is missing a valid location."
+msgstr "Questa destinazione non ha una posizione valida."
+
+msgid "That destination is not valid."
+msgstr "Questa destinazione non è valida."
+
+msgid "That result did not include a usable location."
+msgstr "Quel risultato non includeva una posizione utilizzabile."
+
+msgid "The learned lateral acceleration from collected driving data. Higher values allow faster cornering."
+msgstr "L'accelerazione laterale appresa dai dati di guida raccolti. Valori più alti consentono curve più veloci."
+
+msgid "This model is protected and cannot be removed."
+msgstr "Questo modello è protetto e non può essere rimosso."
+
+msgid "This model requires a detected external GPU."
+msgstr "Questo modello richiede una GPU esterna rilevata."
+
+msgid "This will overwrite your current toggles."
+msgstr "Questo sovrascriverà le opzioni attuali."
+
+msgid "This will prevent your drives from being logged. Are you sure?"
+msgstr "Questo impedirà la registrazione dei tuoi viaggi. Vuoi continuare?"
+
+msgid "This will prevent your drives from being uploaded to comma connect which may impact receiving support. Are you sure?"
+msgstr "Questo impedirà il caricamento dei tuoi viaggi su comma connect e potrebbe compromettere l'assistenza. Vuoi continuare?"
+
+msgid "Time between command and the vehicle's response."
+msgstr "Tempo tra il comando e la risposta del veicolo."
+
+msgid "Toggle Always On Lateral"
+msgstr "Attiva/disattiva sterzo sempre attivo"
+
+msgid "Toggle Experimental"
+msgstr "Attiva/disattiva Sperimentale"
+
+msgid "Toggle Switchback"
+msgstr "Attiva/disattiva il ritorno di modalità"
+
+msgid "Toggle Traffic"
+msgstr "Attiva/disattiva Traffico"
+
+msgid "Toggle backup created."
+msgstr "Backup delle opzioni creato."
+
+msgid "Toggle backup deleted."
+msgstr "Backup delle opzioni eliminato."
+
+msgid "Toggle speed limits, alert banners, and driver monitoring icon."
+msgstr "Attiva o disattiva limiti di velocità, banner di avviso e icona di monitoraggio guidatore."
+
+msgid "Toggles reset to defaults."
+msgstr "Opzioni reimpostate ai valori predefiniti."
+
+msgid "Toggles reset to stock openpilot."
+msgstr "Opzioni reimpostate ai valori di serie di openpilot."
+
+msgid "Toggles restored."
+msgstr "Opzioni ripristinate."
+
+msgid "Torque Bar"
+msgstr "Barra della coppia"
+
+msgid "Torque-based steering for smoother lane keeping."
+msgstr "Sterzo basato sulla coppia per un mantenimento di corsia più fluido."
+
+msgid "Traffic"
+msgstr "Traffico"
+
+msgid "Trailer Load"
+msgstr "Carico del rimorchio"
+
+msgid "Treat the Cancel button as an extra mappable steering-wheel button."
+msgstr "Tratta il tasto Cancel come un tasto aggiuntivo del volante assegnabile."
+
+msgid "Truck Active"
+msgstr "Autocarro attivo"
+
+msgid "Truck Tuning"
+msgstr "Messa a punto autocarro"
+
+msgid "Try a different place or address."
+msgstr "Prova un altro luogo o indirizzo."
+
+msgid "Try refreshing the catalog once the device is offroad and connected."
+msgstr "Prova ad aggiornare il catalogo quando il dispositivo è offroad e collegato."
+
+msgid "Turn Signal Below"
+msgstr "Indicatore di direzione sotto"
+
+msgid "Turn Signal Borders"
+msgstr "Bordi indicatore di direzione"
+
+msgid "Turn Signal Only"
+msgstr "Solo con indicatore"
+
+msgid "Turn off Disable Uploads first"
+msgstr "Prima disattiva «Disattiva i caricamenti»"
+
+msgid "Turn off Model Randomizer to choose a model manually."
+msgstr "Disattiva la selezione casuale del modello per sceglierne uno a mano."
+
+msgid "Turn on Curves first"
+msgstr "Prima attiva Curve"
+
+msgid "Turn on Lead first"
+msgstr "Prima attiva Veicolo davanti"
+
+msgid "U.S. Midwest Region (12 States)"
+msgstr "Regione Midwest USA (12 stati)"
+
+msgid "U.S. Northeast Region (9 States)"
+msgstr "Regione Nord-est USA (9 stati)"
+
+msgid "U.S. South Region (17 States)"
+msgstr "Regione Sud USA (17 stati)"
+
+msgid "U.S. States & Regions"
+msgstr "Stati e regioni USA"
+
+msgid "U.S. Territories (5 Territories)"
+msgstr "Territori USA (5 territori)"
+
+msgid "U.S. West Region (13 States)"
+msgstr "Regione Ovest USA (13 stati)"
+
+msgid "Unable to read model ratings."
+msgstr "Impossibile leggere le valutazioni dei modelli."
+
+msgid "Unavailable"
+msgstr "Non disponibile"
+
+msgid "Unfavorite"
+msgstr "Rimuovi dai preferiti"
+
+msgid "Unknown model."
+msgstr "Modello sconosciuto."
+
+msgid "Unnamed favorite"
+msgstr "Preferito senza nome"
+
+msgid "Uploads must stay enabled"
+msgstr "I caricamenti devono restare attivi"
+
+msgid "Use Auto-Learned Delay"
+msgstr "Usa il ritardo appreso automaticamente"
+
+msgid "Use Konik Server"
+msgstr "Usa il server Konik"
+
+msgid "Use Panda firmware that ignores the physical ignition line and starts only from CAN ignition."
+msgstr "Usa un firmware Panda che ignora la linea di accensione fisica e parte solo dall'accensione CAN."
+
+msgid "Use Route Desires"
+msgstr "Usa le intenzioni del percorso"
+
+msgid "Use Route Speed Control"
+msgstr "Usa il controllo velocità del percorso"
+
+msgid "Use radar to track leads at standstill and respond faster when they move."
+msgstr "Usa il radar per seguire i veicoli davanti da fermo e reagire prima quando si muovono."
+
+msgid "Use the active route to reduce cruise speed for upcoming turns, ramps, and roundabouts."
+msgstr "Usa il percorso attivo per ridurre la velocità del cruise prima di curve, rampe e rotatorie."
+
+msgid "Use the left paddle to pause openpilot acceleration and braking."
+msgstr "Usa la paletta sinistra per mettere in pausa accelerazione e frenata di openpilot."
+
+msgid "Use the on-device keyboard to search Mapbox locations"
+msgstr "Usa la tastiera del dispositivo per cercare luoghi su Mapbox"
+
+msgid "Vehicle Identity"
+msgstr "Identità del veicolo"
+
+msgid "Vehicle Settings"
+msgstr "Impostazioni veicolo"
+
+msgid "Very Long"
+msgstr "Molto lunga"
+
+msgid "Vienna Signs"
+msgstr "Segnali Vienna"
+
+msgid "Vision Detection"
+msgstr "Rilevamento visivo"
+
+msgid "Vision Speed Limits"
+msgstr "Limiti di velocità visivi"
+
+msgid "Volt SNG Hack"
+msgstr "Hack SNG Volt"
+
+msgid "Wait this long after an overtake before signaling a return to the right."
+msgstr "Attendi così a lungo dopo un sorpasso prima di segnalare il rientro a destra."
+
+msgid "Weather API Key"
+msgstr "Chiave API meteo"
+
+msgid "Weather Condition Offsets"
+msgstr "Offset condizioni meteo"
+
+msgid "Wheel Speed"
+msgstr "Velocità ruota"
+
+msgid "When"
+msgstr "Quando"
+
+msgid "Whole U.S."
+msgstr "Tutti gli USA"
+
+msgid "Whole U.S. (56 states)"
+msgstr "Tutti gli USA (56 stati)"
+
+msgid "Whole U.S. (All 50 States & Territories)"
+msgstr "Tutti gli USA (tutti i 50 stati e i territori)"
+
+msgid "Whole U.S. Selected"
+msgstr "Tutti gli USA selezionati"
+
+msgid "Whole U.S. package"
+msgstr "Pacchetto tutti gli USA"
+
+msgid "Work"
+msgstr "Lavoro"
+
+#, python-format
+msgid "You have all available {name}s."
+msgstr "Hai già tutti i {name} disponibili."
+
+msgid "hour"
+msgstr "ora"
+
+msgid "hours"
+msgstr "ore"
+
+msgid "min"
+msgstr "min"
+
+msgid "openpilot disengages when I don't expect it"
+msgstr "openpilot si disinserisce quando non me lo aspetto"
+
+msgid "openpilot feels sluggish or slow to respond"
+msgstr "openpilot sembra pigro o lento a rispondere"
+
+msgid "this destination"
+msgstr "questa destinazione"
+
+#, python-format
+msgid ""
+"{}\n"
+"Elapsed {} | ETA {}"
+msgstr ""
+"{}\n"
+"Trascorso {} | ETA {}"
+
+#, python-format
+msgid "{} + {} more"
+msgstr "{} + altri {}"
+
+#, python-format
+msgid "{} / {} ({}%)"
+msgstr "{} / {} ({}%)"
+
+#, python-format
+msgid ""
+"{} / {} ({}%)\n"
+"Elapsed {} | ETA {}"
+msgstr ""
+"{} / {} ({}%)\n"
+"Trascorso {} | ETA {}"
+
+#, python-format
+msgid "{} available"
+msgstr "{} disponibili"
+
+#, python-format
+msgid "{} available - Tap to select"
+msgstr "{} disponibili - Tocca per selezionare"
+
+#, python-format
+msgid "{} controls + {} toggles"
+msgstr "{} controlli + {} opzioni"
+
+#, python-format
+msgid "{} full | {} toggle"
+msgstr "{} completi | {} opzioni"
+
+#, python-format
+msgid "{} region selected"
+msgstr "{} regione selezionata"
+
+#, python-format
+msgid "{} regions selected"
+msgstr "{} regioni selezionate"
+
+#, python-format
+msgid "{} saved"
+msgstr "{} salvati"
+
+#, python-format
+msgid "{} selected | {} available"
+msgstr "{} selezionati | {} disponibili"
