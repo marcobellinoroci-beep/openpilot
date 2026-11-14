@@ -252,6 +252,40 @@
         "settings_tier": "simple"
       },
       {
+        "key": "AutoOvertake",
+        "label": "Auto Overtake",
+        "description": "On a highway (car speed limit 110 km/h or higher), automatically change left when a slower or stopped lead is ahead. No turn signal is required. Requires at least 60 km/h, a clear left lane, no left blind-spot warning, and no left road edge. Use with caution and be ready to intervene.",
+        "picker_description": "Automatically changes left around a slower lead on the highway, without a turn signal.",
+        "data_type": "bool",
+        "ui_type": "toggle",
+        "parent_key": "LaneChanges",
+        "settings_tier": "simple"
+      },
+      {
+        "key": "AutoOvertakeReturn",
+        "label": "Auto Return After Overtake",
+        "description": "After an automatic overtake, automatically change back to the right lane when it is clear, without a turn signal. The car speed limit must still be 110 km/h or higher, and the right blind spot must be clear. If this is off, StarPilot waits the configured delay and then uses the right turn signal instead.",
+        "picker_description": "Returns to the right lane without a turn signal after an automatic overtake.",
+        "data_type": "bool",
+        "ui_type": "toggle",
+        "parent_key": "LaneChanges",
+        "settings_tier": "simple"
+      },
+      {
+        "key": "OvertakeReturnDelay",
+        "label": "Overtake Return Delay",
+        "description": "How long to wait after finishing an automatic overtake before signaling a return to the right lane. Ignored when Auto Return After Overtake is on. Set to 0 to signal immediately after the settle period.",
+        "data_type": "float",
+        "ui_type": "numeric",
+        "min": 0.0,
+        "max": 10.0,
+        "step": 0.5,
+        "precision": 1,
+        "unit": " s",
+        "parent_key": "LaneChanges",
+        "settings_tier": "simple"
+      },
+      {
         "key": "LaneChangeSmoothing",
         "label": "Lane Change Smoothing",
         "description": "Controls how smoothly openpilot commits to a lane change. 10 is stock behavior; lower values produce a gentler, more gradual maneuver. 1 stretches the maneuver to ~8 seconds.",

@@ -109,6 +109,9 @@ class StarPilotLateralLayout(_SettingsPage):
     def nlc_on():
       return lc_on() and p.get_bool("NudgelessLaneChange")
 
+    def ao_on():
+      return lc_on() and p.get_bool("AutoOvertake")
+
     def close_gap_on():
       return lc_on() and p.get_bool("LaneChangeCloseGap")
 
@@ -173,6 +176,27 @@ class StarPilotLateralLayout(_SettingsPage):
         get_state=lambda: p.get_bool("OneLaneChange"),
         set_state=lambda s: p.put_bool("OneLaneChange", s),
         visible=nlc_on,
+      ),
+      SettingRow(
+        "AutoOvertake", "toggle", tr_noop("Auto Overtake"),
+        subtitle=tr_noop("Blinkerless left pass of a slower lead on the highway."),
+        get_state=lambda: p.get_bool("AutoOvertake"),
+        set_state=lambda s: p.put_bool("AutoOvertake", s),
+        visible=lc_on,
+      ),
+      SettingRow(
+        "AutoOvertakeReturn", "toggle", tr_noop("Auto Return After Overtake"),
+        subtitle=tr_noop("Blinkerless return to the right lane after an automatic overtake."),
+        get_state=lambda: p.get_bool("AutoOvertakeReturn"),
+        set_state=lambda s: p.put_bool("AutoOvertakeReturn", s),
+        visible=ao_on,
+      ),
+      SettingRow(
+        "OvertakeReturnDelay", "value", tr_noop("Overtake Return Delay"),
+        subtitle=tr_noop("Wait this long after an overtake before signaling a return to the right."),
+        get_value=self._get_overtake_return_delay_display,
+        on_click=lambda: self._show_slider("OvertakeReturnDelay", 0.0, 10.0, step=0.5, unit="s", value_type="float"),
+        visible=ao_on,
       ),
       SettingRow(
         "MinimumLaneChangeSpeed", "value", tr_noop("Min Lane Change Speed"),
@@ -391,6 +415,12 @@ class StarPilotLateralLayout(_SettingsPage):
 
   def _get_lane_change_delay_display(self) -> str:
     val = self._params.get_float("LaneChangeTime")
+    if val == 0.0:
+      return tr("Instant")
+    return f"{val:.1f}s"
+
+  def _get_overtake_return_delay_display(self) -> str:
+    val = self._params.get_float("OvertakeReturnDelay")
     if val == 0.0:
       return tr("Instant")
     return f"{val:.1f}s"
