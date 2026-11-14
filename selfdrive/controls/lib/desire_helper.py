@@ -60,6 +60,287 @@ TURN_DESIRES = {
 }
 
 
+# AutoOvertake: blinkerless left pass of a slower or stopped lead, highway only.
+# Thresholds match zoompilot. The car's dashboard speed limit is the highway
+# gate (>= 110 km/h); stale, unknown, non-finite, or 0 fails closed.
+AUTO_OVERTAKE_DELAY = 2.0
+AUTO_OVERTAKE_SPEED_MIN = 60 * CV.KPH_TO_MS
+AUTO_OVERTAKE_RETURN_SETTLE = 5.0
+AUTO_OVERTAKE_RETURN_TIMEOUT = 30.0
+OVERTAKE_RETURN_DELAY_DEFAULT = 2.5
+OVERTAKE_RETURN_DELAY_MAX = 10.0
+AUTO_OVERTAKE_RETURN_CONFIRM = 1.0
+HIGHWAY_SPEED_LIMIT_MIN = 110 * CV.KPH_TO_MS - 0.1
+
+AUTO_OVERTAKE_LEAD_PROB = 0.5
+AUTO_OVERTAKE_LEAD_MAX_X = 70.0
+AUTO_OVERTAKE_LEAD_VREL = -0.3
+AUTO_OVERTAKE_LEAD_VREL_LEGACY = -1.0
+AUTO_OVERTAKE_VCRUISE_UNSET_KPH = 255.0
+AUTO_OVERTAKE_LEAD_BELOW_SET_SPEED = 1.0
+AUTO_OVERTAKE_LEAD_DROPOUT_HOLD = 0.5
+
+STOPPED_LEAD_PROB = 0.7
+STOPPED_LEAD_V_MAX = 1.0
+STOPPED_LEAD_X_MIN = 30.0
+STOPPED_LEAD_TIME_GAP = 2.0
+STOPPED_LEAD_X_MAX = 150.0
+STOPPED_LEAD_CONFIRM = 1.0
+
+LEFT_LANE_LINE_PROB_MIN = 0.5
+LEFT_LANE_OCCUPANCY_MARGIN_M = 0.4
+LEFT_LANE_LEAD_PROB_MIN = 0.5
+
+# Road-edge block for AutoOvertake, same numbers as zoompilot RELC.
+# Always on for overtake (StarPilot has no RoadEdgeLaneChangeEnabled gate).
+AO_EDGE_NEARSIDE_PROB = 0.2
+AO_EDGE_PROB = 0.35
+AO_EDGE_REACTION_TIME = 1.0
+AO_EDGE_CLEAR_TIME = 0.3
+AO_EDGE_MIN_SPEED = 20 * CV.MPH_TO_MS
+AO_VEHICLE_EDGE_MARGIN = 1.08
+AO_EDGE_CLEARANCE = 3.7
+
+
+def road_is_highway(dashboard_speed_limit_ms, fresh: bool) -> bool:
+  """True only for a fresh, known dashboard speed limit of at least 110 km/h."""
+  if not fresh:
+    return False
+  try:
+    speed_limit = float(dashboard_speed_limit_ms)
+  except (TypeError, ValueError):
+    return False
+  if speed_limit != speed_limit or speed_limit <= 0.0:  # NaN or unknown/NONE
+    return False
+  return speed_limit >= HIGHWAY_SPEED_LIMIT_MIN
+
+
+class StoppedLead:
+  NONE = 0
+  OUTSIDE = 1
+  WINDOW = 2
+
+
+class AutoLaneChangeKind:
+  NONE = 0
+  OVERTAKE = 1
+  RETURN = 2
+
+
+def _overtake_return_delay(value) -> float:
+  try:
+    delay = float(value)
+  except (TypeError, ValueError):
+    return OVERTAKE_RETURN_DELAY_DEFAULT
+  if delay != delay:
+    return OVERTAKE_RETURN_DELAY_DEFAULT
+  return min(max(delay, 0.0), OVERTAKE_RETURN_DELAY_MAX)
+
+
+def _cruise_set_speed_ms(v_cruise_kph):
+  try:
+    v_kph = float(v_cruise_kph)
+  except (TypeError, ValueError):
+    return None
+  if v_kph <= 0.0 or v_kph >= AUTO_OVERTAKE_VCRUISE_UNSET_KPH:
+    return None
+  return v_kph * CV.KPH_TO_MS
+
+
+def stopped_lead_status(leads, v_ego) -> int:
+  """Classify leadsV3[0] as a stopped vehicle ahead. Never affects planning."""
+  if not leads:
+    return StoppedLead.NONE
+  lead = leads[0]
+  try:
+    v_lead = float(lead.v[0])
+    x = float(lead.x[0])
+    prob = float(lead.prob)
+    v_ego = float(v_ego)
+  except (IndexError, AttributeError, TypeError, ValueError):
+    return StoppedLead.NONE
+  if not (prob > AUTO_OVERTAKE_LEAD_PROB and x > 0.0 and v_lead < STOPPED_LEAD_V_MAX):
+    return StoppedLead.NONE
+  if prob > STOPPED_LEAD_PROB and max(STOPPED_LEAD_X_MIN, STOPPED_LEAD_TIME_GAP * v_ego) <= x <= STOPPED_LEAD_X_MAX:
+    return StoppedLead.WINDOW
+  return StoppedLead.OUTSIDE
+
+
+def is_slower_lead(leads, v_ego, v_cruise_kph=None):
+  """True if the current model lead is one auto-overtake should consider."""
+  if not leads:
+    return False
+  lead = leads[0]
+  try:
+    v_lead = float(lead.v[0])
+    x = float(lead.x[0])
+    prob = float(lead.prob)
+    v_ego = float(v_ego)
+  except (IndexError, AttributeError, TypeError, ValueError):
+    return False
+
+  if not (prob > AUTO_OVERTAKE_LEAD_PROB and x > 0.0):
+    return False
+
+  v_rel = v_lead - v_ego
+  if v_cruise_kph is None:
+    return v_rel < AUTO_OVERTAKE_LEAD_VREL_LEGACY
+
+  if x >= AUTO_OVERTAKE_LEAD_MAX_X:
+    return False
+  if v_rel < AUTO_OVERTAKE_LEAD_VREL:
+    return True
+
+  v_set = _cruise_set_speed_ms(v_cruise_kph)
+  if v_set is None:
+    return False
+  return v_lead < (v_set - AUTO_OVERTAKE_LEAD_BELOW_SET_SPEED)
+
+
+def is_left_lane_clear(model_v2):
+  """True when the left adjacent lane exists and no model lead is sitting in it."""
+  try:
+    probs = model_v2.laneLineProbs
+    lines = model_v2.laneLines
+    if len(probs) < 2 or len(lines) < 2:
+      return False
+    if not (probs[0] > LEFT_LANE_LINE_PROB_MIN and probs[1] > LEFT_LANE_LINE_PROB_MIN):
+      return False
+    y_far = float(lines[0].y[0])
+    y_near = float(lines[1].y[0])
+  except (IndexError, AttributeError, TypeError, ValueError):
+    return False
+
+  if not y_far < y_near:
+    return False
+  y_lo = y_far + LEFT_LANE_OCCUPANCY_MARGIN_M
+  y_hi = y_near - LEFT_LANE_OCCUPANCY_MARGIN_M
+  if y_lo >= y_hi:
+    return False
+
+  try:
+    leads = model_v2.leadsV3
+  except (AttributeError, TypeError):
+    return True
+
+  for lead in leads:
+    try:
+      if not (float(lead.prob) > LEFT_LANE_LEAD_PROB_MIN):
+        continue
+      x = float(lead.x[0])
+      y = float(lead.y[0])
+    except (IndexError, AttributeError, TypeError, ValueError):
+      continue
+    if x <= 0.0 or x >= AUTO_OVERTAKE_LEAD_MAX_X:
+      continue
+    if y_lo < y < y_hi:
+      return False
+  return True
+
+
+def is_right_lane_clear(model_v2):
+  """True when the right adjacent lane exists and no model lead is sitting in it."""
+  try:
+    probs = model_v2.laneLineProbs
+    lines = model_v2.laneLines
+    if len(probs) < 4 or len(lines) < 4:
+      return False
+    if not (probs[2] > LEFT_LANE_LINE_PROB_MIN and probs[3] > LEFT_LANE_LINE_PROB_MIN):
+      return False
+    y_near = float(lines[2].y[0])
+    y_far = float(lines[3].y[0])
+  except (IndexError, AttributeError, TypeError, ValueError):
+    return False
+
+  if not y_near < y_far:
+    return False
+  y_lo = y_near + LEFT_LANE_OCCUPANCY_MARGIN_M
+  y_hi = y_far - LEFT_LANE_OCCUPANCY_MARGIN_M
+  if y_lo >= y_hi:
+    return False
+
+  try:
+    leads = model_v2.leadsV3
+  except (AttributeError, TypeError):
+    return True
+
+  for lead in leads:
+    try:
+      if not (float(lead.prob) > LEFT_LANE_LEAD_PROB_MIN):
+        continue
+      x = float(lead.x[0])
+      y = float(lead.y[0])
+    except (IndexError, AttributeError, TypeError, ValueError):
+      continue
+    if x <= 0.0 or x >= AUTO_OVERTAKE_LEAD_MAX_X:
+      continue
+    if y_lo < y < y_hi:
+      return False
+  return True
+
+
+class AutoOvertakeRoadEdges:
+  """RELC-style left/right road-edge detector used only to block AutoOvertake."""
+
+  def __init__(self):
+    self.reset()
+
+  def reset(self):
+    self.left_edge_detected = False
+    self.right_edge_detected = False
+    self.left_edge_timer = 0.0
+    self.right_edge_timer = 0.0
+    self.left_clear_timer = 0.0
+    self.right_clear_timer = 0.0
+
+  def update(self, road_edge_stds, lane_line_probs, v_ego: float, road_edges=None):
+    if v_ego < AO_EDGE_MIN_SPEED:
+      self.reset()
+      return
+
+    if len(road_edge_stds) < 2 or len(lane_line_probs) < 4:
+      self.reset()
+      return
+
+    left_edge_prob = float(np.clip(1.0 - road_edge_stds[0], 0.0, 1.0))
+    right_edge_prob = float(np.clip(1.0 - road_edge_stds[1], 0.0, 1.0))
+    left_lane_prob = lane_line_probs[0]
+    right_lane_prob = lane_line_probs[3]
+
+    if road_edges is not None and len(road_edges) == 2 and len(road_edges[0].y) > 0 and len(road_edges[1].y) > 0:
+      left_clearance = abs(road_edges[0].y[0]) - AO_VEHICLE_EDGE_MARGIN
+      right_clearance = abs(road_edges[1].y[0]) - AO_VEHICLE_EDGE_MARGIN
+    else:
+      left_clearance = float('inf')
+      right_clearance = float('inf')
+
+    left_cond = left_edge_prob > AO_EDGE_PROB and left_lane_prob < AO_EDGE_NEARSIDE_PROB and left_clearance < AO_EDGE_CLEARANCE
+    right_cond = right_edge_prob > AO_EDGE_PROB and right_lane_prob < AO_EDGE_NEARSIDE_PROB and right_clearance < AO_EDGE_CLEARANCE
+
+    if left_cond:
+      self.left_edge_timer = min(self.left_edge_timer + DT_MDL, AO_EDGE_REACTION_TIME + AO_EDGE_CLEAR_TIME)
+      self.left_clear_timer = 0.0
+      if self.left_edge_timer > AO_EDGE_REACTION_TIME:
+        self.left_edge_detected = True
+    else:
+      self.left_clear_timer += DT_MDL
+      if self.left_clear_timer > AO_EDGE_CLEAR_TIME:
+        self.left_edge_timer = 0.0
+        self.left_edge_detected = False
+
+    if right_cond:
+      self.right_edge_timer = min(self.right_edge_timer + DT_MDL, AO_EDGE_REACTION_TIME + AO_EDGE_CLEAR_TIME)
+      self.right_clear_timer = 0.0
+      if self.right_edge_timer > AO_EDGE_REACTION_TIME:
+        self.right_edge_detected = True
+    else:
+      self.right_clear_timer += DT_MDL
+      if self.right_clear_timer > AO_EDGE_CLEAR_TIME:
+        self.right_edge_timer = 0.0
+        self.right_edge_detected = False
+
+
+
 class DesireHelper:
   def __init__(self):
     self.params_memory = Params(memory=True)
@@ -76,6 +357,21 @@ class DesireHelper:
     self.lane_change_completed = False
 
     self.lane_change_wait_timer = 0.0
+
+    self.auto_overtake = False
+    self.auto_overtake_active = False
+    self.overtake_timer = 0.0
+    self.lead_dropout_timer = 0.0
+    self.stopped_lead_timer = 0.0
+    self.return_pending = False
+    self.return_wait_timer = 0.0
+    self.return_settle_timer = 0.0
+    self.return_delay = OVERTAKE_RETURN_DELAY_DEFAULT
+    self.return_blinker_held = False
+    self.auto_overtake_return = False
+    self.auto_return_timer = 0.0
+    self.auto_return_active = False
+
     self.nav_desires_allowed = False
     self.nav_lane_positioning_allowed = False
     self._nav_instruction_state_raw: object = None
@@ -295,11 +591,25 @@ class DesireHelper:
 
     return log.Desire.none
 
+  @property
+  def auto_lane_change_kind(self) -> int:
+    if self.lane_change_state not in (LaneChangeState.preLaneChange, LaneChangeState.laneChangeStarting,
+                                      LaneChangeState.laneChangeFinishing):
+      return AutoLaneChangeKind.NONE
+    if self.auto_return_active:
+      return AutoLaneChangeKind.RETURN
+    if self.auto_overtake_active and self.lane_change_direction == LaneChangeDirection.left:
+      return AutoLaneChangeKind.OVERTAKE
+    return AutoLaneChangeKind.NONE
+
   @staticmethod
   def get_lane_change_direction(CS):
     return LaneChangeDirection.left if CS.leftBlinker else LaneChangeDirection.right
 
-  def update(self, carstate, lateral_active, lane_change_prob, starpilotPlan, starpilot_toggles, controls_enabled=None):
+  def update(self, carstate, lateral_active, lane_change_prob, starpilotPlan, starpilot_toggles, controls_enabled=None,
+             slower_lead_detected=False, left_lane_clear=True, right_lane_clear=True,
+             left_edge_detected=False, right_edge_detected=False, right_lane_oncoming=False,
+             highway=False, stopped_lead=StoppedLead.NONE):
     v_ego = carstate.vEgo
     one_blinker = carstate.leftBlinker != carstate.rightBlinker
     below_lane_change_speed = v_ego < starpilot_toggles.minimum_lane_change_speed
@@ -323,26 +633,74 @@ class DesireHelper:
     lane_changes_allowed &= not getattr(starpilot_toggles, "lane_changes_require_cruise", False) or bool(getattr(cruise_state, "enabled", False))
 
     lane_change_time_max = getattr(starpilot_toggles, 'lane_change_time_max', LANE_CHANGE_TIME_MAX)
+
+    self.auto_overtake = bool(getattr(starpilot_toggles, "auto_overtake", False))
+    self.auto_overtake_return = bool(getattr(starpilot_toggles, "auto_overtake_return", False))
+    self.return_delay = _overtake_return_delay(getattr(starpilot_toggles, "overtake_return_delay", OVERTAKE_RETURN_DELAY_DEFAULT))
+
+    # Auto Overtake (left only, no blinker required). Count only while off.
+    overtake_ready = (
+      self.auto_overtake and
+      lane_changes_allowed and
+      lateral_active and
+      not below_lane_change_speed and
+      v_ego >= AUTO_OVERTAKE_SPEED_MIN and
+      not carstate.leftBlinker and
+      not carstate.rightBlinker and
+      not carstate.leftBlindspot and
+      not left_edge_detected and
+      left_lane_clear and
+      highway is True and
+      not self.return_pending and
+      self.lane_change_state == LaneChangeState.off
+    )
+    if stopped_lead != StoppedLead.NONE:
+      slower_lead_detected = False
+    self.stopped_lead_timer = self.stopped_lead_timer + DT_MDL if overtake_ready and stopped_lead == StoppedLead.WINDOW else 0.0
+    if overtake_ready and slower_lead_detected:
+      self.overtake_timer += DT_MDL
+      self.lead_dropout_timer = 0.0
+    elif overtake_ready and self.overtake_timer > 0.0 and self.lead_dropout_timer < AUTO_OVERTAKE_LEAD_DROPOUT_HOLD:
+      self.lead_dropout_timer += DT_MDL
+      self.overtake_timer += DT_MDL
+    else:
+      self.overtake_timer = 0.0
+      self.lead_dropout_timer = 0.0
+    if stopped_lead != StoppedLead.NONE:
+      self.overtake_timer = 0.0
+      self.lead_dropout_timer = 0.0
+
     if not lateral_active or self.lane_change_timer > lane_change_time_max or not lane_changes_allowed:
       self.lane_change_state = LaneChangeState.off
       self.lane_change_direction = LaneChangeDirection.none
+      self.auto_overtake_active = False
+      self.auto_return_active = False
     else:
       if nav_turn_signal and self.lane_change_state == LaneChangeState.preLaneChange:
         self.lane_change_state = LaneChangeState.off
         self.lane_change_direction = LaneChangeDirection.none
 
       # LaneChangeState.off
-      if (self.lane_change_state == LaneChangeState.off and one_blinker and not self.prev_one_blinker
-          and not below_lane_change_speed and not nav_turn_signal):
+      auto_overtake_trigger = self.overtake_timer >= AUTO_OVERTAKE_DELAY or self.stopped_lead_timer >= STOPPED_LEAD_CONFIRM
+      blinker_start = (one_blinker and not self.prev_one_blinker and not below_lane_change_speed and not nav_turn_signal)
+      if self.lane_change_state == LaneChangeState.off and (blinker_start or (auto_overtake_trigger and not below_lane_change_speed)):
         self.lane_change_state = LaneChangeState.preLaneChange
         self.lane_change_ll_prob = 1.0
-        # Initialize lane change direction to prevent UI alert flicker
-        self.lane_change_direction = self.get_lane_change_direction(carstate)
+        if auto_overtake_trigger and not blinker_start:
+          self.lane_change_direction = LaneChangeDirection.left
+          self.auto_overtake_active = True
+          self.overtake_timer = 0.0
+          self.stopped_lead_timer = 0.0
+        else:
+          # Initialize lane change direction to prevent UI alert flicker
+          self.lane_change_direction = self.get_lane_change_direction(carstate)
+          self.auto_overtake_active = False
 
       # LaneChangeState.preLaneChange
       elif self.lane_change_state == LaneChangeState.preLaneChange:
-        # Update lane change direction
-        self.lane_change_direction = self.get_lane_change_direction(carstate)
+        # Update lane change direction, except during a blinkerless auto-overtake
+        if not self.auto_overtake_active:
+          self.lane_change_direction = self.get_lane_change_direction(carstate)
 
         torque_applied = carstate.steeringPressed and \
                          ((carstate.steeringTorque > 0 and self.lane_change_direction == LaneChangeDirection.left) or
@@ -360,13 +718,18 @@ class DesireHelper:
           desired_lane_width = starpilotPlan.laneWidthLeft if self.lane_change_direction == LaneChangeDirection.left else starpilotPlan.laneWidthRight
           torque_applied &= desired_lane_width >= starpilot_toggles.lane_detection_width
 
-        if not one_blinker or below_lane_change_speed or self.lane_change_completed:
+        blinker_ok = one_blinker or self.auto_overtake_active
+        edge_detected = ((left_edge_detected and self.lane_change_direction == LaneChangeDirection.left) or
+                         (right_edge_detected and self.lane_change_direction == LaneChangeDirection.right))
+        if not blinker_ok or below_lane_change_speed or self.lane_change_completed:
           self.lane_change_state = LaneChangeState.off
           self.lane_change_direction = LaneChangeDirection.none
-        elif torque_applied and not blindspot_detected:
+          self.auto_overtake_active = False
+        elif (torque_applied or self.auto_overtake_active) and not blindspot_detected and not edge_detected:
           self.lane_change_state = LaneChangeState.laneChangeStarting
 
-          self.lane_change_completed = starpilot_toggles.one_lane_change
+          if not self.auto_overtake_active:
+            self.lane_change_completed = starpilot_toggles.one_lane_change
 
           self.lane_change_wait_timer = 0.0
 

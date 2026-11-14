@@ -31,7 +31,7 @@ from openpilot.common.transformations.model import get_warp_matrix
 from openpilot.system.camerad.cameras.nv12_info import get_nv12_info
 from openpilot.system import sentry
 from opendbc.car.car_helpers import get_demo_car_params
-from openpilot.selfdrive.controls.lib.desire_helper import DesireHelper
+from openpilot.selfdrive.controls.lib.desire_helper import DesireHelper, AutoOvertakeRoadEdges, is_left_lane_clear, is_right_lane_clear, is_slower_lead, road_is_highway, stopped_lead_status
 from openpilot.selfdrive.controls.lib.drive_helpers import get_accel_from_plan_tomb_raider, smooth_value
 from openpilot.selfdrive.modeld.camera_offset import CameraOffset, DEFAULT_CAMERA_HEIGHT
 from openpilot.selfdrive.modeld.parse_model_outputs import Parser
@@ -1212,7 +1212,7 @@ def main(demo=False):
   if external_gpu_requested:
     publish_services.append("chestnutState")
   pm = PubMaster(publish_services)
-  sm = SubMaster(["deviceState", "carState", "roadCameraState", "liveCalibration", "driverMonitoringState", "carControl", "liveDelay", "starpilotPlan"])
+  sm = SubMaster(["deviceState", "carState", "roadCameraState", "liveCalibration", "driverMonitoringState", "carControl", "liveDelay", "starpilotPlan", "starpilotCarState"])
 
   publish_state = PublishState()
   chestnut_state = ChestnutState(pm, external_gpu_active) if external_gpu_requested else None
@@ -1245,6 +1245,7 @@ def main(demo=False):
   prev_action = log.ModelDataV2.Action()
 
   DH = DesireHelper()
+  auto_overtake_edges = AutoOvertakeRoadEdges()
 
   starpilot_toggles = get_starpilot_toggles(sm)
 
@@ -1512,7 +1513,23 @@ def main(demo=False):
       l_lane_change_prob = desire_state[log.Desire.laneChangeLeft]
       r_lane_change_prob = desire_state[log.Desire.laneChangeRight]
       lane_change_prob = l_lane_change_prob + r_lane_change_prob
-      DH.update(sm['carState'], sm['carControl'].latActive, lane_change_prob, sm['starpilotPlan'], starpilot_toggles, sm['carControl'].enabled)
+      v_cruise = getattr(sm['carState'], 'vCruise', 0.0)
+      slower_lead_detected = is_slower_lead(modelv2_send.modelV2.leadsV3, v_ego, v_cruise)
+      stopped_lead = stopped_lead_status(modelv2_send.modelV2.leadsV3, v_ego)
+      left_lane_clear = is_left_lane_clear(modelv2_send.modelV2)
+      right_lane_clear = is_right_lane_clear(modelv2_send.modelV2)
+      auto_overtake_edges.update(modelv2_send.modelV2.roadEdgeStds, modelv2_send.modelV2.laneLineProbs, v_ego,
+                                 modelv2_send.modelV2.roadEdges)
+      car_state_fresh = bool(sm.alive['starpilotCarState'] and sm.valid['starpilotCarState'])
+      dashboard_speed_limit = sm['starpilotCarState'].dashboardSpeedLimit if car_state_fresh else 0.0
+      highway = road_is_highway(dashboard_speed_limit, car_state_fresh)
+      DH.update(sm['carState'], sm['carControl'].latActive, lane_change_prob, sm['starpilotPlan'], starpilot_toggles,
+                sm['carControl'].enabled,
+                slower_lead_detected=slower_lead_detected, left_lane_clear=left_lane_clear,
+                right_lane_clear=right_lane_clear,
+                left_edge_detected=auto_overtake_edges.left_edge_detected,
+                right_edge_detected=auto_overtake_edges.right_edge_detected,
+                highway=highway, stopped_lead=stopped_lead)
       modelv2_send.modelV2.meta.laneChangeState = DH.lane_change_state
       modelv2_send.modelV2.meta.laneChangeDirection = DH.lane_change_direction
       starpilot_modelv2_send.starpilotModelV2.turnDirection = DH.turn_direction
