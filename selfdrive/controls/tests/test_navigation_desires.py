@@ -790,7 +790,7 @@ def test_nav_lane_positioning_requires_driver_confirmation():
 
 
 from openpilot.common.realtime import DT_MDL
-from openpilot.selfdrive.controls.lib.desire_helper import NAV_LANE_CHANGE_DELAY, NAV_LANE_CHANGE_MIN_DISTANCE
+from openpilot.selfdrive.controls.lib.desire_helper import NAV_LANE_CHANGE_DELAY, NAV_LANE_CHANGE_MAX_PER_MANEUVER, NAV_LANE_CHANGE_MIN_DISTANCE, NAV_LANE_CHANGE_SETTLE
 
 
 def _frames_for(seconds):
@@ -986,4 +986,76 @@ def test_finished_left_nav_lane_change_does_not_arm_overtake_return():
   assert saw_finishing
   assert helper.lane_change_state == LaneChangeState.off
   assert not helper.return_pending
+  assert not helper.auto_nav_active
+
+
+def finish_nav_lane_change(helper, **kwargs):
+  saw_finishing = False
+  for _ in range(_frames_for(2.5) + 5):
+    if helper.lane_change_state == LaneChangeState.laneChangeFinishing:
+      saw_finishing = True
+    step_nav(helper, 1, lane_change_prob=0.0, **kwargs)
+    if helper.lane_change_state == LaneChangeState.off and saw_finishing:
+      break
+  assert saw_finishing
+  assert helper.lane_change_state == LaneChangeState.off
+  assert not helper.auto_nav_active
+  return helper
+
+
+def test_nav_lane_change_waits_to_settle_before_a_second_change():
+  helper = start_nav_lane_change()
+  finish_nav_lane_change(helper)
+  assert helper.nav_lane_change_count == 1
+
+  step_nav(helper, _frames_for(NAV_LANE_CHANGE_SETTLE) - 1)
+  assert helper.lane_change_state == LaneChangeState.off
+  assert not helper.auto_nav_active
+
+  step_nav(helper, 1 + _frames_for(NAV_LANE_CHANGE_DELAY) + 1)
+  assert helper.auto_nav_active
+  assert helper.lane_change_direction == LaneChangeDirection.right
+  assert helper.lane_change_state in (LaneChangeState.preLaneChange, LaneChangeState.laneChangeStarting)
+
+
+def test_nav_lane_change_caps_at_two_changes_per_maneuver():
+  helper = start_nav_lane_change()
+  finish_nav_lane_change(helper)
+  step_nav(helper, _frames_for(NAV_LANE_CHANGE_SETTLE) + _frames_for(NAV_LANE_CHANGE_DELAY) + 2)
+  assert helper.auto_nav_active
+  finish_nav_lane_change(helper)
+  assert helper.nav_lane_change_count == NAV_LANE_CHANGE_MAX_PER_MANEUVER
+
+  step_nav(helper, _frames_for(NAV_LANE_CHANGE_SETTLE) + _frames_for(NAV_LANE_CHANGE_DELAY) + 5)
+  assert helper.lane_change_state == LaneChangeState.off
+  assert not helper.auto_nav_active
+  assert helper.nav_lane_change_count == 2
+
+
+def test_nav_lane_change_count_resets_on_new_maneuver():
+  helper = start_nav_lane_change()
+  finish_nav_lane_change(helper)
+  step_nav(helper, _frames_for(NAV_LANE_CHANGE_SETTLE) + _frames_for(NAV_LANE_CHANGE_DELAY) + 2)
+  finish_nav_lane_change(helper)
+  assert helper.nav_lane_change_count == 2
+
+  arm_nav(helper, maneuverType="off ramp", maneuverModifier="right", activeLaneDirection="slightRight",
+          maneuverDistance=300.0, maneuverPrimaryText="Exit 13")
+  step_nav(helper, _frames_for(NAV_LANE_CHANGE_DELAY) + 2)
+  assert helper.auto_nav_active
+  assert helper.nav_lane_change_count == 0 or helper.lane_change_state != LaneChangeState.off
+
+
+def test_nav_lane_change_second_change_stops_on_road_edge_or_missing_lane():
+  helper = start_nav_lane_change()
+  finish_nav_lane_change(helper)
+
+  step_nav(helper, _frames_for(NAV_LANE_CHANGE_SETTLE) + _frames_for(NAV_LANE_CHANGE_DELAY) + 5, right_edge_detected=True)
+  assert helper.lane_change_state == LaneChangeState.off
+  assert not helper.auto_nav_active
+
+  helper = start_nav_lane_change()
+  finish_nav_lane_change(helper)
+  step_nav(helper, _frames_for(NAV_LANE_CHANGE_SETTLE) + _frames_for(NAV_LANE_CHANGE_DELAY) + 5, right_lane_clear=False)
+  assert helper.lane_change_state == LaneChangeState.off
   assert not helper.auto_nav_active
