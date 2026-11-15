@@ -9,21 +9,6 @@ from openpilot.system.ui.lib.multilang import Multilang, multilang, tr
 REPO_ROOT = Path(__file__).resolve().parents[4]
 BUTTON_PY = REPO_ROOT / "selfdrive/ui/mici/widgets/button.py"
 SLIDER_PY = REPO_ROOT / "system/ui/widgets/slider.py"
-PO_PATH = REPO_ROOT / "selfdrive/ui/translations/app_it.po"
-
-SAMPLE_EXPECT = {
-  "toggles": "opzioni",
-  "network": "rete",
-  "device": "dispositivo",
-  "right hand driving": "guida a destra",
-  "disable auto fingerprint": "disattiva impronta automatica",
-  "car make": "marca",
-  "use metric units": "usa unità metriche",
-  "experimental mode": "modalità sperimentale",
-  "software": "software",
-  "offroad": "fermo",
-  "onroad": "in guida",
-}
 
 
 class FakeParams:
@@ -53,27 +38,29 @@ def _restore(previous):
   multilang._plural_selector = selector
 
 
-@pytest.fixture
-def italian():
-  previous = _activate("main_it")
+@pytest.mark.parametrize("setting", ["main_it", b"main_it", "it"])
+def test_device_ui_stays_english_when_language_setting_is_italian(setting):
+  previous = _activate(setting)
   try:
-    yield
+    assert multilang.language == "en"
+    assert tr("toggles") == "toggles"
+    assert tr("right hand driving") == "right hand driving"
+    assert tr("Car Make") == "Car Make"
+    assert tr("MyHomeSSID") == "MyHomeSSID"
   finally:
     _restore(previous)
 
 
-@pytest.mark.parametrize("setting", ["main_it", b"main_it"])
-def test_language_setting_main_it_loads_italian_po(setting):
-  previous = _activate(setting)
+def test_change_language_writes_setting_but_keeps_device_english():
+  params = FakeParams("main_en")
+  previous = (multilang._params, multilang._language, dict(multilang._translations),
+              dict(multilang._plurals), multilang._plural_selector)
   try:
-    assert multilang.language == "it"
-    assert tr("toggles") == "opzioni"
-    assert tr("right hand driving") == "guida a destra"
-    assert tr("disable auto fingerprint") == "disattiva impronta automatica"
-    for source, expected in SAMPLE_EXPECT.items():
-      assert tr(source) == expected, source
-    # unknown strings pass through unchanged (e.g. SSIDs, dongle IDs)
-    assert tr("MyHomeSSID") == "MyHomeSSID"
+    multilang._params = params
+    multilang.change_language("main_it")
+    assert params.values["LanguageSetting"] == "main_it"
+    assert multilang.language == "en"
+    assert tr("toggles") == "toggles"
   finally:
     _restore(previous)
 
@@ -98,26 +85,18 @@ def test_po_path_fallback_to_basedir(monkeypatch, tmp_path):
   assert translations["hello"] == "ciao"
 
 
-def test_mici_buttons_and_sliders_translate_at_display_time():
+def test_mici_buttons_and_sliders_do_not_translate_at_render_time():
   button = BUTTON_PY.read_text(encoding="utf-8")
   slider = SLIDER_PY.read_text(encoding="utf-8")
-  assert "from openpilot.system.ui.lib.multilang import tr" in button
-  assert "lambda: tr(self.text) if self.text else \"\"" in button
-  assert "lambda: tr(self.value) if self.value else \"\"" in button
-  assert "from openpilot.system.ui.lib.multilang import tr" in slider
-  assert "lambda: tr(self._title) if self._title else \"\"" in slider
+  assert "from openpilot.system.ui.lib.multilang import tr" not in button
+  assert "lambda: tr(" not in button
+  assert "from openpilot.system.ui.lib.multilang import tr" not in slider
+  assert "lambda: tr(" not in slider
 
 
-def test_mici_settings_strings_are_in_app_it_po(italian):
-  # Core hub/toggle/vehicle labels that were previously hardcoded English.
-  for source, expected in SAMPLE_EXPECT.items():
-    assert source in multilang._translations
-    assert tr(source) == expected
-
-
-def test_bytes_language_setting_on_fresh_multilang(monkeypatch):
+def test_bytes_language_setting_does_not_switch_device_ui(monkeypatch):
   monkeypatch.setattr(multilang_mod, "Params", lambda: FakeParams(b"main_it"))
   fresh = Multilang()
   fresh.setup()
-  assert fresh.language == "it"
-  assert fresh.tr("toggles") == "opzioni"
+  assert fresh.language == "en"
+  assert fresh.tr("toggles") == "toggles"

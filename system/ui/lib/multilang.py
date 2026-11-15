@@ -230,11 +230,11 @@ class Multilang:
     return language_code.removeprefix("main_")
 
   def change_language(self, language_code: str) -> None:
-    # languages.json values are "main_<code>" (shared with the Galaxy); the .po
-    # files are named app_<code>.po, so keep the bare code internally.
+    # Persist the preference for Galaxy (and other clients), but keep the
+    # on-device raylib/mici UI in English.
     if self._params is not None:
       self._params.put("LanguageSetting", language_code)
-    self._language = self._strip_prefix(language_code)
+    self._language = "en"
     self.setup()
 
   def tr(self, text: str) -> str:
@@ -257,15 +257,10 @@ class Multilang:
       self.languages = {}
     self.codes = {v: k for k, v in self.languages.items()}
 
-    if self._params is not None:
-      try:
-        raw = self._params.get("LanguageSetting")
-      except Exception:
-        cloudlog.exception("Failed to read LanguageSetting")
-        raw = None
-      lang = self._strip_prefix(raw)
-      if lang in self.codes or f"main_{lang}" in self.codes:
-        self._language = lang
+    # LanguageSetting is still written by Galaxy (e.g. main_it) and shared as a
+    # preference. The comma 4 UI stays English so on-device labels, .po loading,
+    # and render-time translation do not run on the device.
+    self._language = "en"
 
 
 multilang = Multilang()
