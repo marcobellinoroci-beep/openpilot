@@ -2,6 +2,7 @@ from importlib.resources import files
 import json
 import os
 import re
+from pathlib import Path
 from openpilot.common.basedir import BASEDIR
 from openpilot.common.swaglog import cloudlog
 
@@ -13,7 +14,43 @@ except ImportError:
 SYSTEM_UI_DIR = os.path.join(BASEDIR, "system", "ui")
 UI_DIR = files("openpilot.selfdrive.ui")
 TRANSLATIONS_DIR = UI_DIR.joinpath("translations")
+TRANSLATIONS_DIR_FALLBACK = Path(BASEDIR) / "selfdrive" / "ui" / "translations"
 LANGUAGES_FILE = TRANSLATIONS_DIR.joinpath("languages.json")
+
+
+def _is_file(path) -> bool:
+  try:
+    return bool(path.is_file())
+  except Exception:
+    return False
+
+
+def _translations_root():
+  """Prefer the packaged translations dir, then the source tree under BASEDIR."""
+  try:
+    if _is_file(TRANSLATIONS_DIR.joinpath("languages.json")):
+      return TRANSLATIONS_DIR
+  except Exception:
+    pass
+  return TRANSLATIONS_DIR_FALLBACK
+
+
+def _languages_file():
+  root = _translations_root()
+  if root is TRANSLATIONS_DIR:
+    return LANGUAGES_FILE
+  return root / "languages.json"
+
+
+def _po_path(language: str):
+  name = f"app_{language}.po"
+  packaged = TRANSLATIONS_DIR.joinpath(name)
+  if _is_file(packaged):
+    return packaged
+  fallback = TRANSLATIONS_DIR_FALLBACK / name
+  if fallback.is_file():
+    return fallback
+  return packaged
 
 UNIFONT_LANGUAGES = [
   "th",
@@ -167,7 +204,7 @@ class Multilang:
 
   def setup(self):
     try:
-      po_path = TRANSLATIONS_DIR.joinpath(f'app_{self._language}.po')
+      po_path = _po_path(self._language)
       self._translations, self._plurals = load_translations(po_path)
       self._plural_selector = PLURAL_SELECTORS.get(self._language, lambda n: 0)
       cloudlog.debug(f"Loaded translations for language: {self._language}")
@@ -175,15 +212,28 @@ class Multilang:
       cloudlog.error(f"No translation file found for language: {self._language}, using default.")
       self._translations = {}
       self._plurals = {}
+    except Exception:
+      cloudlog.exception(f"Failed to load translations for language: {self._language}, using default.")
+      self._translations = {}
+      self._plurals = {}
 
   @staticmethod
-  def _strip_prefix(language_code: str) -> str:
-    return str(language_code).removeprefix("main_")
+  def _strip_prefix(language_code) -> str:
+    if language_code is None:
+      return ""
+    if isinstance(language_code, bytes):
+      language_code = language_code.decode("utf-8", errors="replace")
+    language_code = str(language_code).strip()
+    # str(b"main_it") is "b'main_it'"; never treat that as a language code.
+    if language_code.startswith("b'") and language_code.endswith("'"):
+      language_code = language_code[2:-1]
+    return language_code.removeprefix("main_")
 
   def change_language(self, language_code: str) -> None:
     # languages.json values are "main_<code>" (shared with the Galaxy); the .po
     # files are named app_<code>.po, so keep the bare code internally.
-    self._params.put("LanguageSetting", language_code)
+    if self._params is not None:
+      self._params.put("LanguageSetting", language_code)
     self._language = self._strip_prefix(language_code)
     self.setup()
 
@@ -199,12 +249,21 @@ class Multilang:
     return singular if n == 1 else plural
 
   def _load_languages(self):
-    with LANGUAGES_FILE.open(encoding='utf-8') as f:
-      self.languages = json.load(f)
+    try:
+      with _languages_file().open(encoding='utf-8') as f:
+        self.languages = json.load(f)
+    except Exception:
+      cloudlog.exception("Failed to load languages.json")
+      self.languages = {}
     self.codes = {v: k for k, v in self.languages.items()}
 
     if self._params is not None:
-      lang = self._strip_prefix(self._params.get("LanguageSetting"))
+      try:
+        raw = self._params.get("LanguageSetting")
+      except Exception:
+        cloudlog.exception("Failed to read LanguageSetting")
+        raw = None
+      lang = self._strip_prefix(raw)
       if lang in self.codes or f"main_{lang}" in self.codes:
         self._language = lang
 

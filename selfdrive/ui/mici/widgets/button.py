@@ -7,6 +7,7 @@ from openpilot.system.ui.widgets import Widget
 from openpilot.system.ui.widgets.label import UnifiedLabel
 from openpilot.system.ui.widgets.scroller import DO_ZOOM
 from openpilot.system.ui.lib.application import gui_app, FontWeight, MousePos
+from openpilot.system.ui.lib.multilang import tr
 from openpilot.common.filter_simple import BounceFilter
 
 try:
@@ -122,10 +123,12 @@ class BigButton(Widget):
 
     self._rotate_icon_t: float | None = None
 
-    self._label = UnifiedLabel(text, font_size=self._get_label_font_size(), font_weight=FontWeight.BOLD,
+    # Translate at render time so settings/home labels follow LanguageSetting
+    # after a reboot. Internal values (e.g. BigMultiToggle options) stay English.
+    self._label = UnifiedLabel(lambda: tr(self.text) if self.text else "", font_size=self._get_label_font_size(), font_weight=FontWeight.BOLD,
                                text_color=LABEL_COLOR, alignment_vertical=rl.GuiTextAlignmentVertical.TEXT_ALIGN_BOTTOM, scroll=scroll,
                                line_height=0.9)
-    self._sub_label = UnifiedLabel(value, font_size=COMPLICATION_SIZE, font_weight=FontWeight.ROMAN,
+    self._sub_label = UnifiedLabel(lambda: tr(self.value) if self.value else "", font_size=COMPLICATION_SIZE, font_weight=FontWeight.ROMAN,
                                    text_color=COMPLICATION_GREY, alignment_vertical=rl.GuiTextAlignmentVertical.TEXT_ALIGN_BOTTOM)
     self._update_label_layout()
 
@@ -153,7 +156,8 @@ class BigButton(Widget):
     return int(self._rect.width - self.LABEL_HORIZONTAL_PADDING * 2 - icon_size)
 
   def _get_label_font_size(self):
-    if len(self.text) <= 18:
+    shown = tr(self.text) if self.text else ""
+    if len(shown) <= 18:
       return 48
     else:
       return 42
@@ -167,12 +171,12 @@ class BigButton(Widget):
 
   def set_text(self, text: str):
     self.text = text
-    self._label.set_text(text)
+    self._label.set_text(lambda: tr(self.text) if self.text else "")
     self._update_label_layout()
 
   def set_value(self, value: str):
     self.value = value
-    self._sub_label.set_text(value)
+    self._sub_label.set_text(lambda: tr(self.value) if self.value else "")
     self._update_label_layout()
 
   def get_value(self) -> str:

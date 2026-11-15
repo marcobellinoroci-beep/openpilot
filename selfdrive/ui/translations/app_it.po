@@ -3334,3 +3334,722 @@ msgstr "{} salvati"
 #, python-format
 msgid "{} selected | {} available"
 msgstr "{} selezionati | {} disponibili"
+
+# mici / comma 4 UI strings (displayed via multilang.tr)
+
+msgid "toggles"
+msgstr "opzioni"
+
+msgid "network"
+msgstr "rete"
+
+msgid "bluetooth"
+msgstr "bluetooth"
+
+msgid "vehicle"
+msgstr "veicolo"
+
+msgid "visuals"
+msgstr "visualizzazione"
+
+msgid "device"
+msgstr "dispositivo"
+
+msgid "software"
+msgstr "software"
+
+msgid "developer"
+msgstr "sviluppatore"
+
+msgid "force drive state"
+msgstr "forza stato di guida"
+
+msgid "offroad"
+msgstr "fermo"
+
+msgid "onroad"
+msgstr "in guida"
+
+msgid "off"
+msgstr "off"
+
+msgid "manual"
+msgstr "manuale"
+
+msgid "driving personality"
+msgstr "personalità di guida"
+
+msgid "aggressive"
+msgstr "aggressiva"
+
+msgid "standard"
+msgstr "standard"
+
+msgid "relaxed"
+msgstr "rilassata"
+
+msgid "safe mode"
+msgstr "modalità sicura"
+
+msgid "experimental mode"
+msgstr "modalità sperimentale"
+
+msgid "use metric units"
+msgstr "usa unità metriche"
+
+msgid "lane departure warnings"
+msgstr "avvisi di uscita dalla corsia"
+
+msgid "always-on driver monitor"
+msgstr "monitoraggio guidatore sempre attivo"
+
+msgid "right hand driving"
+msgstr "guida a destra"
+
+msgid "record & upload driver camera"
+msgstr "registra e invia la camera abitacolo"
+
+msgid "record & upload mic audio"
+msgstr "registra e invia l'audio del microfono"
+
+msgid "enable openpilot"
+msgstr "attiva openpilot"
+
+msgid "disable auto fingerprint"
+msgstr "disattiva impronta automatica"
+
+msgid "car make"
+msgstr "marca"
+
+msgid "car model"
+msgstr "modello"
+
+msgid "variant"
+msgstr "variante"
+
+msgid "No fingerprint list available"
+msgstr "Elenco impronte non disponibile"
+
+msgid "select make"
+msgstr "seleziona marca"
+
+msgid "Select a car make first"
+msgstr "Prima seleziona la marca dell'auto"
+
+msgid "select model"
+msgstr "seleziona modello"
+
+msgid "fingerprint"
+msgstr "impronta"
+
+msgid "Driver"
+msgstr "Guidatore"
+
+msgid "Wide"
+msgstr "Grandangolo"
+
+msgid "Distance"
+msgstr "Distanza"
+
+msgid "Speed"
+msgstr "Velocità"
+
+msgid "camera view"
+msgstr "vista camera"
+
+msgid "Invalid camera view"
+msgstr "Vista camera non valida"
+
+msgid "lead indicator"
+msgstr "indicatore veicolo davanti"
+
+msgid "lead info"
+msgstr "info veicolo davanti"
+
+msgid "Invalid lead info mode"
+msgstr "Modalità info veicolo davanti non valida"
+
+msgid "driver camera on reverse"
+msgstr "camera abitacolo in retromarcia"
+
+msgid "stopped timer"
+msgstr "timer da fermo"
+
+msgid "stock confidence ball"
+msgstr "sfera di confidenza di serie"
+
+msgid "torque bar"
+msgstr "barra della coppia"
+
+msgid "rainbow road"
+msgstr "percorso arcobaleno"
+
+msgid "show speed limits"
+msgstr "mostra i limiti di velocità"
+
+msgid "confirm new speed limits"
+msgstr "conferma i nuovi limiti di velocità"
+
+msgid "confirm lower limits"
+msgstr "conferma i limiti più bassi"
+
+msgid "confirm higher limits"
+msgstr "conferma i limiti più alti"
+
+msgid "device ID"
+msgstr "ID dispositivo"
+
+msgid "serial"
+msgstr "seriale"
+
+msgid "comma connect"
+msgstr "comma connect"
+
+msgid "konik connect"
+msgstr "konik connect"
+
+msgid "connect\nserver"
+msgstr "server di\nconnessione"
+
+msgid "slide to\nreboot"
+msgstr "scorri per\nriavviare"
+
+msgid "pair"
+msgstr "associa"
+
+msgid "paired"
+msgstr "associato"
+
+msgid "subscribed"
+msgstr "abbonato"
+
+msgid "upgrade to prime"
+msgstr "passa a prime"
+
+msgid "Please connect to Wi-Fi to complete initial pairing."
+msgstr "Collegati al Wi-Fi per completare l'associazione iniziale."
+
+msgid "reset driver\nmonitoring"
+msgstr "reimposta monitoraggio\nguidatore"
+
+msgid "reset driver monitoring"
+msgstr "reimposta monitoraggio guidatore"
+
+msgid "reset calibration"
+msgstr "reimposta calibrazione"
+
+msgid "reset"
+msgstr "reimposta"
+
+msgid "reboot"
+msgstr "riavvia"
+
+msgid "power off"
+msgstr "spegni"
+
+msgid "regulatory info"
+msgstr "informazioni normative"
+
+msgid "simple mode"
+msgstr "modalità semplice"
+
+msgid "driver\ncamera preview"
+msgstr "anteprima camera\nabitacolo"
+
+msgid "review\ntraining guide"
+msgstr "rivedi la\nguida iniziale"
+
+msgid "terms &\nconditions"
+msgstr "termini e\ncondizioni"
+
+msgid "slide to\n{action_text.lower()}"
+msgstr "scorri per\n{action_text.lower()}"
+
+msgid "Disengage to {action_text}"
+msgstr "Disinserisci per {action_text}"
+
+msgid "version"
+msgstr "versione"
+
+msgid "branch"
+msgstr "branch"
+
+msgid "Version"
+msgstr "Versione"
+
+msgid "check for update"
+msgstr "cerca aggiornamenti"
+
+msgid "Please connect to Wi-Fi to update."
+msgstr "Collegati al Wi-Fi per aggiornare."
+
+msgid "download update"
+msgstr "scarica aggiornamento"
+
+msgid "slide to\nfast update"
+msgstr "scorri per\naggiornamento rapido"
+
+msgid "starting"
+msgstr "avvio"
+
+msgid "starting fast update..."
+msgstr "avvio aggiornamento rapido..."
+
+msgid "updating"
+msgstr "aggiornamento"
+
+msgid "fast update in progress..."
+msgstr "aggiornamento rapido in corso..."
+
+msgid "fast update failed"
+msgstr "aggiornamento rapido non riuscito"
+
+msgid "running"
+msgstr "in esecuzione"
+
+msgid "rebooting"
+msgstr "riavvio"
+
+msgid "update complete\nrebooting..."
+msgstr "aggiornamento completato\nriavvio..."
+
+msgid "fast update"
+msgstr "aggiornamento rapido"
+
+msgid "updater failed\nto respond"
+msgstr "l'updater non\nha risposto"
+
+msgid "checking..."
+msgstr "verifica..."
+
+msgid "up to date"
+msgstr "già aggiornato"
+
+msgid "install update"
+msgstr "installa aggiornamento"
+
+msgid "no branches"
+msgstr "nessun branch"
+
+msgid "check for update first"
+msgstr "prima cerca gli aggiornamenti"
+
+msgid "target branch"
+msgstr "branch di destinazione"
+
+msgid "slide to\ndownload"
+msgstr "scorri per\nscaricare"
+
+msgid "auto updates"
+msgstr "aggiornamenti automatici"
+
+msgid "uninstall"
+msgstr "disinstalla"
+
+msgid "Loading..."
+msgstr "Caricamento..."
+
+msgid "Not set"
+msgstr "Non impostato"
+
+msgid "enter GitHub username..."
+msgstr "inserisci il nome utente GitHub..."
+
+msgid "Please connect to Wi-Fi to fetch your key."
+msgstr "Collegati al Wi-Fi per recuperare la chiave."
+
+msgid "SSH keys"
+msgstr "chiavi SSH"
+
+msgid "disable wide road camera"
+msgstr "disattiva camera stradale grandangolare"
+
+msgid "alpha longitudinal"
+msgstr "longitudinale alpha"
+
+msgid "joystick debug mode"
+msgstr "modalità debug joystick"
+
+msgid "ui debug mode"
+msgstr "modalità debug interfaccia"
+
+msgid "wi-fi"
+msgstr "wi-fi"
+
+msgid "not connected"
+msgstr "non collegato"
+
+msgid "connecting..."
+msgstr "connessione..."
+
+msgid "obtaining IP..."
+msgstr "ottenimento IP..."
+
+msgid "enable tethering"
+msgstr "attiva il tethering"
+
+msgid "enter password..."
+msgstr "inserisci la password..."
+
+msgid "tethering password"
+msgstr "password tethering"
+
+msgid "network usage"
+msgstr "uso della rete"
+
+msgid "enable roaming"
+msgstr "attiva il roaming"
+
+msgid "apn settings"
+msgstr "impostazioni APN"
+
+msgid "edit"
+msgstr "modifica"
+
+msgid "cellular metered"
+msgstr "cellulare a consumo"
+
+msgid "enter APN..."
+msgstr "inserisci APN..."
+
+msgid "forgetting..."
+msgstr "dimenticando..."
+
+msgid "starting..."
+msgstr "avvio..."
+
+msgid "tethering"
+msgstr "tethering"
+
+msgid "connected"
+msgstr "collegato"
+
+msgid "not in range"
+msgstr "fuori portata"
+
+msgid "unsupported"
+msgstr "non supportato"
+
+msgid "wrong password"
+msgstr "password errata"
+
+msgid "connect"
+msgstr "connetti"
+
+msgid "slide to forget"
+msgstr "scorri per dimenticare"
+
+msgid "searching for networks"
+msgstr "ricerca reti"
+
+msgid "forgetting"
+msgstr "dimenticando"
+
+msgid "pairing"
+msgstr "associazione"
+
+msgid "audio output"
+msgstr "uscita audio"
+
+msgid "audio"
+msgstr "audio"
+
+msgid "controller"
+msgstr "controller"
+
+msgid "scan for devices"
+msgstr "cerca dispositivi"
+
+msgid "scan"
+msgstr "cerca"
+
+msgid "on"
+msgstr "on"
+
+msgid "disconnect"
+msgstr "disconnetti"
+
+msgid "stop using for audio"
+msgstr "smetti di usare per l'audio"
+
+msgid "use for audio"
+msgstr "usa per l'audio"
+
+msgid "test audio"
+msgstr "prova audio"
+
+msgid "Bluetooth device"
+msgstr "Dispositivo Bluetooth"
+
+msgid "Bluetooth"
+msgstr "Bluetooth"
+
+msgid "searching for devices"
+msgstr "ricerca dispositivi"
+
+msgid "pair with galaxy"
+msgstr "associa a galaxy"
+
+msgid "Galaxy is not paired yet."
+msgstr "Galaxy non è ancora associato."
+
+msgid "Password must be at least 6 characters."
+msgstr "La password deve avere almeno 6 caratteri."
+
+msgid "show qr"
+msgstr "mostra qr"
+
+msgid "unpair"
+msgstr "dissocia"
+
+msgid "slide to\nunpair galaxy"
+msgstr "scorri per\ndissociare galaxy"
+
+msgid "set galaxy password..."
+msgstr "imposta la password galaxy..."
+
+msgid "downloaded"
+msgstr "scaricato"
+
+msgid "cancelled"
+msgstr "annullato"
+
+msgid "failed"
+msgstr "non riuscito"
+
+msgid "offline"
+msgstr "offline"
+
+msgid "verification failed"
+msgstr "verifica non riuscita"
+
+msgid "download invalid"
+msgstr "download non valido"
+
+msgid "alphabetical"
+msgstr "alfabetico"
+
+msgid "date"
+msgstr "data"
+
+msgid "favorites"
+msgstr "preferiti"
+
+msgid "newest"
+msgstr "più recenti"
+
+msgid "oldest"
+msgstr "più vecchi"
+
+msgid "(Default)"
+msgstr "(Predefinito)"
+
+msgid "Downloading..."
+msgstr "Download..."
+
+msgid "cancel download"
+msgstr "annulla download"
+
+msgid "verifying"
+msgstr "verifica"
+
+msgid "Downloaded!"
+msgstr "Scaricato!"
+
+msgid "driving model"
+msgstr "modello di guida"
+
+msgid "set sort mode"
+msgstr "imposta ordinamento"
+
+msgid "switch model"
+msgstr "cambia modello"
+
+msgid "download model"
+msgstr "scarica modello"
+
+msgid "download all missing"
+msgstr "scarica tutti quelli mancanti"
+
+msgid "refresh manifest"
+msgstr "aggiorna elenco"
+
+msgid "Refreshing model list..."
+msgstr "Aggiornamento elenco modelli..."
+
+msgid "refresh"
+msgstr "aggiorna"
+
+msgid "Refresh manifest and try again."
+msgstr "Aggiorna l'elenco e riprova."
+
+msgid "Model list unavailable"
+msgstr "Elenco modelli non disponibile"
+
+msgid "No downloaded models"
+msgstr "Nessun modello scaricato"
+
+msgid "Download a model first."
+msgstr "Prima scarica un modello."
+
+msgid "Select Driving Model"
+msgstr "Seleziona il modello di guida"
+
+msgid "Downloads blocked while driving"
+msgstr "Download bloccati durante la guida"
+
+msgid "Try again offroad."
+msgstr "Riprova da fermo."
+
+msgid "All models downloaded"
+msgstr "Tutti i modelli sono già scaricati"
+
+msgid "No additional models are available."
+msgstr "Non ci sono altri modelli disponibili."
+
+msgid "Download Driving Model"
+msgstr "Scarica il modello di guida"
+
+msgid "Model manager busy"
+msgstr "Gestione modelli occupata"
+
+msgid "Please wait for the current task."
+msgstr "Attendi il termine dell'operazione in corso."
+
+msgid "sort mode"
+msgstr "ordinamento"
+
+msgid "download"
+msgstr "scarica"
+
+msgid "Verification failed..."
+msgstr "Verifica non riuscita..."
+
+msgid "Model unavailable"
+msgstr "Modello non disponibile"
+
+msgid "Model not downloaded"
+msgstr "Modello non scaricato"
+
+msgid "Download this model first."
+msgstr "Prima scarica questo modello."
+
+msgid "Model"
+msgstr "Modello"
+
+msgid "Model switched"
+msgstr "Modello cambiato"
+
+msgid "refreshing"
+msgstr "aggiornamento"
+
+msgid "downloading..."
+msgstr "download..."
+
+msgid "Offline"
+msgstr "Offline"
+
+msgid "WiFi"
+msgstr "WiFi"
+
+msgid "Ethernet"
+msgstr "Ethernet"
+
+msgid "no alerts"
+msgstr "nessun avviso"
+
+msgid "Tap to acknowledge."
+msgstr "Tocca per confermare."
+
+msgid "next"
+msgstr "avanti"
+
+msgid "driver monitoring\ncheck"
+msgstr "controllo monitoraggio\nguidatore"
+
+msgid "scroll to continue"
+msgstr "scorri per continuare"
+
+msgid "Next, we'll check if comma four can detect the driver properly."
+msgstr "Adesso controlliamo se il comma four rileva correttamente il guidatore."
+
+msgid "openpilot uses the cabin camera to check if the driver is distracted."
+msgstr "openpilot usa la camera abitacolo per verificare se il guidatore è distratto."
+
+msgid "If it does not have a clear view of the driver, unplug and remount before continuing."
+msgstr "Se non ha una vista chiara del guidatore, scollega e rimonta prima di continuare."
+
+msgid "back"
+msgstr "indietro"
+
+msgid "looking for driver"
+msgstr "ricerca guidatore"
+
+msgid "make sure comma\nfour can see your face"
+msgstr "assicurati che il comma\nfour veda il tuo viso"
+
+msgid "Remount if your face is blocked, or driver monitoring has difficulty tracking your face."
+msgstr "Rimonta se il viso è ostruito o se il monitoraggio fatica a seguirlo."
+
+msgid "allow data uploading"
+msgstr "consenti l'invio dei dati"
+
+msgid "no, don't upload"
+msgstr "no, non inviare"
+
+msgid "driver camera data"
+msgstr "dati camera abitacolo"
+
+msgid "do you want to share video data for training?"
+msgstr "vuoi condividere i video per l'addestramento?"
+
+msgid "Sharing your data with comma helps improve openpilot for everyone."
+msgstr "Condividere i dati con comma aiuta a migliorare openpilot per tutti."
+
+msgid "what is openpilot?"
+msgstr "cos'è openpilot?"
+
+msgid "1. openpilot is a driver assistance system."
+msgstr "1. openpilot è un sistema di assistenza alla guida."
+
+msgid "2. You must pay attention at all times."
+msgstr "2. Devi prestare attenzione in ogni momento."
+
+msgid "3. You must be ready to take over at any time."
+msgstr "3. Devi essere pronto a riprendere il controllo in qualsiasi momento."
+
+msgid "4. You are fully responsible for driving the car."
+msgstr "4. Sei pienamente responsabile della guida dell'auto."
+
+msgid "accept\nterms"
+msgstr "accetta\ntermini"
+
+msgid "decline &\nuninstall"
+msgstr "rifiuta e\ndisinstalla"
+
+msgid "terms and\nconditions"
+msgstr "termini e\ncondizioni"
+
+msgid "swipe for QR code"
+msgstr "scorri per il codice QR"
+
+msgid "pair with {get_pairing_service_label(self._params)}"
+msgstr "associa a {get_pairing_service_label(self._params)}"
+
+msgid "pairing device"
+msgstr "associazione dispositivo"
+
+msgid "SPEED"
+msgstr "VELOCITÀ"
+
+msgid "LIMIT"
+msgstr "LIMITE"
+
+msgid "NEW SPEED LIMIT"
+msgstr "NUOVO LIMITE"
+
+msgid "SET/+ TO CONFIRM  RES/- TO DENY"
+msgstr "SET/+ PER CONFERMARE  RES/- PER RIFIUTARE"
+
+msgid "start the car to\nuse openpilot"
+msgstr "avvia l'auto per\nusare openpilot"

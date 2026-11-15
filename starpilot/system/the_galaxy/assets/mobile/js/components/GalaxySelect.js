@@ -1,3 +1,4 @@
+import { t } from "../i18n.js"
 let nextId = 0
 
 // Keep the native select as the value/event adapter; presentation belongs to Galaxy.
@@ -6,7 +7,7 @@ export const GalaxySelect = {
   inheritAttrs: false,
   props: { value: { default: undefined }, modelValue: { default: undefined }, disabled: Boolean },
   emits: ["change", "update:modelValue"],
-  data() { return { uid: `gx-select-${++nextId}`, items: [], selected: "", label: "", open: false, name: "Choose an option", typeahead: "", typedAt: 0 } },
+  data() { return { uid: `gx-select-${++nextId}`, items: [], selected: "", label: "", open: false, name: t("Choose an option"), typeahead: "", typedAt: 0 } },
   computed: {
     current() { return this.modelValue !== undefined ? this.modelValue : this.value },
     buttonId() { return this.$attrs.id || this.uid },
@@ -24,7 +25,7 @@ export const GalaxySelect = {
       const items = [...native.options].map((option, index) => ({ index, value: option.value, label: option.label, description: option.dataset?.description || "", disabled: option.disabled || (option.parentElement?.tagName === "OPTGROUP" && option.parentElement.disabled), group: option.parentElement?.tagName === "OPTGROUP" ? option.parentElement.label : "" }))
       if (JSON.stringify(items) !== JSON.stringify(this.items)) this.items = items
       this.selected = native.value
-      this.label = native.selectedOptions[0]?.dataset?.collapsedLabel || native.selectedOptions[0]?.label || "Choose an option"
+      this.label = native.selectedOptions[0]?.dataset?.collapsedLabel || native.selectedOptions[0]?.label || t("Choose an option")
       const button = this.$refs.button
       const labelled = this.$attrs["aria-labelledby"]?.split(/\s+/).map(id => document.getElementById(id)?.textContent || "").join(" ")
       const labels = [...new Set([...(button?.labels || []), button?.closest("label")].filter(Boolean))].map(label => {
@@ -32,7 +33,7 @@ export const GalaxySelect = {
         copy.querySelectorAll(".gx-select, select, button").forEach(node => node.remove())
         return copy.textContent.trim()
       }).filter(Boolean).join(" ")
-      this.name = this.$attrs["aria-label"] || labelled || labels || button?.closest(".gx-row")?.querySelector(".gx-row__label")?.textContent || this.$attrs.title || "Choose an option"
+      this.name = this.$attrs["aria-label"] || labelled || labels || button?.closest(".gx-row")?.querySelector(".gx-row__label")?.textContent || this.$attrs.title || t("Choose an option")
       if (this.disabled && this.open) this.close()
     },
     async show(event) {

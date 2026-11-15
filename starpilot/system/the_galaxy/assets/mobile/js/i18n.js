@@ -1,4 +1,5 @@
 import { reactive } from "vue"
+import { IT_SETTINGS } from "./i18n_it_settings.js"
 
 const STORAGE_KEY = "galaxy-language"
 
@@ -204,6 +205,12 @@ const MORE_TRANSLATIONS = {
 }
 
 Object.keys(MORE_TRANSLATIONS).forEach((code) => Object.assign(TRANSLATIONS[code], MORE_TRANSLATIONS[code]))
+
+// Layout labels/descriptions and settings chrome. Hand-written entries above win.
+{
+  const handwrittenIt = { ...TRANSLATIONS.it }
+  Object.assign(TRANSLATIONS.it, IT_SETTINGS, handwrittenIt)
+}
 
 // A word-level fallback covers the many device-provided descriptions and the
 // older Galaxy views that still contain literal English labels. Exact phrases
