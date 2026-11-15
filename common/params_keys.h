@@ -200,7 +200,7 @@ inline static std::unordered_map<std::string, ParamKeyAttributes> keys = {
     {"AllowImpossibleAcceleration", {PERSISTENT, BOOL, "0", "0", 3}},
     {"AlwaysOnLateral", {PERSISTENT, BOOL, "0", "0", 0, SETTINGS_SIMPLE}},
     {"AlwaysOnLateralLKAS", {PERSISTENT, BOOL, "1", "0", 2}},
-    {"AutoOvertake", {PERSISTENT, BOOL, "1", "1", 0, SETTINGS_SIMPLE}},
+    {"AutoOvertake", {PERSISTENT, BOOL, "0", "0", 0, SETTINGS_SIMPLE}},
     {"AutoOvertakeReturn", {PERSISTENT, BOOL, "0", "0", 1, SETTINGS_SIMPLE}},
     {"OvertakeReturnDelay", {PERSISTENT, FLOAT, "2.5", "2.5", 1, SETTINGS_SIMPLE}},
     {"ApiCache_DriveStats", {PERSISTENT, JSON, "{}", "{}"}},

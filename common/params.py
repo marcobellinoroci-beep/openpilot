@@ -4,6 +4,17 @@ from enum import IntEnum, IntFlag
 from pathlib import Path
 import tempfile
 
+from openpilot.common.params_declared import (
+  DeclaredKeyOverlay,
+  OVERLAY_MISSING,
+  coerce_bool,
+  declared_keys,
+  decode_declared,
+  encode_declared,
+  key_name,
+  overlay_path_from_param_dir,
+)
+
 SETTINGS_SIMPLE = 0
 SETTINGS_ADVANCED = 1
 
@@ -211,13 +222,121 @@ else:
   assert UnknownKeyName
 
   class Params(_Params):
+    def _declared(self, key):
+      return declared_keys().get(key_name(key))
+
+    def _overlay(self):
+      if getattr(self, "m", False):
+        return DeclaredKeyOverlay(None)
+      try:
+        param_dir = super().get_param_path()
+      except Exception:
+        param_dir = ""
+      return DeclaredKeyOverlay(overlay_path_from_param_dir(param_dir))
+
+    def _use_overlay(self, key) -> bool:
+      if self._declared(key) is None:
+        return False
+      try:
+        super().check_key(key)
+      except UnknownKeyName:
+        return True
+      return False
+
+    def _migrate_overlay_to_native(self, key) -> None:
+      # When a future prebuilt .so learns these keys, copy any stored overlay
+      # value into the official params file once, then drop it from the overlay.
+      if self._use_overlay(key):
+        return
+      info = self._declared(key)
+      if info is None:
+        return
+      raw = self._overlay().get(key_name(key))
+      if raw is OVERLAY_MISSING:
+        return
+      try:
+        super().put(key, decode_declared(info, raw))
+        self._overlay().remove(key_name(key))
+      except Exception:
+        return
+
+    def _decode_overlay_value(self, key, raw, encoding=None, default=None, return_default=False):
+      info = self._declared(key)
+      if info is None:
+        return default
+      if raw is not None:
+        return decode_declared(info, raw, encoding=encoding)
+      if return_default or getattr(self, "return_defaults", False):
+        if info.default is None:
+          return default
+        return decode_declared(info, info.default, encoding=encoding)
+      return default
+
+    def check_key(self, key):
+      try:
+        return super().check_key(key)
+      except UnknownKeyName:
+        if self._declared(key) is not None:
+          return key.encode() if isinstance(key, str) else key
+        raise
+
+    def all_keys(self):
+      keys = list(super().all_keys())
+      seen = {key_name(k) for k in keys}
+      for name in declared_keys():
+        if name not in seen:
+          keys.append(name)
+      return keys
+
+    def get_type(self, key):
+      if self._use_overlay(key):
+        return ParamKeyType(self._declared(key).type)
+      return super().get_type(key)
+
+    def get_default_value(self, key):
+      if self._use_overlay(key):
+        info = self._declared(key)
+        if info.default is None:
+          return None
+        return decode_declared(info, info.default)
+      return super().get_default_value(key)
+
+    def get_key_flag(self, key):
+      if self._use_overlay(key):
+        return ParamKeyFlag(self._declared(key).flags)
+      return super().get_key_flag(key)
+
+    def get_stock_value(self, key):
+      if self._use_overlay(key):
+        info = self._declared(key)
+        if info.stock is None:
+          return None
+        return decode_declared(info, info.stock)
+      return super().get_stock_value(key)
+
+    def get_tuning_level(self, key):
+      if self._use_overlay(key):
+        return self._declared(key).tuning_level
+      return super().get_tuning_level(key)
+
     def get_settings_tier(self, key):
+      if self._use_overlay(key):
+        return self._declared(key).settings_tier
       try:
         return super().get_settings_tier(key)
       except AttributeError:
-        return _SETTINGS_TIERS.get(self.check_key(key), SETTINGS_ADVANCED)
+        return _SETTINGS_TIERS.get(key_name(key), SETTINGS_ADVANCED)
 
     def get(self, key, block=False, return_default=False, encoding=None, default=None):
+      if not self._use_overlay(key):
+        self._migrate_overlay_to_native(key)
+      if self._use_overlay(key):
+        raw = self._overlay().get(key_name(key))
+        if raw is OVERLAY_MISSING:
+          return self._decode_overlay_value(key, None, encoding=encoding, default=default,
+                                            return_default=return_default)
+        return self._decode_overlay_value(key, raw, encoding=encoding, default=default,
+                                          return_default=return_default)
       try:
         value = super().get(key, block=block, return_default=return_default)
       except UnknownKeyName:
@@ -232,6 +351,13 @@ else:
       return value
 
     def get_bool(self, key, block=False, default=False):
+      if not self._use_overlay(key):
+        self._migrate_overlay_to_native(key)
+      if self._use_overlay(key):
+        value = self.get(key, block=block, return_default=True, default=default)
+        if value is None:
+          return bool(default)
+        return coerce_bool(value)
       try:
         result = super().get(key, block=block, return_default=True)
         if result is None:
@@ -246,7 +372,7 @@ else:
         return default
       try:
         return int(float(val))
-      except ValueError:
+      except (TypeError, ValueError):
         return default
 
     def get_float(self, key, block=False, return_default=False, default=0.0):
@@ -255,8 +381,33 @@ else:
         return default
       try:
         return float(val)
-      except ValueError:
+      except (TypeError, ValueError):
         return default
+
+    def put(self, key, dat):
+      if self._use_overlay(key):
+        info = self._declared(key)
+        self._overlay().put(key_name(key), encode_declared(info, dat))
+        return
+      super().put(key, dat)
+
+    def put_bool(self, key, val: bool):
+      if self._use_overlay(key):
+        self.put(key, bool(val))
+        return
+      super().put_bool(key, val)
+
+    def put_nonblocking(self, key, dat):
+      if self._use_overlay(key):
+        self.put(key, dat)
+        return
+      super().put_nonblocking(key, dat)
+
+    def put_bool_nonblocking(self, key, val: bool):
+      if self._use_overlay(key):
+        self.put_bool(key, val)
+        return
+      super().put_bool_nonblocking(key, val)
 
     def put_int(self, key, val):
       t = self.get_type(key)
@@ -279,6 +430,16 @@ else:
         self.put(key, bool(val))
       else:
         self.put(key, str(float(val)))
+
+    def remove(self, key):
+      if self._use_overlay(key):
+        self._overlay().remove(key_name(key))
+        return
+      super().remove(key)
+
+    def clear_all(self, tx_flag=ParamKeyFlag.ALL):
+      super().clear_all(tx_flag)
+      self._overlay().clear(int(tx_flag), declared_keys())
 
 
 if __name__ == "__main__":
