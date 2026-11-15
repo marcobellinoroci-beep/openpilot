@@ -283,10 +283,18 @@ else:
     def all_keys(self):
       keys = list(super().all_keys())
       seen = {key_name(k) for k in keys}
+      # The compiled Params.all_keys() returns bytes; callers such as
+      # StarPilotVariables do key.decode(), so match the native element type.
+      as_bytes = not keys or isinstance(keys[0], bytes)
       for name in declared_keys():
         if name not in seen:
-          keys.append(name)
+          keys.append(name.encode("utf-8") if as_bytes else name)
       return keys
+
+    def cpp2python(self, key, value):
+      if self._use_overlay(key):
+        return decode_declared(self._declared(key), value)
+      return super().cpp2python(key, value)
 
     def get_type(self, key):
       if self._use_overlay(key):
