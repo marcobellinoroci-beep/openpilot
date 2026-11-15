@@ -264,6 +264,10 @@ BO_ 785 UI_warning: 7 XXX
  SG_ UI_warningCounter : 8|4@1+ (1,0) [0|15] "" XXX
  SG_ UI_warningChecksum : 0|8@1+ (1,0) [0|255] "" XXX
 
+
+BO_ 1016 UI_driverAssistControl: 8 GTW
+ SG_ UI_followDistance : 45|3@1+ (1,0) [0|7] "" XXX
+
 BO_ 923 DAS_status: 8 PARTY
  SG_ DAS_statusChecksum : 56|8@1+ (1,0) [0|255] ""  aps
  SG_ DAS_statusCounter : 52|4@1+ (1,0) [0|15] ""  aps
@@ -486,3 +490,6 @@ VAL_ 325 ESP_ptcTargetState 0 "FAULT" 1 "BACKUP" 2 "ON" 3 "SNA";
 VAL_ 325 ESP_stabilityControlSts2 0 "INIT" 1 "ON" 2 "ENGAGED" 3 "FAULTED";
 VAL_ 325 ESP_steeringAngleQF 0 "UNDEFINABLE_ACCURACY" 1 "IN_SPEC";
 VAL_ 325 ESP_yawRateQF 0 "UNDEFINABLE_ACCURACY" 1 "IN_SPEC";
+
+VAL_ 1016 UI_followDistance 2 "MAX" 3 "HURRY" 4 "NORMAL" 5 "CHILL" 6 "SLOTH";
+CM_ SG_ 1016 UI_followDistance "MCU follow-distance / speed-profile setting. Community HW3/HW4: byte 5 bits 5-7 ((data[5] & 0xE0) >> 5). Seen on Autopilot party (bus 2) with the comma harness and described as Party CAN. Distinct from tesla_can.dbc BO_ 1000 UI_driverAssistControl.";

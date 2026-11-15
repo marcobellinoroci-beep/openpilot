@@ -58,6 +58,38 @@ def tesla_dashboard_speed_limit(fused_physical: float, speed_units: str | None, 
 
 
 
+
+# tesla_model3_party.dbc, message UI_driverAssistControl (0x3F8 / 1016).
+# 3-bit MCU follow-distance / speed-profile setting in byte 5 bits 5-7.
+# Present on Autopilot party (CANBUS.autopilot_party = 2); some community
+# sources also list it on Party CAN (bus 0). UI/GTW originated, so it should
+# still be readable while openpilot is controlling longitudinal.
+UI_DRIVER_ASSIST_CONTROL_ADDR = 0x3F8
+TESLA_FOLLOW_DISTANCE_VALUES = {v: ButtonType.gapAdjustCruise for v in range(1, 8)}
+
+
+def tesla_follow_distance(can_parsers) -> int | None:
+  """Return the MCU follow-distance setting if 0x3F8 has been seen, else None.
+
+  Prefers Autopilot party (bus 2), then Party (bus 0). 0 is treated as unseen.
+  """
+  chosen = None
+  for bus in (Bus.ap_party, Bus.party):
+    parser = can_parsers.get(bus)
+    if parser is None:
+      continue
+    state = parser.message_states.get(UI_DRIVER_ASSIST_CONTROL_ADDR)
+    if state is None or not state.timestamps:
+      continue
+    val = int(parser.vl["UI_driverAssistControl"]["UI_followDistance"])
+    if val == 0:
+      continue
+    if bus == Bus.ap_party:
+      return val
+    chosen = val
+  return chosen
+
+
 class TeslaScreenCANParser(CANParser):
   def __init__(self):
     super().__init__("tesla_model3_vehicle", [("UI_status2", 0), ("SCCM_rightStalk", 0)], CANBUS.vehicle)
@@ -104,6 +136,7 @@ class CarState(CarStateBase):
     self.cruise_buttons = 0
     self.prev_cruise_buttons = 0
     self.gas_pressed = False
+    self.prev_follow_distance = None
     self.active_touch_points = None
     self.screen_cancel_pressed = False
     self.msg_stw_actn_req = None
@@ -249,7 +282,17 @@ class CarState(CarStateBase):
       ret.invalidLkasSetting = cp_ap_party.vl["DAS_settings"]["DAS_autosteerEnabled"] != 0
     else:
       pass
-    # Buttons # ToDo: add Gap adjust button
+    # Buttons
+    # Tesla MCU follow-distance setting (UI_driverAssistControl 0x3F8).
+    # A change emits ButtonType.gapAdjustCruise so StarPilot can cycle the
+    # driving personality when "Distance button -> change personality" is on.
+    follow = tesla_follow_distance(can_parsers)
+    if follow is not None:
+      if self.prev_follow_distance is not None and follow != self.prev_follow_distance:
+        ret.buttonEvents = list(ret.buttonEvents) + create_button_events(
+          follow, self.prev_follow_distance, TESLA_FOLLOW_DISTANCE_VALUES,
+        )
+      self.prev_follow_distance = follow
     if self.CP.flags & TeslaFlags.AOL_SCREEN_BUTTON:
       ret.buttonEvents = list(ret.buttonEvents) + self.update_screen_button(can_parsers[Bus.adas])
 
@@ -357,9 +400,13 @@ class CarState(CarStateBase):
         Bus.ap_pt: CANParser(DBC[CP.carFingerprint][Bus.pt], [], CANBUS.autopilot_party),
         Bus.chassis: CANParser(DBC[CP.carFingerprint][Bus.chassis], [("SDM1", 0), ("RCM_status", 0)], CANBUS.party),
       }
+    # freq=0: optional / ignore_alive so a missing 0x3F8 on one of the two
+    # buses does not invalidate the parser. Register up front so the first
+    # frame is parsed (lazy VLDict registration would miss it).
+    tesla_follow_msgs = [("UI_driverAssistControl", 0)]
     return {
-      Bus.party: CANParser(DBC[CP.carFingerprint][Bus.party], [], CANBUS.party),
-      Bus.ap_party: CANParser(DBC[CP.carFingerprint][Bus.party], [], CANBUS.autopilot_party),
+      Bus.party: CANParser(DBC[CP.carFingerprint][Bus.party], tesla_follow_msgs, CANBUS.party),
+      Bus.ap_party: CANParser(DBC[CP.carFingerprint][Bus.party], tesla_follow_msgs, CANBUS.autopilot_party),
       **({Bus.adas: TeslaScreenCANParser()}
          if CP.flags & TeslaFlags.AOL_SCREEN_BUTTON else {}),
     }
