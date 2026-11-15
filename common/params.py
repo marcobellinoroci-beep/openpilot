@@ -226,27 +226,44 @@ else:
       return declared_keys().get(key_name(key))
 
     def _overlay(self):
+      cached = getattr(self, "_overlay_obj", None)
+      if cached is not None:
+        return cached
       if getattr(self, "m", False):
-        return DeclaredKeyOverlay(None)
-      try:
-        param_dir = super().get_param_path()
-      except Exception:
-        param_dir = ""
-      return DeclaredKeyOverlay(overlay_path_from_param_dir(param_dir))
+        obj = DeclaredKeyOverlay(None)
+      else:
+        try:
+          param_dir = super().get_param_path()
+        except Exception:
+          param_dir = ""
+        obj = DeclaredKeyOverlay(overlay_path_from_param_dir(param_dir))
+      self._overlay_obj = obj
+      return obj
 
-    def _use_overlay(self, key) -> bool:
+    def _use_overlay(self, key, *, refresh=False) -> bool:
+      name = key_name(key)
+      cache = getattr(self, "_use_overlay_cache", None)
+      if cache is None:
+        self._use_overlay_cache = cache = {}
+      if not refresh and name in cache:
+        return cache[name]
       if self._declared(key) is None:
+        cache[name] = False
         return False
       try:
         super().check_key(key)
       except UnknownKeyName:
+        cache[name] = True
         return True
+      cache[name] = False
       return False
 
     def _migrate_overlay_to_native(self, key) -> None:
       # When a future prebuilt .so learns these keys, copy any stored overlay
       # value into the official params file once, then drop it from the overlay.
-      if self._use_overlay(key):
+      # Uses super().put/remove only — never self.get/self.put — so this cannot
+      # recurse into get() -> migrate -> get().
+      if self._use_overlay(key, refresh=True):
         return
       info = self._declared(key)
       if info is None:
@@ -259,6 +276,18 @@ else:
         self._overlay().remove(key_name(key))
       except Exception:
         return
+
+    def _maybe_migrate_key(self, key) -> None:
+      # Native keys (IsMetric, etc.) must not touch the overlay on every get.
+      # declared_keys() includes the whole params_keys.h (~800 keys), so the old
+      # "migrate on every native get" path flocked and json.loaded the overlay
+      # file on the manager boot all_keys() loop and on every process start.
+      # Overlay-only keys (stale .so) stay on the overlay; a new Params instance
+      # after the .so learns the key will see use_overlay=False and migrate then.
+      if self._use_overlay(key):
+        return
+      if self._overlay().contains_cached(key_name(key)):
+        self._migrate_overlay_to_native(key)
 
     def _decode_overlay_value(self, key, raw, encoding=None, default=None, return_default=False):
       info = self._declared(key)
@@ -336,8 +365,7 @@ else:
         return _SETTINGS_TIERS.get(key_name(key), SETTINGS_ADVANCED)
 
     def get(self, key, block=False, return_default=False, encoding=None, default=None):
-      if not self._use_overlay(key):
-        self._migrate_overlay_to_native(key)
+      self._maybe_migrate_key(key)
       if self._use_overlay(key):
         raw = self._overlay().get(key_name(key))
         if raw is OVERLAY_MISSING:
@@ -359,8 +387,7 @@ else:
       return value
 
     def get_bool(self, key, block=False, default=False):
-      if not self._use_overlay(key):
-        self._migrate_overlay_to_native(key)
+      self._maybe_migrate_key(key)
       if self._use_overlay(key):
         value = self.get(key, block=block, return_default=True, default=default)
         if value is None:

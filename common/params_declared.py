@@ -329,10 +329,21 @@ def _write_file(path: Path, data: dict[str, Any]) -> None:
 
 
 class DeclaredKeyOverlay:
-  """Process-safe JSON overlay. path=None keeps values in memory only."""
+  """Process-safe JSON overlay. path=None keeps values in memory only.
+
+  File contents are cached by (mtime_ns, size).  Reads do not take the
+  exclusive flock; writers still lock and atomically replace the file.
+  Native Params.get used to flock+json.loads on every call — that is the
+  hot path at manager boot (all_keys loop over ~800 keys, then every
+  process).
+  """
+
+  _file_cache: dict[str, tuple[int | None, int, dict[str, Any]]] = {}
 
   def __init__(self, path: Path | None):
     self.path = path
+    self._cache_key = str(path) if path is not None else None
+    self._loaded = False
 
   def _lock_path(self) -> Path:
     return self.path.with_name(self.path.name + ".lock")
@@ -345,20 +356,53 @@ class DeclaredKeyOverlay:
       def __enter__(guard):
         guard.path.parent.mkdir(parents=True, exist_ok=True)
         guard.fd = os.open(str(guard.path), os.O_CREAT | os.O_RDWR, 0o644)
-        fcntl.flock(guard.fd, fcntl.LOCK_EX)
+        try:
+          fcntl.flock(guard.fd, fcntl.LOCK_EX)
+        except BaseException:
+          os.close(guard.fd)
+          guard.fd = None
+          raise
         return guard
       def __exit__(guard, exc_type, exc, tb):
         if guard.fd is not None:
-          fcntl.flock(guard.fd, fcntl.LOCK_UN)
-          os.close(guard.fd)
-          guard.fd = None
+          try:
+            fcntl.flock(guard.fd, fcntl.LOCK_UN)
+          finally:
+            os.close(guard.fd)
+            guard.fd = None
         return False
     return _Guard(self._lock_path())
 
-  def _load(self) -> dict[str, Any]:
+  def _stat(self) -> tuple[int, int] | None:
+    try:
+      st = self.path.stat()
+      return st.st_mtime_ns, st.st_size
+    except OSError:
+      return None
+
+  def _cached_data(self, *, refresh: bool) -> dict[str, Any]:
     if self.path is None:
       return _memory_store
-    return _read_file(self.path)
+    key = self._cache_key
+    cached = self._file_cache.get(key)
+    if not refresh and self._loaded and cached is not None:
+      return cached[2]
+    st = self._stat()
+    if st is None:
+      self._file_cache[key] = (None, 0, {})
+      self._loaded = True
+      return self._file_cache[key][2]
+    if cached is not None and cached[0] == st[0] and cached[1] == st[1]:
+      self._loaded = True
+      return cached[2]
+    data = _read_file(self.path)
+    self._file_cache[key] = (st[0], st[1], data)
+    self._loaded = True
+    return data
+
+  def _load(self) -> dict[str, Any]:
+    # Under a write lock, always re-read so we do not clobber a concurrent writer.
+    return self._cached_data(refresh=True)
 
   def _save(self, data: dict[str, Any]) -> None:
     if self.path is None:
@@ -366,6 +410,9 @@ class DeclaredKeyOverlay:
       _memory_store.update(data)
       return
     _write_file(self.path, data)
+    st = self._stat()
+    self._file_cache[self._cache_key] = (st[0] if st else None, st[1] if st else 0, dict(data))
+    self._loaded = True
 
   def _with_locks(self):
     class _Both:
@@ -385,26 +432,33 @@ class DeclaredKeyOverlay:
         return False
     return _Both(self)
 
+  def contains_cached(self, name: str) -> bool:
+    """True if this key is in the last loaded overlay. Loads once; no re-stat."""
+    return name in self._cached_data(refresh=False)
+
   def get(self, name: str) -> Any:
-    with self._with_locks():
-      return self._load().get(name, OVERLAY_MISSING)
+    if self.path is None:
+      with _io_lock:
+        return _memory_store.get(name, OVERLAY_MISSING)
+    # Atomic replace makes a lock-free read safe; refresh on mtime/size.
+    return self._cached_data(refresh=True).get(name, OVERLAY_MISSING)
 
   def put(self, name: str, value: Any) -> None:
     with self._with_locks():
-      data = self._load()
+      data = dict(self._load())
       data[name] = value
       self._save(data)
 
   def remove(self, name: str) -> None:
     with self._with_locks():
-      data = self._load()
+      data = dict(self._load())
       if name in data:
         del data[name]
         self._save(data)
 
   def clear(self, flag: int, declared: dict[str, DeclaredKey]) -> None:
     with self._with_locks():
-      data = self._load()
+      data = dict(self._load())
       changed = False
       for name in list(data):
         info = declared.get(name)

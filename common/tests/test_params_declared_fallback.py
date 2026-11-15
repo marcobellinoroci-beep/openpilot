@@ -379,3 +379,47 @@ def test_overlay_migrates_when_native_learns_the_key(tmp_path):
   stored = json.loads(overlay.read_text()) if overlay.exists() else {}
   assert "AutoOvertake" not in stored
   assert upgraded._store.get("AutoOvertake") in (True, "1", 1)
+
+
+def test_overlay_file_is_cached_by_mtime(tmp_path, monkeypatch):
+  import openpilot.common.params_declared as pd
+
+  path = tmp_path / OVERLAY_FILENAME
+  path.write_text('{"AutoOvertake":"1"}', encoding="utf-8")
+  reads = {"n": 0}
+  orig = pd._read_file
+
+  def counting(p):
+    reads["n"] += 1
+    return orig(p)
+
+  monkeypatch.setattr(pd, "_read_file", counting)
+  overlay = DeclaredKeyOverlay(path)
+  assert overlay.get("AutoOvertake") == "1"
+  assert reads["n"] == 1
+  for _ in range(1000):
+    assert overlay.get("AutoOvertake") == "1"
+    assert overlay.contains_cached("AutoOvertake")
+  assert reads["n"] == 1
+
+  path.write_text('{"AutoOvertake":"0"}', encoding="utf-8")
+  assert overlay.get("AutoOvertake") == "0"
+  assert reads["n"] == 2
+
+
+def test_overlay_contains_cached_loads_once_for_missing_file(tmp_path, monkeypatch):
+  import openpilot.common.params_declared as pd
+
+  path = tmp_path / OVERLAY_FILENAME
+  reads = {"n": 0}
+  orig = pd._read_file
+
+  def counting(p):
+    reads["n"] += 1
+    return orig(p)
+
+  monkeypatch.setattr(pd, "_read_file", counting)
+  overlay = DeclaredKeyOverlay(path)
+  for _ in range(1000):
+    assert not overlay.contains_cached("IsMetric")
+  assert reads["n"] == 0  # missing file is cached without json.loads
