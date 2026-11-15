@@ -176,9 +176,15 @@ class Multilang:
       self._translations = {}
       self._plurals = {}
 
+  @staticmethod
+  def _strip_prefix(language_code: str) -> str:
+    return str(language_code).removeprefix("main_")
+
   def change_language(self, language_code: str) -> None:
+    # languages.json values are "main_<code>" (shared with the Galaxy); the .po
+    # files are named app_<code>.po, so keep the bare code internally.
     self._params.put("LanguageSetting", language_code)
-    self._language = language_code
+    self._language = self._strip_prefix(language_code)
     self.setup()
 
   def tr(self, text: str) -> str:
@@ -198,8 +204,8 @@ class Multilang:
     self.codes = {v: k for k, v in self.languages.items()}
 
     if self._params is not None:
-      lang = str(self._params.get("LanguageSetting")).removeprefix("main_")
-      if lang in self.codes:
+      lang = self._strip_prefix(self._params.get("LanguageSetting"))
+      if lang in self.codes or f"main_{lang}" in self.codes:
         self._language = lang
 
 
