@@ -3,6 +3,8 @@
 CUSTOM_SETTING_KEYS = frozenset({
   # Solo sterzo: openpilot sterza, la velocità resta ai pedali (nessuna accelerazione da openpilot o TACC)
   "SteerOnlyMode",
+  # Velocità minima dello sterzo: parametro esistente (QOL laterale), spostato nella sezione Marco
+  "PauseLateralSpeed",
   "AutoOvertake",
   "AutoOvertakeReturn",
   "OvertakeReturnDelay",

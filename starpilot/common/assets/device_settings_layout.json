@@ -30,6 +30,21 @@
         "requires_offroad": true
       },
       {
+        "key": "PauseLateralSpeed",
+        "label": "Pause Steering Below",
+        "description": "Pause steering below the set speed. Steering, including Always On Lateral and Steering Only, turns on again at or above it. Set to 0 to steer at any speed. Works while Quality of Life in Lateral (Steering) is on (it is on by default); if Turn Signal Only is on there, it applies only while signaling.",
+        "picker_description": "Steering turns on only at or above this speed.",
+        "data_type": "int",
+        "ui_type": "numeric",
+        "min": 0.0,
+        "max": 99.0,
+        "step": 1.0,
+        "unit_type": "vehicle_speed",
+        "metric_max": 150.0,
+        "settings_tier": "simple",
+        "custom": true
+      },
+      {
         "key": "AutoOvertake",
         "label": "Auto Overtake",
         "description": "On a highway (car speed limit 110 km/h or higher), automatically change left when a slower or stopped lead is ahead. No turn signal is required. Requires at least 60 km/h, a clear left lane, no left blind-spot warning, and no left road edge. Use with caution and be ready to intervene.",
@@ -757,20 +772,6 @@
         "data_type": "bool",
         "ui_type": "toggle",
         "is_parent_toggle": true,
-        "settings_tier": "simple"
-      },
-      {
-        "key": "PauseLateralSpeed",
-        "label": "Pause Steering Below",
-        "description": "Pause steering below the set speed.",
-        "data_type": "int",
-        "ui_type": "numeric",
-        "min": 0.0,
-        "max": 99.0,
-        "step": 1.0,
-        "unit_type": "vehicle_speed",
-        "metric_max": 150.0,
-        "parent_key": "QOLLateral",
         "settings_tier": "simple"
       },
       {
