@@ -68,6 +68,341 @@
         "parent_key": "AutoOvertake",
         "settings_tier": "simple",
         "custom": true
+      },
+      {
+        "key": "SpeedLimitController",
+        "label": "Speed Limit Controller",
+        "description": "Limit openpilot's maximum driving speed using configured map, dashboard, and optional vision sources. Press + above a limit for a persistent override; hold the gas pedal for a temporary override.",
+        "picker_description": "Press + above a limit for a persistent override; hold the gas pedal for a temporary override.",
+        "data_type": "bool",
+        "ui_type": "toggle",
+        "is_parent_toggle": true,
+        "settings_tier": "simple",
+        "custom": true
+      },
+      {
+        "key": "SLCConfirmation",
+        "label": "Confirm New Speed Limits",
+        "description": "Ask before changing to a new speed limit. To accept, tap the flashing on-screen widget or press the Cruise Increase button. To deny, press the Cruise Decrease button or ignore the prompt for 30 seconds.",
+        "picker_description": "Asks before applying a new speed limit.",
+        "data_type": "bool",
+        "ui_type": "toggle",
+        "is_parent_toggle": true,
+        "parent_key": "SpeedLimitController",
+        "settings_tier": "advanced"
+      },
+      {
+        "key": "SLCConfirmationLower",
+        "label": "Confirm Lower Limits",
+        "description": "Require confirmation before applying a newly detected lower speed limit.",
+        "picker_description": "Asks before applying a lower speed limit.",
+        "data_type": "bool",
+        "ui_type": "toggle",
+        "parent_key": "SLCConfirmation",
+        "settings_tier": "advanced"
+      },
+      {
+        "key": "SLCConfirmationHigher",
+        "label": "Confirm Higher Limits",
+        "description": "Require confirmation before applying a newly detected higher speed limit.",
+        "picker_description": "Asks before applying a higher speed limit.",
+        "data_type": "bool",
+        "ui_type": "toggle",
+        "parent_key": "SLCConfirmation",
+        "settings_tier": "advanced"
+      },
+      {
+        "key": "SLCLookaheadHigher",
+        "label": "Higher Limit Lookahead Time",
+        "description": "How far ahead openpilot anticipates upcoming higher speed limits from downloaded map data.",
+        "data_type": "int",
+        "ui_type": "numeric",
+        "min": 0.0,
+        "max": 30.0,
+        "parent_key": "SpeedLimitController",
+        "settings_tier": "advanced"
+      },
+      {
+        "key": "SLCLookaheadLower",
+        "label": "Lower Limit Lookahead Time",
+        "description": "How far ahead openpilot anticipates upcoming lower speed limits from downloaded map data.",
+        "data_type": "int",
+        "ui_type": "numeric",
+        "min": 0.0,
+        "max": 30.0,
+        "parent_key": "SpeedLimitController",
+        "settings_tier": "advanced"
+      },
+      {
+        "key": "SetSpeedLimit",
+        "label": "Match Speed Limit on Engage",
+        "description": "When openpilot is first enabled, automatically set the max speed to the current posted limit.",
+        "picker_description": "Matches the speed limit when openpilot engages.",
+        "data_type": "bool",
+        "ui_type": "toggle",
+        "parent_key": "SpeedLimitController",
+        "settings_tier": "advanced"
+      },
+      {
+        "key": "SLCFallback",
+        "label": "Fallback Speed",
+        "description": "Choose the speed to use when no speed limit source is currently available.",
+        "picker_description": "Chooses the speed when no limit source is available.",
+        "data_type": "int",
+        "ui_type": "dropdown",
+        "options": [
+          {
+            "value": 0,
+            "label": "Set Speed"
+          },
+          {
+            "value": 1,
+            "label": "Experimental Mode"
+          },
+          {
+            "value": 2,
+            "label": "Previous Limit"
+          }
+        ],
+        "parent_key": "SpeedLimitController",
+        "settings_tier": "advanced"
+      },
+      {
+        "key": "SLCMapboxFiller",
+        "label": "Use Mapbox as Fallback",
+        "description": "Use Mapbox speed-limit data when no other source is available.",
+        "picker_description": "Uses Mapbox speed limits as a fallback.",
+        "data_type": "bool",
+        "ui_type": "toggle",
+        "parent_key": "SpeedLimitController",
+        "settings_tier": "advanced"
+      },
+      {
+        "key": "SLCPriority1",
+        "label": "Primary Speed Limit Source",
+        "description": "Choose the first speed-limit source to trust when more than one is available.",
+        "data_type": "string",
+        "ui_type": "dropdown",
+        "options": [
+          {
+            "value": "Dashboard",
+            "label": "Dashboard"
+          },
+          {
+            "value": "Map Data",
+            "label": "Map Data"
+          },
+          {
+            "value": "Vision",
+            "label": "Vision"
+          },
+          {
+            "value": "Highest",
+            "label": "Highest"
+          },
+          {
+            "value": "Lowest",
+            "label": "Lowest"
+          }
+        ],
+        "parent_key": "SpeedLimitController",
+        "settings_tier": "simple",
+        "custom": true
+      },
+      {
+        "key": "SLCPriority2",
+        "label": "Secondary Speed Limit Source",
+        "description": "Choose the backup speed-limit source when the primary one is unavailable.",
+        "picker_description": "Chooses the backup speed-limit source.",
+        "data_type": "string",
+        "ui_type": "dropdown",
+        "options": [
+          {
+            "value": "None",
+            "label": "None"
+          },
+          {
+            "value": "Dashboard",
+            "label": "Dashboard"
+          },
+          {
+            "value": "Map Data",
+            "label": "Map Data"
+          },
+          {
+            "value": "Vision",
+            "label": "Vision"
+          }
+        ],
+        "parent_key": "SpeedLimitController",
+        "settings_tier": "simple",
+        "custom": true
+      },
+      {
+        "key": "Offset1",
+        "label": "Speed Offset (0–24 mph)",
+        "description": "How much to offset posted speed-limits between 0 and 24 mph.",
+        "data_type": "float",
+        "ui_type": "numeric",
+        "min": -99.0,
+        "max": 99.0,
+        "step": 1.0,
+        "precision": 0,
+        "unit_type": "vehicle_speed",
+        "metric_min": -150.0,
+        "metric_max": 150.0,
+        "unit_range_index": 0,
+        "parent_key": "SpeedLimitController",
+        "settings_tier": "simple",
+        "custom": true
+      },
+      {
+        "key": "Offset2",
+        "label": "Speed Offset (25–34 mph)",
+        "description": "How much to offset posted speed-limits between 25 and 34 mph.",
+        "data_type": "float",
+        "ui_type": "numeric",
+        "min": -99.0,
+        "max": 99.0,
+        "step": 1.0,
+        "precision": 0,
+        "unit_type": "vehicle_speed",
+        "metric_min": -150.0,
+        "metric_max": 150.0,
+        "unit_range_index": 1,
+        "parent_key": "SpeedLimitController",
+        "settings_tier": "simple",
+        "custom": true
+      },
+      {
+        "key": "Offset3",
+        "label": "Speed Offset (35–44 mph)",
+        "description": "How much to offset posted speed-limits between 35 and 44 mph.",
+        "data_type": "float",
+        "ui_type": "numeric",
+        "min": -99.0,
+        "max": 99.0,
+        "step": 1.0,
+        "precision": 0,
+        "unit_type": "vehicle_speed",
+        "metric_min": -150.0,
+        "metric_max": 150.0,
+        "unit_range_index": 2,
+        "parent_key": "SpeedLimitController",
+        "settings_tier": "simple",
+        "custom": true
+      },
+      {
+        "key": "Offset4",
+        "label": "Speed Offset (45–54 mph)",
+        "description": "How much to offset posted speed-limits between 45 and 54 mph.",
+        "data_type": "float",
+        "ui_type": "numeric",
+        "min": -99.0,
+        "max": 99.0,
+        "step": 1.0,
+        "precision": 0,
+        "unit_type": "vehicle_speed",
+        "metric_min": -150.0,
+        "metric_max": 150.0,
+        "unit_range_index": 3,
+        "parent_key": "SpeedLimitController",
+        "settings_tier": "simple",
+        "custom": true
+      },
+      {
+        "key": "Offset5",
+        "label": "Speed Offset (55–64 mph)",
+        "description": "How much to offset posted speed-limits between 55 and 64 mph.",
+        "data_type": "float",
+        "ui_type": "numeric",
+        "min": -99.0,
+        "max": 99.0,
+        "step": 1.0,
+        "precision": 0,
+        "unit_type": "vehicle_speed",
+        "metric_min": -150.0,
+        "metric_max": 150.0,
+        "unit_range_index": 4,
+        "parent_key": "SpeedLimitController",
+        "settings_tier": "simple",
+        "custom": true
+      },
+      {
+        "key": "Offset6",
+        "label": "Speed Offset (65–74 mph)",
+        "description": "How much to offset posted speed-limits between 65 and 74 mph.",
+        "data_type": "float",
+        "ui_type": "numeric",
+        "min": -99.0,
+        "max": 99.0,
+        "step": 1.0,
+        "precision": 0,
+        "unit_type": "vehicle_speed",
+        "metric_min": -150.0,
+        "metric_max": 150.0,
+        "unit_range_index": 5,
+        "parent_key": "SpeedLimitController",
+        "settings_tier": "simple",
+        "custom": true
+      },
+      {
+        "key": "Offset7",
+        "label": "Speed Offset (75–99 mph)",
+        "description": "How much to offset posted speed-limits between 75 and 99 mph.",
+        "data_type": "float",
+        "ui_type": "numeric",
+        "min": -99.0,
+        "max": 99.0,
+        "step": 1.0,
+        "precision": 0,
+        "unit_type": "vehicle_speed",
+        "metric_min": -150.0,
+        "metric_max": 150.0,
+        "unit_range_index": 6,
+        "parent_key": "SpeedLimitController",
+        "settings_tier": "simple",
+        "custom": true
+      },
+      {
+        "key": "ShowSLCOffset",
+        "label": "Show Speed Limit Offset",
+        "description": "Show the current offset on the compact driving display. The unified Max Set / Speed Limit card always shows nonzero offsets.",
+        "picker_description": "Shows the offset on the compact display; the unified card always shows nonzero offsets.",
+        "data_type": "bool",
+        "ui_type": "toggle",
+        "parent_key": "SpeedLimitController",
+        "settings_tier": "advanced"
+      },
+      {
+        "key": "SpeedLimitSources",
+        "label": "Show Speed Limit Sources",
+        "description": "Display the speed-limit sources and their current values on the driving screen.",
+        "picker_description": "Shows speed-limit sources and their current values.",
+        "data_type": "bool",
+        "ui_type": "toggle",
+        "parent_key": "SpeedLimitController",
+        "settings_tier": "advanced"
+      },
+      {
+        "key": "SLCAbbreviatedSources",
+        "label": "Show Abbreviated Icon Sources",
+        "description": "Render the speed-limit sources as compact text labels (e.g. \"Dash-45\", \"MapD-30\") without icons.",
+        "picker_description": "Shows speed-limit sources as compact text labels.",
+        "data_type": "bool",
+        "ui_type": "toggle",
+        "parent_key": "SpeedLimitController",
+        "settings_tier": "advanced"
+      },
+      {
+        "key": "SLCActiveSourcesOnly",
+        "label": "Only Show Sources With Speed Limits",
+        "description": "Hide source rows that have no current speed limit reading. Works with both abbreviated and full display.",
+        "picker_description": "Hides speed-limit sources with no current reading.",
+        "data_type": "bool",
+        "ui_type": "toggle",
+        "parent_key": "SpeedLimitController",
+        "settings_tier": "advanced"
       }
     ]
   },
@@ -2153,311 +2488,6 @@
         "settings_tier": "simple"
       },
       {
-        "key": "SpeedLimitController",
-        "label": "Speed Limit Controller",
-        "description": "Limit openpilot's maximum driving speed using configured map, dashboard, and optional vision sources. Press + above a limit for a persistent override; hold the gas pedal for a temporary override.",
-        "picker_description": "Press + above a limit for a persistent override; hold the gas pedal for a temporary override.",
-        "data_type": "bool",
-        "ui_type": "toggle",
-        "is_parent_toggle": true,
-        "settings_tier": "advanced"
-      },
-      {
-        "key": "SLCConfirmation",
-        "label": "Confirm New Speed Limits",
-        "description": "Ask before changing to a new speed limit. To accept, tap the flashing on-screen widget or press the Cruise Increase button. To deny, press the Cruise Decrease button or ignore the prompt for 30 seconds.",
-        "picker_description": "Asks before applying a new speed limit.",
-        "data_type": "bool",
-        "ui_type": "toggle",
-        "is_parent_toggle": true,
-        "parent_key": "SpeedLimitController",
-        "settings_tier": "advanced"
-      },
-      {
-        "key": "SLCConfirmationLower",
-        "label": "Confirm Lower Limits",
-        "description": "Require confirmation before applying a newly detected lower speed limit.",
-        "picker_description": "Asks before applying a lower speed limit.",
-        "data_type": "bool",
-        "ui_type": "toggle",
-        "parent_key": "SLCConfirmation",
-        "settings_tier": "advanced"
-      },
-      {
-        "key": "SLCConfirmationHigher",
-        "label": "Confirm Higher Limits",
-        "description": "Require confirmation before applying a newly detected higher speed limit.",
-        "picker_description": "Asks before applying a higher speed limit.",
-        "data_type": "bool",
-        "ui_type": "toggle",
-        "parent_key": "SLCConfirmation",
-        "settings_tier": "advanced"
-      },
-      {
-        "key": "SLCLookaheadHigher",
-        "label": "Higher Limit Lookahead Time",
-        "description": "How far ahead openpilot anticipates upcoming higher speed limits from downloaded map data.",
-        "data_type": "int",
-        "ui_type": "numeric",
-        "min": 0.0,
-        "max": 30.0,
-        "parent_key": "SpeedLimitController",
-        "settings_tier": "advanced"
-      },
-      {
-        "key": "SLCLookaheadLower",
-        "label": "Lower Limit Lookahead Time",
-        "description": "How far ahead openpilot anticipates upcoming lower speed limits from downloaded map data.",
-        "data_type": "int",
-        "ui_type": "numeric",
-        "min": 0.0,
-        "max": 30.0,
-        "parent_key": "SpeedLimitController",
-        "settings_tier": "advanced"
-      },
-      {
-        "key": "SetSpeedLimit",
-        "label": "Match Speed Limit on Engage",
-        "description": "When openpilot is first enabled, automatically set the max speed to the current posted limit.",
-        "picker_description": "Matches the speed limit when openpilot engages.",
-        "data_type": "bool",
-        "ui_type": "toggle",
-        "parent_key": "SpeedLimitController",
-        "settings_tier": "advanced"
-      },
-      {
-        "key": "SLCFallback",
-        "label": "Fallback Speed",
-        "description": "Choose the speed to use when no speed limit source is currently available.",
-        "picker_description": "Chooses the speed when no limit source is available.",
-        "data_type": "int",
-        "ui_type": "dropdown",
-        "options": [
-          {
-            "value": 0,
-            "label": "Set Speed"
-          },
-          {
-            "value": 1,
-            "label": "Experimental Mode"
-          },
-          {
-            "value": 2,
-            "label": "Previous Limit"
-          }
-        ],
-        "parent_key": "SpeedLimitController",
-        "settings_tier": "advanced"
-      },
-      {
-        "key": "SLCMapboxFiller",
-        "label": "Use Mapbox as Fallback",
-        "description": "Use Mapbox speed-limit data when no other source is available.",
-        "picker_description": "Uses Mapbox speed limits as a fallback.",
-        "data_type": "bool",
-        "ui_type": "toggle",
-        "parent_key": "SpeedLimitController",
-        "settings_tier": "advanced"
-      },
-      {
-        "key": "SLCPriority1",
-        "label": "Primary Speed Limit Source",
-        "description": "Choose the first speed-limit source to trust when more than one is available.",
-        "data_type": "string",
-        "ui_type": "dropdown",
-        "options": [
-          {
-            "value": "Dashboard",
-            "label": "Dashboard"
-          },
-          {
-            "value": "Map Data",
-            "label": "Map Data"
-          },
-          {
-            "value": "Vision",
-            "label": "Vision"
-          },
-          {
-            "value": "Highest",
-            "label": "Highest"
-          },
-          {
-            "value": "Lowest",
-            "label": "Lowest"
-          }
-        ],
-        "parent_key": "SpeedLimitController",
-        "settings_tier": "advanced"
-      },
-      {
-        "key": "SLCPriority2",
-        "label": "Secondary Speed Limit Source",
-        "description": "Choose the backup speed-limit source when the primary one is unavailable.",
-        "picker_description": "Chooses the backup speed-limit source.",
-        "data_type": "string",
-        "ui_type": "dropdown",
-        "options": [
-          {
-            "value": "None",
-            "label": "None"
-          },
-          {
-            "value": "Dashboard",
-            "label": "Dashboard"
-          },
-          {
-            "value": "Map Data",
-            "label": "Map Data"
-          },
-          {
-            "value": "Vision",
-            "label": "Vision"
-          }
-        ],
-        "parent_key": "SpeedLimitController",
-        "settings_tier": "advanced"
-      },
-      {
-        "key": "Offset1",
-        "label": "Speed Offset (0–24 mph)",
-        "description": "How much to offset posted speed-limits between 0 and 24 mph.",
-        "data_type": "float",
-        "ui_type": "numeric",
-        "min": -99.0,
-        "max": 99.0,
-        "step": 1.0,
-        "precision": 0,
-        "unit_type": "vehicle_speed",
-        "metric_min": -150.0,
-        "metric_max": 150.0,
-        "unit_range_index": 0,
-        "parent_key": "SpeedLimitController",
-        "settings_tier": "advanced"
-      },
-      {
-        "key": "Offset2",
-        "label": "Speed Offset (25–34 mph)",
-        "description": "How much to offset posted speed-limits between 25 and 34 mph.",
-        "data_type": "float",
-        "ui_type": "numeric",
-        "min": -99.0,
-        "max": 99.0,
-        "step": 1.0,
-        "precision": 0,
-        "unit_type": "vehicle_speed",
-        "metric_min": -150.0,
-        "metric_max": 150.0,
-        "unit_range_index": 1,
-        "parent_key": "SpeedLimitController",
-        "settings_tier": "advanced"
-      },
-      {
-        "key": "Offset3",
-        "label": "Speed Offset (35–44 mph)",
-        "description": "How much to offset posted speed-limits between 35 and 44 mph.",
-        "data_type": "float",
-        "ui_type": "numeric",
-        "min": -99.0,
-        "max": 99.0,
-        "step": 1.0,
-        "precision": 0,
-        "unit_type": "vehicle_speed",
-        "metric_min": -150.0,
-        "metric_max": 150.0,
-        "unit_range_index": 2,
-        "parent_key": "SpeedLimitController",
-        "settings_tier": "advanced"
-      },
-      {
-        "key": "Offset4",
-        "label": "Speed Offset (45–54 mph)",
-        "description": "How much to offset posted speed-limits between 45 and 54 mph.",
-        "data_type": "float",
-        "ui_type": "numeric",
-        "min": -99.0,
-        "max": 99.0,
-        "step": 1.0,
-        "precision": 0,
-        "unit_type": "vehicle_speed",
-        "metric_min": -150.0,
-        "metric_max": 150.0,
-        "unit_range_index": 3,
-        "parent_key": "SpeedLimitController",
-        "settings_tier": "advanced"
-      },
-      {
-        "key": "Offset5",
-        "label": "Speed Offset (55–64 mph)",
-        "description": "How much to offset posted speed-limits between 55 and 64 mph.",
-        "data_type": "float",
-        "ui_type": "numeric",
-        "min": -99.0,
-        "max": 99.0,
-        "step": 1.0,
-        "precision": 0,
-        "unit_type": "vehicle_speed",
-        "metric_min": -150.0,
-        "metric_max": 150.0,
-        "unit_range_index": 4,
-        "parent_key": "SpeedLimitController",
-        "settings_tier": "advanced"
-      },
-      {
-        "key": "Offset6",
-        "label": "Speed Offset (65–74 mph)",
-        "description": "How much to offset posted speed-limits between 65 and 74 mph.",
-        "data_type": "float",
-        "ui_type": "numeric",
-        "min": -99.0,
-        "max": 99.0,
-        "step": 1.0,
-        "precision": 0,
-        "unit_type": "vehicle_speed",
-        "metric_min": -150.0,
-        "metric_max": 150.0,
-        "unit_range_index": 5,
-        "parent_key": "SpeedLimitController",
-        "settings_tier": "advanced"
-      },
-      {
-        "key": "Offset7",
-        "label": "Speed Offset (75–99 mph)",
-        "description": "How much to offset posted speed-limits between 75 and 99 mph.",
-        "data_type": "float",
-        "ui_type": "numeric",
-        "min": -99.0,
-        "max": 99.0,
-        "step": 1.0,
-        "precision": 0,
-        "unit_type": "vehicle_speed",
-        "metric_min": -150.0,
-        "metric_max": 150.0,
-        "unit_range_index": 6,
-        "parent_key": "SpeedLimitController",
-        "settings_tier": "advanced"
-      },
-      {
-        "key": "ShowSLCOffset",
-        "label": "Show Speed Limit Offset",
-        "description": "Show the current offset on the compact driving display. The unified Max Set / Speed Limit card always shows nonzero offsets.",
-        "picker_description": "Shows the offset on the compact display; the unified card always shows nonzero offsets.",
-        "data_type": "bool",
-        "ui_type": "toggle",
-        "parent_key": "SpeedLimitController",
-        "settings_tier": "advanced"
-      },
-      {
-        "key": "SpeedLimitSources",
-        "label": "Show Speed Limit Sources",
-        "description": "Display the speed-limit sources and their current values on the driving screen.",
-        "picker_description": "Shows speed-limit sources and their current values.",
-        "data_type": "bool",
-        "ui_type": "toggle",
-        "parent_key": "SpeedLimitController",
-        "settings_tier": "advanced"
-      },
-      {
         "key": "ConditionalChill",
         "label": "Conditional Chill Mode",
         "description": "Keep \"Experimental Mode\" on by default, but temporarily switch to \"Chill Mode\" in simple cruising scenes where speed holding is usually better.",
@@ -2547,26 +2577,6 @@
         "data_type": "bool",
         "ui_type": "toggle",
         "parent_key": "ConditionalChill",
-        "settings_tier": "advanced"
-      },
-      {
-        "key": "SLCAbbreviatedSources",
-        "label": "Show Abbreviated Icon Sources",
-        "description": "Render the speed-limit sources as compact text labels (e.g. \"Dash-45\", \"MapD-30\") without icons.",
-        "picker_description": "Shows speed-limit sources as compact text labels.",
-        "data_type": "bool",
-        "ui_type": "toggle",
-        "parent_key": "SpeedLimitController",
-        "settings_tier": "advanced"
-      },
-      {
-        "key": "SLCActiveSourcesOnly",
-        "label": "Only Show Sources With Speed Limits",
-        "description": "Hide source rows that have no current speed limit reading. Works with both abbreviated and full display.",
-        "picker_description": "Hides speed-limit sources with no current reading.",
-        "data_type": "bool",
-        "ui_type": "toggle",
-        "parent_key": "SpeedLimitController",
         "settings_tier": "advanced"
       }
     ]

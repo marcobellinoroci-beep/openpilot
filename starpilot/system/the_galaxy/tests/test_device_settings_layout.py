@@ -348,7 +348,6 @@ def test_requested_simple_and_advanced_settings_tiers():
     "LeadDetectionThreshold",
     "TacoTune",
     "NavLongitudinalAllowed",
-    "SpeedLimitController",
     "ConditionalChill",
   ):
     assert longitudinal[key]["settings_tier"] == "advanced"
@@ -430,7 +429,17 @@ def test_custom_fork_settings_are_marked_in_layout():
   sections = _params_by_section(layout)
   marco = next(section for section in layout if section["name"] == CUSTOM_SETTING_SECTION_NAME)
   assert marco.get("custom") is True
-  assert set(sections[CUSTOM_SETTING_SECTION_NAME]) == set(CUSTOM_SETTING_KEYS)
+  marco_keys = set(sections[CUSTOM_SETTING_SECTION_NAME])
+  assert set(CUSTOM_SETTING_KEYS) <= marco_keys
+  # Non-custom rows may live in Marco only as descendants of a custom parent
+  # (Galaxy resolves parent_key within one section), e.g. the advanced
+  # Speed Limit Controller children.
+  marco_by_key = {param["key"]: param for param in marco["params"]}
+  for key in marco_keys - set(CUSTOM_SETTING_KEYS):
+    ancestor = marco_by_key[key].get("parent_key")
+    while ancestor in marco_by_key and ancestor not in CUSTOM_SETTING_KEYS:
+      ancestor = marco_by_key[ancestor].get("parent_key")
+    assert ancestor in CUSTOM_SETTING_KEYS, f"{key} must descend from a custom Marco setting"
   assert CUSTOM_SETTING_KEYS.isdisjoint(sections["Lateral (Steering)"])
 
   custom_keys = {
@@ -450,6 +459,32 @@ def test_custom_fork_settings_are_marked_in_layout():
   assert marco_params["NavLaneChange"]["requires_key_true"] == "LaneChanges"
   assert marco_params["AutoOvertakeReturn"]["parent_key"] == "AutoOvertake"
   assert marco_params["OvertakeReturnDelay"]["parent_key"] == "AutoOvertake"
+
+
+def test_speed_limit_controller_settings_are_in_marco_without_developer_mode():
+  sections = _params_by_section(_layout())
+  longitudinal = sections["Longitudinal (Speed & Following)"]
+  marco = sections[CUSTOM_SETTING_SECTION_NAME]
+  simple_keys = ("SpeedLimitController", "SLCPriority1", "SLCPriority2", *(f"Offset{i}" for i in range(1, 8)))
+
+  assert marco["SpeedLimitController"]["is_parent_toggle"] is True
+  for key in simple_keys:
+    assert key not in longitudinal
+    assert marco[key]["settings_tier"] == "simple"
+    assert marco[key]["custom"] is True
+    if key != "SpeedLimitController":
+      assert marco[key]["parent_key"] == "SpeedLimitController"
+  assert [option["value"] for option in marco["SLCPriority1"]["options"]] == [
+    "Dashboard", "Map Data", "Vision", "Highest", "Lowest",
+  ]
+
+  for section_name, params in sections.items():
+    for key, param in params.items():
+      if param.get("parent_key") in {"SpeedLimitController", "SLCConfirmation"}:
+        assert section_name == CUSTOM_SETTING_SECTION_NAME, f"{key} would be orphaned in {section_name}"
+  for key in ("SLCConfirmation", "SLCFallback", "SLCMapboxFiller", "ShowSLCOffset", "SpeedLimitSources"):
+    assert marco[key]["settings_tier"] == "advanced"
+    assert "custom" not in marco[key]
 
 
 def test_toyota_auto_hold_is_galaxy_only():

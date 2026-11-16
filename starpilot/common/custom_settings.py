@@ -5,6 +5,20 @@ CUSTOM_SETTING_KEYS = frozenset({
   "AutoOvertakeReturn",
   "OvertakeReturnDelay",
   "NavLaneChange",
+  # Speed Limit Controller settings shown in the Marco section of Galaxy
+  # without Developer Mode. They are existing params: membership here only
+  # drives the Marco section and the orange color; the fork-key overlay is
+  # decided by params_declared.py from the prebuilt params library.
+  "SpeedLimitController",
+  "SLCPriority1",
+  "SLCPriority2",
+  "Offset1",
+  "Offset2",
+  "Offset3",
+  "Offset4",
+  "Offset5",
+  "Offset6",
+  "Offset7",
 })
 
 # Orange title/badge color used on C4 and in Galaxy.
