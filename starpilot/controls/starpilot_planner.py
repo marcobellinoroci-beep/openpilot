@@ -31,6 +31,12 @@ from openpilot.starpilot.controls.lib.starpilot_vcruise import StarPilotVCruise
 from openpilot.starpilot.controls.lib.weather_checker import WeatherChecker
 
 RADARLESS_TRACK_HOLD_TIME = 0.45
+# Hysteresis on trackingLead: acquire at THRESHOLD (~0.63, ~0.5 s of continuous
+# detection) but release only once the filter falls below half of it (~0.32).
+# Without this a radarless/vision lead sitting near the tracking gate drops out
+# after ~0.25 s of flicker: the MPC then sees no lead and accelerates, and brakes
+# again when the lead is re-acquired (brake/accelerate cycling behind a lead).
+TRACKING_LEAD_RELEASE_THRESHOLD = THRESHOLD * 0.5
 FORCE_STOP_JERK_SCALE = 0.20  # accel-change cost multiplier for the whole stop approach,
                               # envelope included (125 -> 25). Lower = reaches the braking
                               # target sooner; it does not make the target deeper. Response
@@ -296,6 +302,8 @@ class StarPilotPlanner:
       following_lead = True
 
     self.tracking_lead_filter.update(following_lead)
+    if self.tracking_lead:
+      return self.tracking_lead_filter.x >= TRACKING_LEAD_RELEASE_THRESHOLD
     return self.tracking_lead_filter.x >= THRESHOLD
 
   def publish(self, theme_updated, sm, pm, starpilot_toggles, serialized_toggles=""):

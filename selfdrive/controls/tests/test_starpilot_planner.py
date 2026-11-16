@@ -308,3 +308,43 @@ def test_untracked_vision_lead_still_uses_strict_entry_gate():
     assert not planner.update_lead_status(16.8)
   finally:
     planner.shutdown()
+
+
+def _lost_vision_lead():
+  # Same lead as above but momentarily rejected by both the entry and the
+  # continuity gate (model probability dip), i.e. one flicker frame.
+  return SimpleNamespace(status=True, dRel=44.5, vLead=16.7, yRel=-0.69, aLeadK=0.0, modelProb=0.5, radar=False)
+
+
+def test_tracked_lead_survives_short_flicker():
+  planner = StarPilotPlanner(Path("/tmp/nonexistent"), DummyThemeManager())
+
+  try:
+    planner.model_length = 174.0
+    planner.tracking_lead = True
+    planner.tracking_lead_filter.x = 1.0
+    planner.lead_one = _lost_vision_lead()
+
+    # ~0.35 s of flicker used to drop the lead after ~0.25 s; now it is held.
+    for _ in range(7):
+      planner.tracking_lead = planner.update_lead_status(16.8)
+      assert planner.tracking_lead
+  finally:
+    planner.shutdown()
+
+
+def test_tracked_lead_is_still_released_when_really_lost():
+  planner = StarPilotPlanner(Path("/tmp/nonexistent"), DummyThemeManager())
+
+  try:
+    planner.model_length = 174.0
+    planner.tracking_lead = True
+    planner.tracking_lead_filter.x = 1.0
+    planner.lead_one = SimpleNamespace(status=False, dRel=0.0, vLead=0.0, yRel=0.0, aLeadK=0.0, modelProb=0.0, radar=False)
+
+    for _ in range(int(1.0 / DT_MDL)):
+      planner.tracking_lead = planner.update_lead_status(16.8)
+    assert not planner.tracking_lead
+    assert planner.tracking_lead_filter.x < starpilot_planner_module.TRACKING_LEAD_RELEASE_THRESHOLD
+  finally:
+    planner.shutdown()
