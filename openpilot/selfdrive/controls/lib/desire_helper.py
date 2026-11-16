@@ -25,6 +25,8 @@ OVERTAKE_RETURN_DELAY_MAX = 10.0  # s
 # AutoOvertakeReturn: the owed return also starts by itself, without the right blinker, once the delay and the
 # settle time are over and every right-side check has held for this long (no flicker).
 AUTO_OVERTAKE_RETURN_CONFIRM = 1.0  # s
+# Tight road: no automatic overtake or automatic return while the wheel is turned more than this.
+AUTO_OVERTAKE_MAX_STEER_ANGLE = 10.0  # deg
 
 # Highway only (auto-overtake start and AutoOvertakeReturn). The one road-type signal published on a Tesla Model 3
 # HW4 without a route is the car's own fused speed limit (carStateSP.speedLimit from DAS_status.DAS_fusedSpeedLimit:
@@ -444,6 +446,7 @@ class DesireHelper:
       not left_edge_detected and
       left_lane_clear and
       highway is True and
+      abs(carstate.steeringAngleDeg) <= AUTO_OVERTAKE_MAX_STEER_ANGLE and
       not self.return_pending and
       not nav_requested and
       self.lane_change_state == LaneChangeState.off and
@@ -546,6 +549,7 @@ class DesireHelper:
       not carstate.rightBlinker and
       not carstate.leftBlinker and
       highway is True and
+      abs(carstate.steeringAngleDeg) <= AUTO_OVERTAKE_MAX_STEER_ANGLE and
       lateral_active and
       v_ego >= AUTO_OVERTAKE_SPEED_MIN and
       self.auto_overtake and
