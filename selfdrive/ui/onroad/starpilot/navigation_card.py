@@ -513,6 +513,37 @@ class NavigationCardRenderer(Widget):
       rl.WHITE,
     )
 
+  def _render_mici_compact(self, rect: rl.Rectangle) -> None:  # MICI compact card: arrow + distance only
+    left_safe = 96
+    icon_size = 44
+    distance_font_size = 24
+    pad = 10
+    distance_size = measure_text_cached(self._font_bold, self._distance, distance_font_size)
+    container_width = int(max(icon_size, distance_size.x) + pad * 2)
+    container_height = pad + icon_size + 4 + int(distance_size.y) + pad
+    container_x = int(rect.x + left_safe)
+    container_y = int(rect.y + 16)
+    container = rl.Rectangle(container_x, container_y, container_width, container_height)
+    self._interactive_rect = container
+    rl.draw_rectangle_rounded(container, 0.25, 10, rl.Color(7, 11, 18, 228))
+    rl.draw_rectangle_rounded_lines_ex(container, 0.25, 10, 2, rl.Color(255, 255, 255, 34))
+
+    icon = self._get_icon(self._maneuver_type, self._modifier)
+    icon_x = container_x + (container_width - icon_size) / 2
+    icon_y = container_y + pad
+    rl.draw_texture_pro(
+      icon,
+      rl.Rectangle(0, 0, icon.width, icon.height),
+      rl.Rectangle(icon_x, icon_y, icon_size, icon_size),
+      rl.Vector2(0, 0),
+      0,
+      rl.WHITE,
+    )
+
+    distance_x = container_x + (container_width - distance_size.x) / 2
+    distance_y = icon_y + icon_size + 4
+    rl.draw_text_ex(self._font_bold, self._distance, rl.Vector2(distance_x, distance_y), distance_font_size, 0, rl.WHITE)
+
   def _render_collapsed_mici(self, rect: rl.Rectangle) -> None:  # MICI collapsed chip
     chip_size = 72
     right_reserved = 160
@@ -547,6 +578,6 @@ class NavigationCardRenderer(Widget):
         self._render_collapsed_default(rect)     # tici/tizi: right edge
       return
     if self._layout_variant == "mici":
-      self._render_mici(rect)                     # MICI: top-left card
+      self._render_mici_compact(rect)             # MICI: arrow + distance only
     else:
       self._render_default(rect)                  # tici/tizi: right edge, bottom-aligned
