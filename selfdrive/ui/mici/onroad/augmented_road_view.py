@@ -596,6 +596,8 @@ class AugmentedRoadView(CameraView):
     self._min_steer_speed_banner = MinSteerSpeedBanner()
     self._standstill_timer = StandstillTimerOverlay()
     self._favorite_slots = self._child(FavoriteSlotsOverlay())
+    # Steer Only chip: its tap must not also fire the favorite slot underneath
+    self._favorite_slots.set_touch_event_valid_callback(lambda ev: not self._hud_renderer.steer_only_chip_hit(ev.pos))
     self._offroad_label = UnifiedLabel("start the car to\nuse openpilot", 54, FontWeight.DISPLAY,
                                        text_color=rl.Color(255, 255, 255, int(255 * 0.9)),
                                        alignment=rl.GuiTextAlignment.TEXT_ALIGN_CENTER,

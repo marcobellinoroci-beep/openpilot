@@ -6,6 +6,7 @@ from openpilot.common.constants import CV
 from openpilot.selfdrive.ui.onroad.starpilot.torque_bar import TorqueBar
 from openpilot.selfdrive.ui.onroad.starpilot.rivian_lateral_mode import rivian_lateral_mode
 from openpilot.selfdrive.ui.mici.onroad.speed_limit_utils import resolve_display_speed_limit_ms
+from openpilot.selfdrive.ui.mici.onroad.steer_only_chip import SteerOnlyChip
 from openpilot.selfdrive.ui.lib.speed_limit_pulse import SpeedLimitPulse
 from openpilot.selfdrive.ui.onroad.starpilot.navigation_card import NavigationCardRenderer
 from openpilot.selfdrive.ui.ui_state import ui_state, UIStatus
@@ -152,6 +153,7 @@ class HudRenderer(Widget):
     self._turn_intent = TurnIntent()
     self._torque_bar = TorqueBar()
     self._navigation_card = NavigationCardRenderer("mici")
+    self._steer_only_chip = SteerOnlyChip()
 
     self._txt_wheel: rl.Texture = gui_app.texture('icons_mici/wheel.png', 50, 50)
     self._txt_wheel_critical: rl.Texture = gui_app.texture('icons_mici/wheel_critical.png', 50, 50)
@@ -308,10 +310,15 @@ class HudRenderer(Widget):
 
     self._draw_steering_wheel(self._rect)
     self._draw_auto_overtake_indicator(self._rect)
+    self._steer_only_chip.layout_at(self._rect.x + self._rect.width - 10, self._rect.y + 52)
+    self._steer_only_chip.render()
     self._draw_speed_limit_prompt(self._rect)
 
+  def steer_only_chip_hit(self, pos) -> bool:
+    return rl.check_collision_point_rec(pos, self._steer_only_chip.rect)
+
   def user_interacting(self) -> bool:
-    return self._navigation_card.is_pressed
+    return self._navigation_card.is_pressed or self._steer_only_chip.interacting()
 
   def _render(self, rect: rl.Rectangle) -> None:
     """Render HUD elements to the screen."""

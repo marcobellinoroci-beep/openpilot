@@ -79,6 +79,8 @@ BLOCKED_ONROAD_KEYS = {
   "SteerKP",
   "SteerFriction",
   "SteerLatAccel",
+  # Solo sterzo: onroad solo dal chip dedicato, che controlla che il cruise non sia inserito
+  "SteerOnlyMode",
 }
 
 
