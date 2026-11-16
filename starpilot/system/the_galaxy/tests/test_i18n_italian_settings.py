@@ -30,6 +30,7 @@ CHROME = {
   "Language",
   "Fine scrubbing",
   "Hold to fine scrub",
+  "to",
 }
 
 # Units, brands, and labels intentionally left identical in Italian.
@@ -91,6 +92,27 @@ def test_i18n_js_loads_generated_italian_settings_catalog():
   assert "LanguageSetting" not in catalog
 
 
+
+# Runtime labels/descriptions written by resolveVehicleUnitParam in params.js.
+# These overwrite the mph layout strings when IsMetric is on, and use slightly
+# different English than the layout ("speed limits" and an en-dash range).
+SPEED_OFFSET_RANGES = {
+  "imperial": ["0–24", "25–34", "35–44", "45–54", "55–64", "65–74", "75–99"],
+  "metric": ["0–29", "30–49", "50–59", "60–79", "80–99", "100–119", "120–140"],
+}
+SPEED_OFFSET_UNITS = {"imperial": "mph", "metric": "km/h"}
+
+
+def _speed_offset_runtime_strings():
+  strings = []
+  for mode, ranges in SPEED_OFFSET_RANGES.items():
+    unit = SPEED_OFFSET_UNITS[mode]
+    for band in ranges:
+      strings.append(f"Speed Offset ({band} {unit})")
+      strings.append(f"How much to offset posted speed limits between {band} {unit}.")
+  return strings
+
+
 def test_italian_catalog_covers_layout_and_settings_chrome():
   catalog = _catalog()
   missing = []
@@ -104,6 +126,22 @@ def test_italian_catalog_covers_layout_and_settings_chrome():
   assert missing == []
   assert still_english == []
 
+
+
+def test_italian_catalog_covers_runtime_speed_offset_bands():
+  catalog = _catalog()
+  missing = []
+  still_english = []
+  for source in _speed_offset_runtime_strings():
+    if source not in catalog:
+      missing.append(source)
+      continue
+    if catalog[source] == source:
+      still_english.append(source)
+  assert missing == []
+  assert still_english == []
+  assert catalog["Speed Offset (0–29 km/h)"] == "Offset velocità (0–29 km/h)"
+  assert catalog["to"] == "a"
 
 def test_italian_catalog_translates_reported_english_labels():
   catalog = _catalog()

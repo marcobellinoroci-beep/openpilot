@@ -58,7 +58,9 @@ export const GalaxyToggleCard = {
       return this.value !== undefined ? formatNumericParamValue(this.displayParam, this.currentValue, this.values) : ".."
     },
     sliderRangeDisplay() {
-      return `${formatNumericParamValue(this.displayParam, this.bounds.min, this.values)} to ${formatNumericParamValue(this.displayParam, this.bounds.max, this.values)}`
+      const min = formatNumericParamValue(this.displayParam, this.bounds.min, this.values)
+      const max = formatNumericParamValue(this.displayParam, this.bounds.max, this.values)
+      return `${min} ${t("to")} ${max}`
     },
     sliderStepDisplay() {
       return formatNumericParamValue(this.displayParam, this.bounds.step, this.values)
