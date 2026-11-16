@@ -154,7 +154,7 @@ class StarPilotState:
                 
             self.car_state.hasAlphaLongitudinal = bool(self._safe_get(CP, "alphaLongitudinalAvailable", False))
             self.car_state.hasBSM = bool(self._safe_get(CP, "enableBsm", False))
-            self.car_state.hasDashSpeedLimits = car_make in ("ford", "hyundai", "toyota")
+            self.car_state.hasDashSpeedLimits = car_make in ("ford", "hyundai", "tesla", "toyota")
             # hasNNFFLog is default True for now
             self.car_state.hasOpenpilotLongitudinal = bool(self._safe_get(CP, "openpilotLongitudinalControl", False))
             self.car_state.hasPCMCruise = bool(self._safe_get(CP, "pcmCruise", False))
