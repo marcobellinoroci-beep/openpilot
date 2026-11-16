@@ -137,6 +137,7 @@ class CarState(CarStateBase):
     self.prev_cruise_buttons = 0
     self.gas_pressed = False
     self.prev_follow_distance = None
+    self.follow_distance_release_pending = False
     self.active_touch_points = None
     self.screen_cancel_pressed = False
     self.msg_stw_actn_req = None
@@ -286,13 +287,23 @@ class CarState(CarStateBase):
     # Tesla MCU follow-distance setting (UI_driverAssistControl 0x3F8).
     # A change emits ButtonType.gapAdjustCruise so StarPilot can cycle the
     # driving personality when "Distance button -> change personality" is on.
+    # The setting is a level, not a button: simulate a short press with the
+    # press on the change and the release on the next update. Ending on a
+    # press (as create_button_events does here) leaves distancePressed stuck
+    # high, which fires the long/very-long actions and then masks every later
+    # short press in selfdrived.
+    follow_events = []
+    if self.follow_distance_release_pending:
+      follow_events.append(structs.CarState.ButtonEvent(pressed=False, type=ButtonType.gapAdjustCruise))
+      self.follow_distance_release_pending = False
     follow = tesla_follow_distance(can_parsers)
     if follow is not None:
       if self.prev_follow_distance is not None and follow != self.prev_follow_distance:
-        ret.buttonEvents = list(ret.buttonEvents) + create_button_events(
-          follow, self.prev_follow_distance, TESLA_FOLLOW_DISTANCE_VALUES,
-        )
+        follow_events.append(structs.CarState.ButtonEvent(pressed=True, type=ButtonType.gapAdjustCruise))
+        self.follow_distance_release_pending = True
       self.prev_follow_distance = follow
+    if follow_events:
+      ret.buttonEvents = list(ret.buttonEvents) + follow_events
     if self.CP.flags & TeslaFlags.AOL_SCREEN_BUTTON:
       ret.buttonEvents = list(ret.buttonEvents) + self.update_screen_button(can_parsers[Bus.adas])
 

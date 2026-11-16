@@ -74,13 +74,15 @@ def test_follow_distance_change_emits_gap_adjust_cruise():
 
   _feed(parsers, 2_000_000_000, distance=5)
   events = _events(cs, parsers, toggles)
-  # create_button_events emits a falling edge of the previous value then a
-  # rising edge of the new one. selfdrived cycles personality on the release.
-  assert (ButtonType.gapAdjustCruise, False) in events
-  assert (ButtonType.gapAdjustCruise, True) in events
+  # Short press: press on the change, release on the next update, so
+  # distancePressed does not stay high. selfdrived cycles personality on the release.
+  assert events == [(ButtonType.gapAdjustCruise, True)]
   assert cs.prev_follow_distance == 5
 
   _feed(parsers, 3_000_000_000, distance=5)
+  assert _events(cs, parsers, toggles) == [(ButtonType.gapAdjustCruise, False)]
+
+  _feed(parsers, 4_000_000_000, distance=5)
   assert _events(cs, parsers, toggles) == []
 
 
@@ -102,7 +104,7 @@ def test_party_bus_fallback_and_zero_ignored():
 
   _feed(parsers, 3_000_000_000, distance=3, bus=CANBUS.party)
   events = _events(cs, parsers, toggles)
-  assert (ButtonType.gapAdjustCruise, False) in events
+  assert events == [(ButtonType.gapAdjustCruise, True)]
 
 
 def test_ap_party_preferred_over_party():
@@ -122,10 +124,13 @@ def test_missing_frame_does_not_clear_or_retrigger():
   _events(cs, parsers, toggles)
   _feed(parsers, 2_000_000_000, distance=5)
   events = _events(cs, parsers, toggles)
-  assert (ButtonType.gapAdjustCruise, False) in events
+  assert events == [(ButtonType.gapAdjustCruise, True)]
 
-  # No new 0x3F8 this cycle: keep last setting, no extra event.
+  # No new 0x3F8 this cycle: keep last setting, only the pending release.
   _feed(parsers, 3_000_000_000, distance=None)
   assert tesla_follow_distance(parsers) == 5
-  assert _events(cs, parsers, toggles) == []
+  assert _events(cs, parsers, toggles) == [(ButtonType.gapAdjustCruise, False)]
   assert cs.prev_follow_distance == 5
+
+  _feed(parsers, 4_000_000_000, distance=None)
+  assert _events(cs, parsers, toggles) == []
