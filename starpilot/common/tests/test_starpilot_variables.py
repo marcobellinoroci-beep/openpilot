@@ -259,6 +259,23 @@ def test_steer_delay_mode_migration_preserves_existing_manual_full_delay():
   assert params.get_bool(spv.STEER_DELAY_MODE_MIGRATION_KEY) is True
 
 
+def test_ensure_distance_button_personality_default_writes_only_when_unset():
+  params = _FakeParams()
+
+  assert spv.ensure_distance_button_personality_default(params) is True
+  assert params.get_int("DistanceButtonControl") == spv.BUTTON_FUNCTIONS["PERSONALITY_PROFILE"]
+
+  assert spv.ensure_distance_button_personality_default(params) is False
+  assert params.get_int("DistanceButtonControl") == spv.BUTTON_FUNCTIONS["PERSONALITY_PROFILE"]
+
+
+def test_ensure_distance_button_personality_default_preserves_explicit_no_action():
+  params = _FakeParams(ints={"DistanceButtonControl": 0})
+
+  assert spv.ensure_distance_button_personality_default(params) is False
+  assert params.get_int("DistanceButtonControl") == 0
+
+
 def test_cancel_button_migration_copies_distance_actions_once():
   params = _FakeParams(
     ints={

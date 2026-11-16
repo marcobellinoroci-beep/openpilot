@@ -408,6 +408,28 @@ def reverse_cruise_available(quality_of_life: bool, car_make: str, pcm_cruise: b
   return bool(quality_of_life and car_make == "toyota" and pcm_cruise)
 
 
+def ensure_distance_button_personality_default(params: Params | None = None) -> bool:
+  """Write DistanceButtonControl=Change Personality if the key has never been set.
+
+  The header default is already 1, but DistanceButtonControl is not in the
+  prebuilt params_pyx.so, so it lives in the fork-key overlay. Params.get()
+  without an applied default returns None for an unset overlay key, and
+  get_button_function then treats the short press as "No Action". Writing the
+  value makes the documented default take effect without recompiling. An
+  explicit 0 (No Action) is left unchanged. Call with a Params instance that
+  does not substitute defaults on get() (e.g. params_raw).
+  """
+  params = params or Params()
+  try:
+    raw = params.get("DistanceButtonControl", return_default=False)
+  except TypeError:
+    raw = params.get("DistanceButtonControl")
+  if raw is not None:
+    return False
+  params.put_int("DistanceButtonControl", BUTTON_FUNCTIONS["PERSONALITY_PROFILE"])
+  return True
+
+
 def migrate_cancel_button_controls(params: Params | None = None) -> bool:
   params = params or Params(return_defaults=True)
   if params.get_bool(CANCEL_BUTTON_MIGRATION_KEY) or not params.get_bool("RemapCancelToDistance"):
@@ -463,6 +485,7 @@ class StarPilotVariables:
     self.params_memory = Params(memory=True)
     migrate_cancel_button_controls(self.params)
     migrate_aol_lkas_to_button_control(self.params)
+    ensure_distance_button_personality_default(self.params_raw)
 
     self.starpilot_toggles = SimpleNamespace()
     toggle = self.starpilot_toggles
