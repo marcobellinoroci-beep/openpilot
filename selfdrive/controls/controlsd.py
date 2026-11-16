@@ -551,7 +551,7 @@ class Controls:
     CC.longActive = (
       CC.enabled and not any(e.overrideLongitudinal for e in self.sm['onroadEvents']) and
       not self.sm['starpilotCarState'].pauseLongitudinal and self.CP.openpilotLongitudinalControl and
-      not self.ecu_disable_failed
+      not self.ecu_disable_failed and not getattr(self.starpilot_toggles, "steer_only_mode", False)
     )
 
     actuators = CC.actuators
@@ -846,6 +846,8 @@ class Controls:
       self.sm['starpilotCarState'].alwaysOnLateralEnabled,
     )
     cancel_requested = should_cancel_stock_cruise(self.CP, CS.cruiseState.enabled, CC.enabled)
+    # Solo sterzo: nessuna accelerazione dal TACC Tesla, il cruise inserito viene annullato
+    cancel_requested |= getattr(self.starpilot_toggles, "steer_only_mode", False) and CS.cruiseState.enabled
     CC.cruiseControl.cancel = cancel_requested and not pacifica_hybrid_aol
 
     legacy_resume_hack = False

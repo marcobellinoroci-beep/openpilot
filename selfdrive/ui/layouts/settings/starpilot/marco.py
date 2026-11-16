@@ -8,6 +8,7 @@ from openpilot.selfdrive.ui.layouts.settings.starpilot.aethergrid import (
   SettingRow,
   SettingSection,
 )
+from openpilot.selfdrive.ui.ui_state import ui_state
 from openpilot.starpilot.common.custom_settings import CUSTOM_SETTING_SECTION_NAME
 from openpilot.system.ui.lib.multilang import tr, tr_noop
 
@@ -31,6 +32,14 @@ class StarPilotMarcoLayout(_SettingsPage):
       return lc_on() and p.get_bool("AutoOvertake")
 
     rows = [
+      SettingRow(
+        "SteerOnlyMode", "toggle", tr_noop("Steering Only (Pedals Control Speed)"),
+        subtitle=tr_noop("openpilot steers only; you control speed with the pedals. The brake does not turn steering off. Applies from the next drive."),
+        get_state=lambda: p.get_bool("SteerOnlyMode"),
+        set_state=lambda s: p.put_bool("SteerOnlyMode", s),
+        enabled=lambda: not ui_state.started,
+        disabled_label=tr_noop("Change this while parked."),
+      ),
       SettingRow(
         "AutoOvertake", "toggle", tr_noop("Auto Overtake"),
         subtitle=tr_noop("Blinkerless left pass of a slower lead on the highway."),

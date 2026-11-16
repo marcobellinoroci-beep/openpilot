@@ -743,6 +743,7 @@ inline static std::unordered_map<std::string, ParamKeyAttributes> keys = {
     {"StoppingDecelRate", {PERSISTENT, FLOAT, "0.0", "0.0", 3}},
     {"StoppingDecelRateStock", {PERSISTENT, FLOAT, "0.0", "0.0", 3}},
     {"StarButtonControl", {PERSISTENT, INT, "0", "0", 2, SETTINGS_SIMPLE}},
+    {"SteerOnlyMode", {PERSISTENT, BOOL, "0", "0", 0, SETTINGS_SIMPLE}},
     {"SwitchbackModeCooldown", {PERSISTENT, INT, "5", "0", 2, SETTINGS_SIMPLE}},
     {"SwitchbackModeEnabled", {CLEAR_ON_OFFROAD_TRANSITION, BOOL, "0", "0"}},
     {"SubaruSNG", {PERSISTENT, BOOL, "1", "0", 2, SETTINGS_SIMPLE}},

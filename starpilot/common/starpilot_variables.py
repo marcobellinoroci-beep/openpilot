@@ -671,7 +671,12 @@ class StarPilotVariables:
     # CarParams uses this value to select the matching Panda safety configuration.
     toggle.tesla_cooperative_steering = self.params.get_bool("TeslaCoopSteering")
     toggle.tesla_aol_screen_tap_requested = self.params.get_bool("TeslaAOLScreenTap") and self.params.get_bool("AlwaysOnLateral")
-    toggle.tesla_aol_screen_brake_disengage_requested = self.params.get_bool("TeslaAOLDisengageOnBrake")
+    # Solo sterzo (Marco): openpilot sterza sempre (AOL), la velocità resta ai pedali.
+    # Il freno non deve spegnere né mettere in pausa lo sterzo in questa modalità.
+    toggle.steer_only_mode = self.params.get_bool("SteerOnlyMode")
+    toggle.tesla_aol_screen_brake_disengage_requested = (
+      self.params.get_bool("TeslaAOLDisengageOnBrake") and not toggle.steer_only_mode
+    )
     toggle.rivian_angle_control = self.params.get_bool("RivianAngleControl")
     toggle.toyota_radar_mode_requested = self.params.get_int("ToyotaRadarMode")
 
@@ -894,16 +899,19 @@ class StarPilotVariables:
     toggle.warningSoft_volume = self.get_value("WarningSoftVolume", cast=float, condition=toggle.alert_volume_controller)
     toggle.warningImmediate_volume = max(self.get_value("WarningImmediateVolume", cast=float, condition=toggle.alert_volume_controller, default=25), 25)
 
-    toggle.always_on_lateral = self.get_value("AlwaysOnLateral") and always_on_lateral_available(CP)
+    toggle.always_on_lateral = (self.get_value("AlwaysOnLateral") or toggle.steer_only_mode) and always_on_lateral_available(CP)
     lkas_button_assigned_to_aol = self.get_button_function("LKASButtonControl") == BUTTON_FUNCTIONS["AOL_TOGGLE"]
     toggle.ford_lkas_aol_toggle = toggle.car_make == "ford" and lkas_button_assigned_to_aol
     toggle.always_on_lateral_lkas = (
       toggle.always_on_lateral and toggle.lkas_allowed_for_aol and lkas_button_assigned_to_aol and not toggle.ford_lkas_aol_toggle
     )
     toggle.always_on_lateral_main = toggle.always_on_lateral and not prohibited_main_aol
-    toggle.always_on_lateral_pause_speed = self.get_value("PauseAOLOnBrake", cast=float, condition=toggle.always_on_lateral)
+    toggle.always_on_lateral_pause_speed = self.get_value(
+      "PauseAOLOnBrake", cast=float, condition=toggle.always_on_lateral and not toggle.steer_only_mode, default=0.0
+    )
     toggle.tesla_aol_disengage_on_brake = self.get_value(
-      "TeslaAOLDisengageOnBrake", condition=toggle.always_on_lateral and toggle.car_make == "tesla"
+      "TeslaAOLDisengageOnBrake",
+      condition=toggle.always_on_lateral and toggle.car_make == "tesla" and not toggle.steer_only_mode,
     )
     toggle.tesla_aol_screen_tap = self.get_value(
       "TeslaAOLScreenTap", condition=toggle.always_on_lateral and toggle.car_make == "tesla" and

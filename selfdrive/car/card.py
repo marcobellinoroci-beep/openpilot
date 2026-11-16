@@ -135,7 +135,8 @@ class Car:
         if len(can.can) > 0:
           break
 
-      alpha_long_allowed = self.params.get_bool("AlphaLongitudinalEnabled")
+      # Solo sterzo: niente longitudinale openpilot, il panda resta in modalità stock (AEB Tesla inoltrato)
+      alpha_long_allowed = self.params.get_bool("AlphaLongitudinalEnabled") and not self.params.get_bool("SteerOnlyMode")
       num_pandas = len(messaging.recv_one_retry(self.sm.sock['pandaStates']).pandaStates)
 
       cached_params = None
@@ -291,6 +292,10 @@ class Car:
 
     # Update carState from CAN
     CS, FPCS = self.CI.update(can_list, self.starpilot_toggles)
+    if getattr(self.starpilot_toggles, "steer_only_mode", False):
+      # Solo sterzo: il cruise (TACC) non inserisce openpilot; controlsd lo annulla. Il freno non c'entra.
+      CS.blockPcmEnable = True
+      CS.buttonEnable = False
     if self.CP.brand == 'mock':
       CS, FPCS = self.mock_carstate.update(CS, FPCS)
     self._inject_favorite_virtual_cruise_events(CS)

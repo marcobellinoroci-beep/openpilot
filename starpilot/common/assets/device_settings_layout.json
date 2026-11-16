@@ -19,6 +19,17 @@
     "custom": true,
     "params": [
       {
+        "key": "SteerOnlyMode",
+        "label": "Steering Only (Pedals Control Speed)",
+        "description": "openpilot only steers: neither openpilot nor the Tesla's cruise control (TACC/Autopilot) will accelerate or brake. You always control speed with the pedals. Steering stays active whenever the car is in Drive and cruise is available (Always On Lateral); if you engage cruise with the stalk it is cancelled right away. The brake pedal works normally and does not turn off this mode or the steering. openpilot will NOT slow down for vehicles ahead, stops, or curves: keep your foot ready. The Tesla's own emergency braking stays active. Change it while parked; it applies from the next drive.",
+        "picker_description": "openpilot steers only; you control speed with the pedals. The brake does not turn steering off.",
+        "data_type": "bool",
+        "ui_type": "toggle",
+        "settings_tier": "simple",
+        "custom": true,
+        "requires_offroad": true
+      },
+      {
         "key": "AutoOvertake",
         "label": "Auto Overtake",
         "description": "On a highway (car speed limit 110 km/h or higher), automatically change left when a slower or stopped lead is ahead. No turn signal is required. Requires at least 60 km/h, a clear left lane, no left blind-spot warning, and no left road edge. Use with caution and be ready to intervene.",

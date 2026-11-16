@@ -1,6 +1,8 @@
 """Keys for settings added in this fork, so the UI can mark them distinctly."""
 
 CUSTOM_SETTING_KEYS = frozenset({
+  # Solo sterzo: openpilot sterza, la velocità resta ai pedali (nessuna accelerazione da openpilot o TACC)
+  "SteerOnlyMode",
   "AutoOvertake",
   "AutoOvertakeReturn",
   "OvertakeReturnDelay",
