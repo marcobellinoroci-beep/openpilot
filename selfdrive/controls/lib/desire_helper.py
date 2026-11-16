@@ -82,8 +82,6 @@ AUTO_OVERTAKE_RETURN_TIMEOUT = 30.0
 OVERTAKE_RETURN_DELAY_DEFAULT = 2.5
 OVERTAKE_RETURN_DELAY_MAX = 10.0
 AUTO_OVERTAKE_RETURN_CONFIRM = 1.0
-# Tight road: no automatic overtake or automatic return while the wheel is turned more than this.
-AUTO_OVERTAKE_MAX_STEER_ANGLE = 10.0  # deg
 HIGHWAY_SPEED_LIMIT_MIN = 110 * CV.KPH_TO_MS - 0.1
 
 AUTO_OVERTAKE_LEAD_PROB = 0.5
@@ -804,7 +802,6 @@ class DesireHelper:
       not left_edge_detected and
       left_lane_clear and
       highway is True and
-      abs(carstate.steeringAngleDeg) <= AUTO_OVERTAKE_MAX_STEER_ANGLE and
       not self.return_pending and
       self.lane_change_state == LaneChangeState.off and
       not nav_blocks_left
@@ -891,7 +888,6 @@ class DesireHelper:
       not carstate.rightBlinker and
       not carstate.leftBlinker and
       highway is True and
-      abs(carstate.steeringAngleDeg) <= AUTO_OVERTAKE_MAX_STEER_ANGLE and
       lateral_active and
       v_ego >= AUTO_OVERTAKE_SPEED_MIN and
       self.auto_overtake and
