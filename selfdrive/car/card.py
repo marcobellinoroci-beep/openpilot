@@ -135,8 +135,9 @@ class Car:
         if len(can.can) > 0:
           break
 
-      # Solo sterzo: niente longitudinale openpilot, il panda resta in modalità stock (AEB Tesla inoltrato)
-      alpha_long_allowed = self.params.get_bool("AlphaLongitudinalEnabled") and not self.params.get_bool("SteerOnlyMode")
+      # Solo sterzo non decide più la longitudinale all'avvio: con alpha attiva il CarParams resta in alpha
+      # e Solo sterzo agisce dal vivo (longActive spento, cruise annullato), così si cambia in viaggio
+      alpha_long_allowed = self.params.get_bool("AlphaLongitudinalEnabled")
       num_pandas = len(messaging.recv_one_retry(self.sm.sock['pandaStates']).pandaStates)
 
       cached_params = None
