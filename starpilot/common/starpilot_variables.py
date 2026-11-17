@@ -1438,8 +1438,9 @@ class StarPilotVariables:
     toggle.speed_limit_vienna = self.get_value("UseVienna", condition=navigation_ui)
 
     quality_of_life_lateral = self.get_value("QOLLateral")
-    toggle.pause_lateral_below_speed = self.get_value("PauseLateralSpeed", cast=float, condition=quality_of_life_lateral, conversion=speed_conversion)
-    toggle.pause_lateral_below_signal = self.get_value("PauseLateralOnSignal", condition=toggle.pause_lateral_below_speed != 0)
+    # Pause Steering Below lives in the Marco section (no parent toggle), so it is not gated by Quality of Life.
+    toggle.pause_lateral_below_speed = self.get_value("PauseLateralSpeed", cast=float, conversion=speed_conversion)
+    toggle.pause_lateral_below_signal = self.get_value("PauseLateralOnSignal", condition=quality_of_life_lateral and toggle.pause_lateral_below_speed != 0)
     toggle.pause_lateral_signal_delay = self.get_value("LateralResumeDelay", cast=float, condition=toggle.pause_lateral_below_signal, default=0.0, min=0.0, max=5.0)
 
     quality_of_life = self.get_value("QOLLongitudinal")

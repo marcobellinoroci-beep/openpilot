@@ -32,7 +32,7 @@
       {
         "key": "PauseLateralSpeed",
         "label": "Pause Steering Below",
-        "description": "Pause steering below the set speed. Steering, including Always On Lateral and Steering Only, turns on again at or above it. Set to 0 to steer at any speed. Works while Quality of Life in Lateral (Steering) is on (it is on by default); if Turn Signal Only is on there, it applies only while signaling.",
+        "description": "Pause steering below the set speed. Steering, including Always On Lateral and Steering Only, turns on again at or above it. Set to 0 to steer at any speed. If Turn Signal Only is on in Lateral (Steering) > Quality of Life, it applies only while signaling.",
         "picker_description": "Steering turns on only at or above this speed.",
         "data_type": "int",
         "ui_type": "numeric",
