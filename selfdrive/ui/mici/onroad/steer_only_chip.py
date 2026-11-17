@@ -36,11 +36,11 @@ class SteerOnlyChip(Widget):
     interacting, self._interacting = self._interacting, False
     return interacting
 
-  def layout_at(self, right_x: float, top_y: float) -> None:
+  def layout_at(self, left_x: float, bottom_y: float) -> None:
     self._on = ui_state.params.get_bool(STEER_ONLY_PARAM)
     size = measure_text_cached(self._font, self._label(), self.FONT_SIZE)
     width, height = size.x + self.PAD_X * 2, size.y + self.PAD_Y * 2
-    self.set_rect(rl.Rectangle(right_x - width, top_y, width, height))
+    self.set_rect(rl.Rectangle(left_x, bottom_y - height, width, height))
 
   def _label(self) -> str:
     return "STEER ONLY" if self._on else "STEER ONLY OFF"

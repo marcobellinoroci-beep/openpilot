@@ -310,7 +310,8 @@ class HudRenderer(Widget):
 
     self._draw_steering_wheel(self._rect)
     self._draw_auto_overtake_indicator(self._rect)
-    self._steer_only_chip.layout_at(self._rect.x + self._rect.width - 10, self._rect.y + 52)
+    # Steer Only chip: bottom-left, just right of the steering wheel icon
+    self._steer_only_chip.layout_at(self._rect.x + 21 + self._txt_wheel.width + 12, self._rect.y + self._rect.height - 14)
     self._steer_only_chip.render()
     self._draw_speed_limit_prompt(self._rect)
 
