@@ -101,6 +101,9 @@ MODEL_LAUNCH_MAX_ACCEL = 1.5
 RAW_LEAD_SAFETY_MIN_CLOSING_SPEED = 0.5
 RAW_LEAD_SAFETY_TTC = 7.0
 RAW_LEAD_SAFETY_DISTANCE = 40.0
+# Keep the raw close-lead path active this long after it last triggered (only while a lead still
+# exists), so noisy vision aLeadK/closing speed does not toggle the lead on and off every frame.
+CLOSE_LEAD_HOLD_TIME = 2.0  # s
 RAW_RADAR_STOPPED_LEAD_MAX_SPEED = 1.0
 RAW_RADAR_STOPPED_LEAD_MAX_DISTANCE = 120.0
 RAW_LEAD_LOW_SPEED_HOLD_MAX_EGO_SPEED = 4.5
@@ -622,6 +625,7 @@ class LongitudinalPlanner:
     self.uncert_slow = FirstOrderFilter(0.0, 1.6, self.dt)  # ~lam=0.6
     self.uncert_fast = FirstOrderFilter(0.0, 0.9, self.dt)  # faster cool-down for accel decisions
     # Lead stability tracking
+    self.close_lead_hold_frames = 0
     self.prev_lead_dist = None
     self.last_big_brake_t = 0.0
     self.stable_lead = False
@@ -2116,6 +2120,13 @@ class LongitudinalPlanner:
     self.lead_one = sm['radarState'].leadOne
     self.lead_two = sm['radarState'].leadTwo
     raw_close_lead_control = any(self.raw_close_lead_needs_control(lead, scene_v_ego) for lead in (self.lead_one, self.lead_two))
+    if not (self.lead_one.status or self.lead_two.status):
+      self.close_lead_hold_frames = 0
+    elif raw_close_lead_control:
+      self.close_lead_hold_frames = int(round(CLOSE_LEAD_HOLD_TIME / self.dt))
+    elif self.close_lead_hold_frames > 0:
+      self.close_lead_hold_frames -= 1
+      raw_close_lead_control = True
     early_truck_follow = (
       not experimental_mode and
       any(is_gm_silverado_early_follow_lead(self.CP, lead, scene_v_ego) for lead in (self.lead_one, self.lead_two))
