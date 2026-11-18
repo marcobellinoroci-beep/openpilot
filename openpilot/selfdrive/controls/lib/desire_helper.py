@@ -12,7 +12,9 @@ TurnDirection = custom.ModelDataV2SP.TurnDirection
 LANE_CHANGE_SPEED_MIN = 20 * CV.MPH_TO_MS  # 20 mph == 8.9408 m/s
 LANE_CHANGE_TIME_MAX = 10.
 LANE_CHANGE_START_TIME = 0.5
-AUTO_OVERTAKE_DELAY = 2.0
+# The slower lead must hold this long (30 model frames) before the change starts. The 0.5 s dropout grace
+# counts toward it, so at least 1.0 s of real detection is still needed.
+AUTO_OVERTAKE_DELAY = 1.5  # s
 AUTO_OVERTAKE_SPEED_MIN = 60 * CV.KPH_TO_MS  # 60 km/h == 16.67 m/s
 # Settled in the passing lane, then give up if the right lane never opens.
 AUTO_OVERTAKE_RETURN_SETTLE = 5.0  # s
@@ -92,7 +94,10 @@ def _overtake_return_delay(value) -> float:
 
 # Lead qualification. x is meters ahead, v is absolute speed in m/s.
 AUTO_OVERTAKE_LEAD_PROB = 0.5
-AUTO_OVERTAKE_LEAD_MAX_X = 70.0  # m; ignore leads farther than this
+AUTO_OVERTAKE_LEAD_MAX_X = 70.0  # m; adjacent-lane occupancy range (is_left/right_lane_clear)
+# Slower-lead trigger range: start the overtake as soon as a confident slower lead is seen this far ahead,
+# instead of waiting until it is inside 70 m. Every other check (prob, speed margin, timer) is unchanged.
+AUTO_OVERTAKE_TRIGGER_MAX_X = 100.0  # m
 # Slightly slower than ego. -1.0 m/s never fired once longitudinal control had
 # matched the lead (v_rel ~ 0) or when the lead was only a little slower.
 AUTO_OVERTAKE_LEAD_VREL = -0.3  # m/s; v_lead - v_ego must be below this
@@ -195,7 +200,7 @@ def is_slower_lead(leads, v_ego, v_cruise_kph=None):
   check) so existing callers do not change.
 
   When v_cruise_kph is passed (carState.vCruise, kph) the lead must also be
-  within AUTO_OVERTAKE_LEAD_MAX_X and either slightly slower than ego
+  within AUTO_OVERTAKE_TRIGGER_MAX_X and either slightly slower than ego
   (v_lead - v_ego < -0.3 m/s) or more than ~1 m/s below the cruise set speed.
   A matched lead (v_rel ~ 0) still counts in that second case. 255 or <= 0
   means the setpoint is unset and only the relative-speed check applies.
@@ -218,7 +223,7 @@ def is_slower_lead(leads, v_ego, v_cruise_kph=None):
   if v_cruise_kph is None:
     return v_rel < AUTO_OVERTAKE_LEAD_VREL_LEGACY
 
-  if x >= AUTO_OVERTAKE_LEAD_MAX_X:
+  if x >= AUTO_OVERTAKE_TRIGGER_MAX_X:
     return False
   if v_rel < AUTO_OVERTAKE_LEAD_VREL:
     return True
