@@ -75,7 +75,9 @@ TURN_DESIRES = {
 # AutoOvertake: blinkerless left pass of a slower or stopped lead, highway only.
 # Thresholds match zoompilot. The car's dashboard speed limit is the highway
 # gate (>= 110 km/h); stale, unknown, non-finite, or 0 fails closed.
-AUTO_OVERTAKE_DELAY = 2.0
+# The slower lead must hold this long (30 model frames) before the change starts. The 0.5 s dropout grace
+# counts toward it, so at least 1.0 s of real detection is still needed.
+AUTO_OVERTAKE_DELAY = 1.5  # s
 AUTO_OVERTAKE_SPEED_MIN = 60 * CV.KPH_TO_MS
 AUTO_OVERTAKE_RETURN_SETTLE = 5.0
 AUTO_OVERTAKE_RETURN_TIMEOUT = 30.0
@@ -85,7 +87,10 @@ AUTO_OVERTAKE_RETURN_CONFIRM = 1.0
 HIGHWAY_SPEED_LIMIT_MIN = 110 * CV.KPH_TO_MS - 0.1
 
 AUTO_OVERTAKE_LEAD_PROB = 0.5
-AUTO_OVERTAKE_LEAD_MAX_X = 70.0
+AUTO_OVERTAKE_LEAD_MAX_X = 70.0  # m; adjacent-lane occupancy range (is_left/right_lane_clear)
+# Slower-lead trigger range: start the overtake as soon as a confident slower lead is seen this far ahead,
+# instead of waiting until it is inside 70 m. Every other check (prob, speed margin, timer) is unchanged.
+AUTO_OVERTAKE_TRIGGER_MAX_X = 100.0  # m
 AUTO_OVERTAKE_LEAD_VREL = -0.3
 AUTO_OVERTAKE_LEAD_VREL_LEGACY = -1.0
 AUTO_OVERTAKE_VCRUISE_UNSET_KPH = 255.0
@@ -199,7 +204,7 @@ def is_slower_lead(leads, v_ego, v_cruise_kph=None):
   if v_cruise_kph is None:
     return v_rel < AUTO_OVERTAKE_LEAD_VREL_LEGACY
 
-  if x >= AUTO_OVERTAKE_LEAD_MAX_X:
+  if x >= AUTO_OVERTAKE_TRIGGER_MAX_X:
     return False
   if v_rel < AUTO_OVERTAKE_LEAD_VREL:
     return True

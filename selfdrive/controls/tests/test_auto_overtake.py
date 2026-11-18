@@ -88,12 +88,14 @@ def test_is_slower_lead_thresholds():
   def leads(x=40.0, v=25.0, prob=0.8):
     return [SimpleNamespace(x=[x], v=[v], prob=prob)]
 
-  # slightly slower than ego, within 70 m
+  # slightly slower than ego, within 100 m
   assert is_slower_lead(leads(v=HIGHWAY_V_EGO - 0.4), HIGHWAY_V_EGO, SET_SPEED_KPH)
   # matched speed, but at least 1 m/s under the set speed (130 kph ~ 36.1 m/s)
   assert is_slower_lead(leads(v=HIGHWAY_V_EGO), HIGHWAY_V_EGO, SET_SPEED_KPH)
+  # 80 m now counts (trigger range 100 m)
+  assert is_slower_lead(leads(x=80.0, v=20.0), HIGHWAY_V_EGO, SET_SPEED_KPH)
   # too far
-  assert not is_slower_lead(leads(x=80.0, v=20.0), HIGHWAY_V_EGO, SET_SPEED_KPH)
+  assert not is_slower_lead(leads(x=105.0, v=20.0), HIGHWAY_V_EGO, SET_SPEED_KPH)
   # low confidence
   assert not is_slower_lead(leads(prob=0.4, v=20.0), HIGHWAY_V_EGO, SET_SPEED_KPH)
   # unset cruise: only relative-speed check
