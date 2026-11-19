@@ -17,9 +17,6 @@ from opendbc.car.tesla.preap.pedal_feedback import PedalFeedback
 ButtonType = structs.CarState.ButtonEvent.Type
 
 
-TESLA_GAS_PRESS_ON = 0.8
-TESLA_GAS_PRESS_OFF = 0.4
-
 # tesla_model3_party.dbc, message DAS_status (0x39B) on the Autopilot party bus (CANBUS.autopilot_party = 2).
 # 5-bit signal, factor 5, units kph or mph from DI_state.DI_speedUnits. VAL_ raw 0 = UNKNOWN_SNA, raw 31 = NONE.
 # The CAN parser exposes the physical value (raw * 5), so NONE arrives as 155, outside the DBC [0|150] range.
@@ -105,8 +102,9 @@ class TeslaScreenCANParser(CANParser):
 
 
 def update_tesla_gas_pressed(previous: bool, pedal_position: float) -> bool:
-  threshold = TESLA_GAS_PRESS_OFF if previous else TESLA_GAS_PRESS_ON
-  return float(pedal_position) > threshold
+  # Any accelerator position counts as pressed, exactly like panda safety (tesla.h: DI_accelPedalPos != 0).
+  # A higher threshold let openpilot send accel the panda then blocked, leaving the car with no DAS_control.
+  return float(pedal_position) > 0.0
 
 
 class CarState(CarStateBase):

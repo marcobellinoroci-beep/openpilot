@@ -51,9 +51,10 @@ def test_longitudinal_jerk_release_timer_resets_while_gas_is_pressed():
   assert values["DAS_jerkMax"] == pytest.approx(0.0)
 
 
-def test_tesla_gas_pressed_hysteresis_prevents_release_chatter():
-  assert update_tesla_gas_pressed(False, 0.4) is False
-  assert update_tesla_gas_pressed(False, 0.8) is False
-  assert update_tesla_gas_pressed(False, 1.2) is True
-  assert update_tesla_gas_pressed(True, 0.4) is False
-  assert update_tesla_gas_pressed(True, 0.8) is True
+def test_tesla_gas_pressed_matches_panda():
+  # panda: gas_pressed = DI_accelPedalPos raw != 0 (0.4 % per step)
+  for previous in (False, True):
+    assert update_tesla_gas_pressed(previous, 0.0) is False
+    assert update_tesla_gas_pressed(previous, 0.4) is True
+    assert update_tesla_gas_pressed(previous, 0.8) is True
+    assert update_tesla_gas_pressed(previous, 1.2) is True
