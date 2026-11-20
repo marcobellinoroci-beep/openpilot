@@ -11,6 +11,21 @@ from opendbc.car.tesla.preap.stock_cc_spoofer import StockCCSpoofer
 from opendbc.car.tesla.values import CANBUS, CAR, CarControllerParams, TeslaSafetyFlags, LEGACY_CARS
 from opendbc.car.vehicle_model import VehicleModel
 
+
+def apply_tesla_accel_jerk_limit(accel, prev, dt):
+  """Slew DAS accel commands. Stronger braking is limited less, and near-max
+  braking is not delayed."""
+  if accel <= CarControllerParams.ACCEL_JERK_UNLIMITED_DECEL and accel < prev:
+    return float(accel)
+  if accel <= CarControllerParams.ACCEL_JERK_URGENT_DECEL:
+    down = CarControllerParams.ACCEL_JERK_LIMIT_DOWN_URGENT
+  else:
+    down = CarControllerParams.ACCEL_JERK_LIMIT_DOWN
+  lo = prev - down * dt
+  hi = prev + CarControllerParams.ACCEL_JERK_LIMIT_UP * dt
+  return float(np.clip(accel, lo, hi))
+
+
 def get_safety_CP():
   from opendbc.car.tesla.interface import CarInterface
   return CarInterface.get_non_essential_params(CAR.TESLA_MODEL_Y)
@@ -21,6 +36,8 @@ class CarController(CarControllerBase):
     super().__init__(dbc_names, CP)
     self.apply_angle_last = 0
     self.apply_angle_command_last = 0
+    self.apply_accel_last = 0.0
+    self.apply_accel_initialized = False
     self.coop_steer = CooperativeSteeringController()
     self.coop_enabled = CP.carFingerprint == CAR.TESLA_MODEL_3 and any(
       config.safetyParam & TeslaSafetyFlags.COOP_STEERING.value for config in CP.safetyConfigs
@@ -132,6 +149,11 @@ class CarController(CarControllerBase):
       if self.frame % 4 == 0:
         state = 13 if CC.cruiseControl.cancel else 4  # 4=ACC_ON, 13=ACC_CANCEL_GENERIC_SILENT
         accel = float(np.clip(actuators.accel, CarControllerParams.ACCEL_MIN, CarControllerParams.ACCEL_MAX))
+        if CC.longActive and not CC.cruiseControl.cancel:
+          accel = self._limit_accel_jerk(accel)
+        else:
+          self.apply_accel_initialized = False
+          self.apply_accel_last = 0.0
         cntr = (self.frame // 4) % 8
         if self.CP.carFingerprint in LEGACY_CARS:
           hw1_accel = accel if CC.longActive and not CC.cruiseControl.cancel else 0.
@@ -152,9 +174,20 @@ class CarController(CarControllerBase):
     # TODO: HUD control
     new_actuators = actuators.as_builder()
     new_actuators.steeringAngleDeg = self.apply_angle_command_last
+    if self.apply_accel_initialized:
+      new_actuators.accel = self.apply_accel_last
 
     self.frame += 1
     return new_actuators, can_sends
+
+  def _limit_accel_jerk(self, accel):
+    if not self.apply_accel_initialized:
+      self.apply_accel_last = accel
+      self.apply_accel_initialized = True
+      return accel
+    accel = apply_tesla_accel_jerk_limit(accel, self.apply_accel_last, CarControllerParams.ACCEL_CMD_DT)
+    self.apply_accel_last = accel
+    return accel
 
   def _update_preap(self, CC, CS):
     actuators = CC.actuators

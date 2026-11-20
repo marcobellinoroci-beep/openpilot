@@ -138,6 +138,16 @@ class CarControllerParams:
   JERK_LIMIT_MIN = -4.9  # m/s^3, ACC faults at 5.0
   JERK_RAMP_RATE = JERK_LIMIT_MAX * 0.002
 
+  # Rate-limit DAS_accelMin/Max commands (carcontroller). Tesla's bus jerk window is
+  # ±4.9 m/s^3, well above comfort (~1 m/s^3), and openpilot otherwise forwards
+  # unsmoothed planner steps at 25 Hz. Limits are jerk (m/s^3).
+  ACCEL_CMD_DT = 0.04  # s, DAS_control is sent every 4 x 10 ms frames
+  ACCEL_JERK_LIMIT_UP = 1.2  # more positive accel (throttle / brake release)
+  ACCEL_JERK_LIMIT_DOWN = 2.5  # mild increase in braking
+  ACCEL_JERK_LIMIT_DOWN_URGENT = 12.0  # strong braking; 0 to -3.48 m/s^2 in ~0.29 s
+  ACCEL_JERK_URGENT_DECEL = -1.5  # m/s^2, use the urgent down rate at/below this request
+  ACCEL_JERK_UNLIMITED_DECEL = -2.5  # m/s^2, do not delay near-max / emergency braking
+
 
 class TeslaSafetyFlags(IntFlag):
   LONG_CONTROL = 1
