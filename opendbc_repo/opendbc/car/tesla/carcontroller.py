@@ -112,13 +112,19 @@ class CarController(CarControllerBase):
         else:
           self._clear_steering_limit_info()
 
-      if self.CP.carFingerprint in LEGACY_CARS:
-        cntr = (self.frame // 2) % 16
-        can_sends.append(self.tesla_can.create_steering_control(cntr, self.apply_angle_command_last, lat_active))
-      else:
-        can_sends.append(self.tesla_can.create_steering_control(self.apply_angle_command_last, lat_active))
+      # Only send steering / EAC allow while openpilot lateral is active. When disengaged the
+      # panda forwards stock DAS_steeringControl and APS_eacMonitor; sending ours would overlap.
+      # On engage, cruise sets controls_allowed first, then latActive: the first OP frames are
+      # accepted because tesla_tx_hook allows 0x488/0x27D once openpilot may steer. On disengage
+      # we stop immediately (no hold), which can leave a short gap until stock is forwarded.
+      if CC.latActive:
+        if self.CP.carFingerprint in LEGACY_CARS:
+          cntr = (self.frame // 2) % 16
+          can_sends.append(self.tesla_can.create_steering_control(cntr, self.apply_angle_command_last, lat_active))
+        else:
+          can_sends.append(self.tesla_can.create_steering_control(self.apply_angle_command_last, lat_active))
 
-    if self.frame % 10 == 0 and self.CP.carFingerprint not in LEGACY_CARS:
+    if self.frame % 10 == 0 and self.CP.carFingerprint not in LEGACY_CARS and CC.latActive:
       can_sends.append(self.tesla_can.create_steering_allowed())
 
     # Longitudinal control

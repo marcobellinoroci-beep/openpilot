@@ -235,10 +235,13 @@ class TestTeslaScreenButton(unittest.TestCase):
     self.helper._rx(self.helper._angle_cmd_msg(0, state=2, bus=2))
     self.assertTrue(self.helper._tx(self.helper._angle_cmd_msg(0)))
 
-  def test_stock_lkas_still_blocks_when_not_authorized(self):
+  def test_stock_lkas_no_longer_latches_against_authorized_steering(self):
+    # Stock type-2 on the bus before the gesture must not keep blocking openpilot after authorization.
     self.helper._rx(self.helper._angle_cmd_msg(0, state=2, bus=2))
     self.gesture()
-    self.assertFalse(self.helper._tx(self.helper._angle_cmd_msg(0)))
+    self.assertTrue(self.safety.get_aol_allowed())
+    self.assertTrue(self.helper._tx(self.helper._angle_cmd_msg(0)))
+    self.assertEqual(-1, self.safety.safety_fwd_hook(2, 0x488))
 
   def test_autopark_still_blocks_steering(self):
     self.helper._rx(self.helper._pcm_status_msg(False, autopark_state=3))

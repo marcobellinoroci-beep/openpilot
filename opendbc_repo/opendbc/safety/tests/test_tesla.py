@@ -9,6 +9,7 @@ from opendbc.car.tesla.carcontroller import get_safety_CP
 from opendbc.car.structs import CarParams
 from opendbc.car.vehicle_model import VehicleModel
 from opendbc.can import CANDefine
+from opendbc.safety import ALTERNATIVE_EXPERIENCE
 from opendbc.safety.tests.libsafety import libsafety_py
 import opendbc.safety.tests.common as common
 from opendbc.safety.tests.common import CANPackerSafety, MAX_SPEED_DELTA, MAX_WRONG_COUNTERS, away_round, round_speed
@@ -27,7 +28,8 @@ def round_angle(apply_angle, can_offset=0):
 
 class TestTeslaSafetyBase(common.CarSafetyTest, common.AngleSteeringSafetyTest, common.LongitudinalAccelSafetyTest):
   RELAY_MALFUNCTION_ADDRS = {0: (MSG_DAS_steeringControl, MSG_APS_eacMonitor)}
-  FWD_BLACKLISTED_ADDRS = {2: [MSG_DAS_steeringControl, MSG_APS_eacMonitor]}
+  # 0x488 / 0x27D are forwarded while openpilot is not steering (default: controls not allowed).
+  FWD_BLACKLISTED_ADDRS: dict[int, list[int]] = {}
   TX_MSGS = [[MSG_DAS_steeringControl, 0], [MSG_APS_eacMonitor, 0], [MSG_DAS_Control, 0]]
 
   STANDSTILL_THRESHOLD = 0.1
@@ -116,6 +118,17 @@ class TestTeslaSafetyBase(common.CarSafetyTest, common.AngleSteeringSafetyTest, 
       "DI_autoparkState": autopark_state,
     }
     return self.packer.make_can_msg_safety("DI_state", 0, values)
+
+  def _cruise_state_msg(self, cruise_state, autopark_state=0):
+    values = {
+      "DI_cruiseState": cruise_state,
+      "DI_autoparkState": autopark_state,
+    }
+    return self.packer.make_can_msg_safety("DI_state", 0, values)
+
+  def _eac_monitor_msg(self, allow=1, bus=0):
+    values = {"APS_eacAllow": allow}
+    return self.packer.make_can_msg_safety("APS_eacMonitor", bus, values)
 
   def _long_control_msg(self, set_speed, acc_state=0, jerk_limits=(0, 0), accel_limits=(0, 0), aeb_event=0, bus=0):
     values = {
@@ -235,7 +248,9 @@ class TestTeslaSafetyBase(common.CarSafetyTest, common.AngleSteeringSafetyTest, 
     # We should still not respect Autopark if we disengage cruise
     self._rx(self._pcm_status_msg(False, self.autopark_states["SELFPARK_STARTED"]))
     self.assertFalse(self.safety.get_controls_allowed())
-    self.assertTrue(self._tx(self._angle_cmd_msg(0, False)))
+    # Autopark was not latched, so stock lateral is forwarded and OP 0x488 must not overlap it.
+    self.assertFalse(self._tx(self._angle_cmd_msg(0, False)))
+    self.assertEqual(0, self.safety.safety_fwd_hook(2, MSG_DAS_steeringControl))
     self.assertTrue(self._tx(self._long_control_msg(0, acc_state=self.acc_states["ACC_CANCEL_GENERIC_SILENT"])))
 
   def test_autopark_summon_behavior(self):
@@ -270,21 +285,71 @@ class TestTeslaSafetyBase(common.CarSafetyTest, common.AngleSteeringSafetyTest, 
                                          self.steer_control_types["ANGLE_CONTROL"])
       self.assertEqual(should_tx, self._tx(self._angle_cmd_msg(0, state=steer_control_type)))
 
-  def test_stock_lkas_passthrough(self):
-    # TODO: make these generic passthrough tests
+  def test_angle_cmd_when_disabled(self):
+    # When openpilot may not steer, all OP 0x488 is rejected so it cannot overlap stock passthrough.
+    self.safety.set_controls_allowed(False)
+    self._reset_angle_measurement(0)
+    self._set_prev_desired_angle(0)
+    self.assertFalse(self._tx(self._angle_cmd_msg(0, False)))
+    self.assertFalse(self._tx(self._angle_cmd_msg(0, True)))
+
+    # Once controls are allowed, inactive matching-angle commands and enabled commands work as usual.
+    self.safety.set_controls_allowed(True)
+    self.assertTrue(self._tx(self._angle_cmd_msg(0, False)))
+    self.assertTrue(self._tx(self._angle_cmd_msg(0, True)))
+
+  def test_stock_lateral_passthrough(self):
+    # Folded the old type-2-only LKAS passthrough into: forward stock 0x488 and 0x27D whenever
+    # openpilot may not steer, and reject OP TX of those addresses in the same state.
     no_lkas_msg = self._angle_cmd_msg(0, state=False)
-    no_lkas_msg_cam = self._angle_cmd_msg(0, state=True, bus=2)
+    no_lkas_msg_cam = self._angle_cmd_msg(0, state=False, bus=2)
     lkas_msg_cam = self._angle_cmd_msg(0, state=self.steer_control_types['LANE_KEEP_ASSIST'], bus=2)
+    eac_op = self._eac_monitor_msg(1, bus=0)
+    eac_cam = self._eac_monitor_msg(1, bus=2)
 
-    # stock system sends no LKAS -> no forwarding, and OP is allowed to TX
+    # Not steering: stock 0x488 (type 0 or LKAS) and 0x27D are forwarded; OP TX is rejected
+    self.safety.set_controls_allowed(False)
+    self.safety.set_alternative_experience(0)
     self.assertEqual(1, self._rx(no_lkas_msg_cam))
-    self.assertEqual(-1, self.safety.safety_fwd_hook(2, no_lkas_msg_cam.addr))
-    self.assertTrue(self._tx(no_lkas_msg))
-
-    # stock system sends LKAS -> forwarding, and OP is not allowed to TX
+    self.assertEqual(0, self.safety.safety_fwd_hook(2, no_lkas_msg_cam.addr))
     self.assertEqual(1, self._rx(lkas_msg_cam))
     self.assertEqual(0, self.safety.safety_fwd_hook(2, lkas_msg_cam.addr))
+    self.assertEqual(0, self.safety.safety_fwd_hook(2, eac_cam.addr))
     self.assertFalse(self._tx(no_lkas_msg))
+    self.assertFalse(self._tx(eac_op))
+
+    # Controls allowed: stock is blocked, OP TX is allowed
+    self.safety.set_controls_allowed(True)
+    self._reset_angle_measurement(0)
+    self._set_prev_desired_angle(0)
+    self.assertEqual(-1, self.safety.safety_fwd_hook(2, no_lkas_msg_cam.addr))
+    self.assertEqual(-1, self.safety.safety_fwd_hook(2, lkas_msg_cam.addr))
+    self.assertEqual(-1, self.safety.safety_fwd_hook(2, eac_cam.addr))
+    self.assertTrue(self._tx(no_lkas_msg))
+    self.assertTrue(self._tx(eac_op))
+
+    # Always-on lateral (cruise standby, not engaged) is treated as steering
+    self.safety.set_controls_allowed(False)
+    self.safety.set_alternative_experience(ALTERNATIVE_EXPERIENCE.ALWAYS_ON_LATERAL)
+    self.assertEqual(1, self._rx(self._cruise_state_msg(1)))  # STANDBY
+    self.assertTrue(self.safety.get_aol_allowed())
+    self.assertFalse(self.safety.get_controls_allowed())
+    self.assertEqual(-1, self.safety.safety_fwd_hook(2, no_lkas_msg_cam.addr))
+    self.assertEqual(-1, self.safety.safety_fwd_hook(2, eac_cam.addr))
+    self._reset_angle_measurement(0)
+    self._set_prev_desired_angle(0)
+    self.assertTrue(self._tx(no_lkas_msg))
+    self.assertTrue(self._tx(eac_op))
+
+    # AOL experience without acc main / lkas: openpilot may not steer
+    self.safety.set_alternative_experience(ALTERNATIVE_EXPERIENCE.ALWAYS_ON_LATERAL)
+    self.assertEqual(1, self._rx(self._cruise_state_msg(0)))  # UNAVAILABLE
+    self.assertFalse(self.safety.get_aol_allowed())
+    self.assertFalse(self.safety.get_controls_allowed())
+    self.assertEqual(0, self.safety.safety_fwd_hook(2, no_lkas_msg_cam.addr))
+    self.assertEqual(0, self.safety.safety_fwd_hook(2, eac_cam.addr))
+    self.assertFalse(self._tx(no_lkas_msg))
+    self.assertFalse(self._tx(eac_op))
 
   def test_angle_cmd_when_enabled(self):
     # We properly test lateral acceleration and jerk below
@@ -426,7 +491,7 @@ class TestTeslaStockSafety(TestTeslaSafetyBase):
 
 class TestTeslaLongitudinalSafety(TestTeslaSafetyBase):
   RELAY_MALFUNCTION_ADDRS = {0: (MSG_DAS_steeringControl, MSG_APS_eacMonitor, MSG_DAS_Control)}
-  FWD_BLACKLISTED_ADDRS = {2: [MSG_DAS_steeringControl, MSG_APS_eacMonitor, MSG_DAS_Control]}
+  FWD_BLACKLISTED_ADDRS = {2: [MSG_DAS_Control]}
 
   def setUp(self):
     super().setUp()

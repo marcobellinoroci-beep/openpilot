@@ -17,7 +17,7 @@ from opendbc.car.tesla.values import CAR, DBC
 BASELINE_SHA = "a80064be4fdf4b8765a5e9dec44d8a5c266f48a8"
 BASELINE_SOURCE_SHA256 = {
   "opendbc_repo/opendbc/car/tesla/coop_steering.py": "9c9d60bbfae2aaa0d8c1fca203a9fa19a14a19feef5aa89e85ecaa6f6502a9f0",
-  "opendbc_repo/opendbc/car/tesla/carcontroller.py": "1ef3cf646bc4b3c398bd12010e624b90e083426152d632fafb5b2e93fd3d8661",
+  "opendbc_repo/opendbc/car/tesla/carcontroller.py": "7494b7240398985f365f2f5528561a61c598b3d08c40eb356f09a1f6bc134c8c",
 }
 BASELINE_FIXTURE = Path(__file__).parent / "fixtures" / "coop_steering_baseline_a80064be.json"
 
@@ -226,3 +226,22 @@ def test_actual_actuators_and_steering_can_match_pinned_baseline_fixture():
 
     assert legacy_actuator_dict(candidate_actuators) == expected["actuators"]
     assert [[address, data.hex(), bus] for address, data, bus in candidate_can] == expected["can"]
+
+
+def test_inactive_lateral_does_not_send_steering_or_eac():
+  controller = make_controller(cooperative=False)
+  for i in range(20):
+    _, can = run_frame(controller, lat_active=False, now_nanos=1_000_000_000 + i * 10_000_000)
+    addrs = {addr for addr, _data, _bus in can}
+    assert 0x488 not in addrs
+    assert 0x27d not in addrs
+
+
+def test_active_lateral_sends_steering_and_eac():
+  controller = make_controller(cooperative=False)
+  seen = set()
+  for i in range(20):
+    _, can = run_frame(controller, lat_active=True, now_nanos=1_000_000_000 + i * 10_000_000)
+    seen |= {addr for addr, _data, _bus in can}
+  assert 0x488 in seen
+  assert 0x27d in seen

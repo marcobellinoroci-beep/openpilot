@@ -12,10 +12,14 @@ static bool tesla_stock_aeb = false;
 
 #define TESLA_STEERING_DISENGAGE_TORQUE 500  // cNm
 
-// Only rising edges while controls are not allowed are considered for these systems:
-// TODO: Only LKAS (non-emergency) is currently supported since we've only seen it
-static bool tesla_stock_lkas = false;
-static bool tesla_stock_lkas_prev = false;
+// Openpilot may command the EPS when PCM cruise has controls, or when always-on lateral is allowed.
+// The old stock-LKAS rising-edge check used:
+//   controls_allowed || (tesla_aol_screen_button && aol_allowed)
+// aol_allowed already covers the Tesla screen-button path (via lkas_on) and regular AOL, so any
+// aol_allowed is treated as steering. This avoids forwarding stock 0x488/0x27D while openpilot still steers.
+static bool tesla_openpilot_may_steer(void) {
+  return controls_allowed || aol_allowed;
+}
 
 // Only Summon is currently supported due to Autopark not setting Autopark state properly
 static bool tesla_autopark = false;
@@ -225,21 +229,8 @@ static void tesla_rx_hook(const CANPacket_t *msg) {
       tesla_stock_aeb = (msg->data[2] & 0x03U) == 1U;
     }
 
-    // DAS_steeringControl
-    if (msg->addr == 0x488U) {
-      int steering_control_type = msg->data[2] >> 6;
-      bool tesla_stock_lkas_now = steering_control_type == 2;  // "LANE_KEEP_ASSIST"
-
-      // Only consider rising edges while controls are not allowed
-      if (tesla_stock_lkas_now && !tesla_stock_lkas_prev &&
-          !(controls_allowed || (tesla_aol_screen_button && aol_allowed))) {
-        tesla_stock_lkas = true;
-      }
-      if (!tesla_stock_lkas_now) {
-        tesla_stock_lkas = false;
-      }
-      tesla_stock_lkas_prev = tesla_stock_lkas_now;
-    }
+    // DAS_steeringControl is forwarded from Autopilot when openpilot is not steering
+    // (see tesla_fwd_hook). No extra per-type tracking is required.
   }
 }
 
@@ -290,8 +281,15 @@ static bool tesla_tx_hook(const CANPacket_t *msg) {
       violation = true;
     }
 
-    if (tesla_stock_lkas) {
-      // Don't allow any steering commands when stock LKAS is active
+    // When openpilot is not steering, drop OP 0x488 so it cannot overlap stock passthrough.
+    if (!tesla_openpilot_may_steer()) {
+      violation = true;
+    }
+  }
+
+  // APS_eacMonitor: same overlap rule as DAS_steeringControl
+  if (msg->addr == 0x27dU) {
+    if (!tesla_openpilot_may_steer()) {
       violation = true;
     }
   }
@@ -347,14 +345,11 @@ static bool tesla_fwd_hook(int bus_num, int addr) {
 
   if (bus_num == 2) {
     if (!tesla_autopark) {
-      // APS_eacMonitor
-      if (addr == 0x27d) {
-        block_msg = true;
-      }
-
-      // DAS_steeringControl
-      if ((addr == 0x488) && !tesla_stock_lkas) {
-        block_msg = true;
+      // APS_eacMonitor and DAS_steeringControl: forward stock when openpilot is not steering
+      // so Tesla LDW / blind-spot / lane assist keep working while disengaged. Block them
+      // once openpilot may steer so only one commander is on the bus.
+      if ((addr == 0x27d) || (addr == 0x488)) {
+        block_msg = tesla_openpilot_may_steer();
       }
 
       // DAS_control
@@ -398,8 +393,6 @@ static safety_config tesla_init(uint16_t param) {
 #endif
 
   tesla_stock_aeb = false;
-  tesla_stock_lkas = false;
-  tesla_stock_lkas_prev = false;
   // we need to assume Autopark/Summon on startup since DI_state is a low freq msg.
   // this is so that we don't fault if starting while these systems are active
   tesla_autopark = true;
